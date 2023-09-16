@@ -3,8 +3,27 @@
     xmlns:tools="http://schemas.android.com/tools"
     tools:context="com.example.hive.view.MainActivity">
     <item
-        android:id="@+id/action_settings"
-        android:orderInCategory="100"
-        android:title="@string/action_settings"
-        app:showAsAction="never" />
+        android:id="@+id/ic_home"
+        android:icon="@drawable/ic_baseline_home"
+        android:title="Home"
+        />
+
+    <item
+        android:id="@+id/ic_create"
+        android:icon="@drawable/ic_baseline_add"
+        android:title="Create"
+        />
+
+    <item
+        android:id="@+id/ic_profile"
+        android:icon="@drawable/ic_baseline_person_24"
+        android:title="Profile"
+        />
+
+    <item
+        android:id="@+id/ic_calendar"
+        android:icon="@drawable/ic_baseline_calendar_today_24"
+        android:title="Calendar"
+        />
+
 </menu>
