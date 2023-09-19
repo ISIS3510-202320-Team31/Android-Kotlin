@@ -1,20 +1,15 @@
 package com.example.hive.view
 
 import android.os.Bundle
-import com.google.android.material.snackbar.Snackbar
 import androidx.appcompat.app.AppCompatActivity
-import androidx.navigation.findNavController
 import androidx.navigation.ui.AppBarConfiguration
-import androidx.navigation.ui.navigateUp
-import androidx.navigation.ui.setupActionBarWithNavController
 import android.view.Menu
-import android.view.MenuItem
+import androidx.fragment.app.Fragment
 import com.example.hive.R
 import com.example.hive.databinding.ActivityMainBinding
 
 class MainActivity : AppCompatActivity() {
 
-    private lateinit var appBarConfiguration: AppBarConfiguration
     private lateinit var binding: ActivityMainBinding
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -23,11 +18,29 @@ class MainActivity : AppCompatActivity() {
         binding = ActivityMainBinding.inflate(layoutInflater)
         setContentView(binding.root)
 
-        setSupportActionBar(binding.toolbar)
+        replaceFragment(FirstFragment())
 
-        val navController = findNavController(R.id.nav_host_fragment_content_main)
-        appBarConfiguration = AppBarConfiguration(navController.graph)
-        setupActionBarWithNavController(navController, appBarConfiguration)
+        binding.bottomNavigation.setOnItemSelectedListener {
+            when(it.itemId) {
+                R.id.ic_home -> {
+                    replaceFragment(FirstFragment())
+                    true
+                }
+                R.id.ic_create -> {
+                    replaceFragment(EventCreationFragment())
+                    true
+                }
+                R.id.ic_calendar -> {
+                    replaceFragment(FirstFragment())
+                    true
+                }
+                R.id.ic_profile -> {
+                    replaceFragment(FirstFragment())
+                    true
+                }
+                else -> false
+            }
+        }
 
     }
 
@@ -37,10 +50,11 @@ class MainActivity : AppCompatActivity() {
         return true
     }
 
-
-    override fun onSupportNavigateUp(): Boolean {
-        val navController = findNavController(R.id.nav_host_fragment_content_main)
-        return navController.navigateUp(appBarConfiguration)
-                || super.onSupportNavigateUp()
+    private fun replaceFragment(fragment: Fragment) {
+        if (fragment != null) {
+            val transaction = supportFragmentManager.beginTransaction()
+            transaction.replace(R.id.fragment_container, fragment)
+            transaction.commit()
+        }
     }
 }
