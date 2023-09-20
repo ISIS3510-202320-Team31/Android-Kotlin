@@ -8,6 +8,7 @@
             <PersistentState>
               <option name="children">
                 <map>
+
                   <entry key="confirmationStep">
                     <value>
                       <PersistentState>
@@ -19,6 +20,7 @@
                       </PersistentState>
                     </value>
                   </entry>
+
                   <entry key="imageAssetPanel">
                     <value>
                       <PersistentState>
@@ -35,6 +37,7 @@
                                             <option name="values">
                                               <map>
                                                 <entry key="color" value="000000" />
+
                                                 <entry key="imagePath" value="C:\Users\dania\AppData\Local\Temp\ic_android_black_24dp.xml" />
                                                 <entry key="opacityPercent" value="60" />
                                               </map>
@@ -50,6 +53,7 @@
                                                 <entry key="color" value="000000" />
                                                 <entry key="imagePath" value="C:\Users\dania\Downloads\HIVE_LOGO\HIVE_LOGO_small.png" />
                                                 <entry key="opacityPercent" value="60" />
+
                                               </map>
                                             </option>
                                           </PersistentState>
@@ -61,7 +65,9 @@
                                             <option name="values">
                                               <map>
                                                 <entry key="color" value="000000" />
+
                                                 <entry key="opacityPercent" value="60" />
+
                                               </map>
                                             </option>
                                           </PersistentState>
@@ -73,7 +79,9 @@
                                             <option name="values">
                                               <map>
                                                 <entry key="color" value="000000" />
+
                                                 <entry key="opacityPercent" value="60" />
+
                                               </map>
                                             </option>
                                           </PersistentState>
@@ -81,6 +89,7 @@
                                       </entry>
                                     </map>
                                   </option>
+
                                   <option name="values">
                                     <map>
                                       <entry key="assetType" value="IMAGE" />
@@ -88,6 +97,7 @@
                                       <entry key="outputName" value="hive_small_logo" />
                                     </map>
                                   </option>
+
                                 </PersistentState>
                               </value>
                             </entry>
@@ -101,7 +111,9 @@
                                           <PersistentState>
                                             <option name="values">
                                               <map>
+
                                                 <entry key="imagePath" value="C:\Users\dania\AppData\Local\Temp\ic_android_black_24dp.xml" />
+
                                               </map>
                                             </option>
                                           </PersistentState>
@@ -113,6 +125,10 @@
                                             <option name="values">
                                               <map>
                                                 <entry key="color" value="000000" />
+
+                                                <entry key="imagePath" value="C:\Users\lavam\OneDrive\Escritorio\MOVILES\HIVE_LOGO_small.png" />
+                                                <entry key="trimmed" value="true" />
+
                                               </map>
                                             </option>
                                           </PersistentState>
@@ -142,6 +158,13 @@
                                       </entry>
                                     </map>
                                   </option>
+
+                                  <option name="values">
+                                    <map>
+                                      <entry key="outputName" value="ic_hive_logo" />
+                                    </map>
+                                  </option>
+
                                 </PersistentState>
                               </value>
                             </entry>
@@ -156,7 +179,10 @@
                                             <option name="values">
                                               <map>
                                                 <entry key="color" value="000000" />
+
                                                 <entry key="imagePath" value="C:\Users\dania\AppData\Local\Temp\ic_android_black_24dp.xml" />
+
+
                                               </map>
                                             </option>
                                           </PersistentState>
@@ -200,7 +226,9 @@
                                             <option name="values">
                                               <map>
                                                 <entry key="color" value="000000" />
+
                                                 <entry key="imagePath" value="C:\Users\dania\AppData\Local\Temp\ic_android_black_24dp.xml" />
+
                                               </map>
                                             </option>
                                           </PersistentState>
@@ -264,7 +292,9 @@
                                           <PersistentState>
                                             <option name="values">
                                               <map>
+
                                                 <entry key="imagePath" value="C:\Users\dania\AppData\Local\Temp\ic_android_black_24dp.xml" />
+
                                               </map>
                                             </option>
                                           </PersistentState>
@@ -310,11 +340,13 @@
                             </entry>
                           </map>
                         </option>
+
                         <option name="values">
                           <map>
                             <entry key="outputIconType" value="ACTIONBAR" />
                           </map>
                         </option>
+
                       </PersistentState>
                     </value>
                   </entry>
