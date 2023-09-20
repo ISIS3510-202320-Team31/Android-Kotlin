@@ -18,7 +18,7 @@ class MainActivity : AppCompatActivity() {
         binding = ActivityMainBinding.inflate(layoutInflater)
         setContentView(binding.root)
 
-        replaceFragment(FirstFragment())
+        replaceFragment(SignUpFragment())
 
         binding.bottomNavigation.setOnItemSelectedListener {
             when(it.itemId) {
