@@ -1,0 +1,267 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.cardview.widget.CardView
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    app:cardBackgroundColor="#F8F8F8">
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:orientation="vertical">
+
+        <TextView
+            android:id="@+id/title"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:padding="5dp"
+            android:textAlignment="center"
+            android:background="#faf4b5"
+            android:text="Partido Futbol"
+            android:textSize="20dp"
+            android:textStyle="bold"
+            android:textColor="#25221F" />
+
+        <ImageView
+            android:id="@+id/imagen"
+            android:layout_width="match_parent"
+            android:layout_height="100dp"
+            android:src="@drawable/ic_baseline_person_24"
+            app:layout_constraintTop_toBottomOf="@+id/title" />
+
+        <LinearLayout
+            android:id="@+id/info"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="10dp"
+            android:orientation="horizontal"
+            app:layout_constraintTop_toBottomOf="@+id/imagen">
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:orientation="vertical">
+
+                <TextView
+                    android:id="@+id/creador"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:paddingLeft="10dp"
+                    android:textAlignment="viewStart"
+                    android:text="Cristian Sachez"
+                    android:textSize="15dp"
+                    android:textStyle="bold"
+                    android:textColor="#707070" />
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:layout_weight="1"
+                    android:orientation="horizontal">
+
+                    <TextView
+                        android:id="@+id/fechaText"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_weight="1"
+                        android:paddingLeft="10dp"
+                        android:textAlignment="viewStart"
+                        android:text="Fecha"
+                        android:textColor="#707070"
+                        android:textSize="15dp"
+                        android:textStyle="bold" />
+
+                    <TextView
+                        android:id="@+id/fecha"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_weight="1"
+                        android:textAlignment="viewStart"
+                        android:text="12/08/23"
+                        android:textColor="#25221F"
+                        android:textSize="15dp"
+                        android:textStyle="bold" />
+
+                </LinearLayout>
+
+            </LinearLayout>
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:orientation="vertical">
+
+                <TextView
+                    android:id="@+id/categorias"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:paddingLeft="10dp"
+                    android:textAlignment="viewStart"
+                    android:text="Categorias"
+                    android:textSize="15dp"
+                    android:textStyle="bold"
+                    android:textColor="#25221F" />
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:layout_weight="1"
+                    android:orientation="horizontal">
+                    <TextView
+                        android:id="@+id/categoria1"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:paddingLeft="10dp"
+                        android:textAlignment="viewStart"
+                        android:background="@drawable/round_grey"
+                        android:text="Deporte"
+                        android:textSize="15dp"
+                        android:textStyle="bold"
+                        android:textColor="#F8F8F8" />
+                    <TextView
+                        android:id="@+id/categoria2"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:paddingLeft="10dp"
+                        android:textAlignment="viewStart"
+                        android:background="@drawable/round_grey"
+                        android:text="Grupos"
+                        android:textSize="15dp"
+                        android:textStyle="bold"
+                        android:textColor="#F8F8F8" />
+                </LinearLayout>
+
+            </LinearLayout>
+
+        </LinearLayout>
+
+        <TextView
+            android:id="@+id/descripcion"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:textAlignment="center"
+            android:layout_marginTop="10dp"
+            android:padding="10dp"
+            android:background="#faf4b5"
+            android:text="Este evento promete ser una experiencia única y emocionante para todos los amantes del fútbol y aquellos que simplemente quieren disfrutar de un día lleno de diversión deportiva. Dos equipos apasionados se enfrentarán en un partido que promete ser una auténtica batalla en el campo de juego."
+            android:textSize="10dp"
+            android:textColor="#25221F"
+            app:layout_constraintTop_toBottomOf="@+id/info"/>
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_margin="10dp"
+            android:orientation="horizontal">
+
+            <ImageView
+                android:id="@+id/imgPersonas"
+                android:layout_width="wrap_content"
+                android:layout_height="match_parent"
+                android:src="@drawable/ic_baseline_person_24"/>
+
+            <TextView
+                android:id="@+id/personas"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:textAlignment="viewStart"
+                android:text="0/20 personas"
+                android:textColor="#25221F"
+                android:textSize="10dp"
+                android:textStyle="bold" />
+
+
+            <ImageView
+                android:id="@+id/imgRestriccion"
+                android:layout_width="wrap_content"
+                android:layout_height="match_parent"
+                android:src="@drawable/ic_baseline_add"/>
+
+            <TextView
+                android:id="@+id/restriccion"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:textAlignment="viewStart"
+                android:text="Sin restriccion"
+                android:textColor="#25221F"
+                android:textSize="10dp"
+                android:textStyle="bold" />
+
+        </LinearLayout>
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:layout_weight="1"
+            android:layout_marginRight="10dp"
+            android:layout_marginLeft="10dp"
+            android:orientation="horizontal">
+
+            <ImageView
+                android:id="@+id/imgLugar"
+                android:layout_width="wrap_content"
+                android:layout_height="match_parent"
+                android:src="@drawable/ic_baseline_add"/>
+
+            <TextView
+                android:id="@+id/lugar"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:textAlignment="viewStart"
+                android:text="Universidad de los andes “La Caneca”"
+                android:textColor="#25221F"
+                android:textSize="10dp"
+                android:textStyle="bold" />
+
+        </LinearLayout>
+        <TextView
+            android:id="@+id/links"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_margin="10dp"
+            android:padding="5dp"
+            android:textAlignment="center"
+            android:background="@drawable/round_grey"
+            android:text="Links de Interes"
+            android:textSize="15dp"
+            android:textStyle="bold"
+            android:textColor="#F8F8F8" />
+        <TextView
+            android:id="@+id/link1"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:textAlignment="center"
+            android:text="https://web.whatsapp.com/GrupoFutbol"
+            android:textColor="#2196F3"
+            android:textSize="10dp"
+            android:textStyle="bold" />
+        <TextView
+            android:id="@+id/link2"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:textAlignment="center"
+            android:text="https://uniandes.edu.co/GrupoFutbol"
+            android:textColor="#2196F3"
+            android:textSize="10dp"
+            android:textStyle="bold" />
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:gravity="center"
+            android:orientation="horizontal">
+            <Button
+                android:id="@+id/submitButton"
+                android:backgroundTint="#2196F3"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Unirse" />
+        </LinearLayout>
+    </LinearLayout>
+</androidx.cardview.widget.CardView>
