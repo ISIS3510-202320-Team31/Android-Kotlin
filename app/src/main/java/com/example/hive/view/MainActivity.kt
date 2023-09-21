@@ -35,7 +35,7 @@ class MainActivity : AppCompatActivity() {
                     true
                 }
                 R.id.ic_profile -> {
-                    replaceFragment(FirstFragment())
+                    replaceFragment(UserProfileFragment())
                     true
                 }
                 else -> false
