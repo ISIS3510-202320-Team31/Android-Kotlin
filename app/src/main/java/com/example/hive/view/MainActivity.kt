@@ -31,7 +31,7 @@ class MainActivity : AppCompatActivity() {
                     true
                 }
                 R.id.ic_calendar -> {
-                    replaceFragment(FirstFragment())
+                    replaceFragment(CalendarFragment())
                     true
                 }
                 R.id.ic_profile -> {
