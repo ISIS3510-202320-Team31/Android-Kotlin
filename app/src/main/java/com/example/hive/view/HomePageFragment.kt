@@ -1,5 +1,6 @@
 package com.example.hive.view
 
+import android.app.Dialog
 import androidx.lifecycle.ViewModelProvider
 import android.os.Bundle
 import androidx.fragment.app.Fragment
@@ -27,7 +28,13 @@ class HomePageFragment : Fragment() {
     override fun onActivityCreated(savedInstanceState: Bundle?) {
         super.onActivityCreated(savedInstanceState)
         viewModel = ViewModelProvider(this).get(HomePageViewModel::class.java)
-        // TODO: Use the ViewModel
+
+        val cardView = requireView().findViewById<View>(R.id.eventCardView)
+        cardView.setOnClickListener {
+            val dialog = Dialog(requireContext())
+            dialog.setContentView(R.layout.fragment_event_detail)
+            dialog.show()
+        }
     }
 
 }
