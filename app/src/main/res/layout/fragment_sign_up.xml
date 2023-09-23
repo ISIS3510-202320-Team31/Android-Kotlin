@@ -10,6 +10,7 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content">
 
+        <!-- First two views (ImageView and TextView) without the CardView -->
         <ImageView
             android:id="@+id/imageView"
             android:layout_width="150dp"
@@ -24,113 +25,142 @@
             android:id="@+id/textViewSignUp"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="Sign Up"
+            android:text="HIVE!"
             android:textSize="24sp"
             android:textStyle="bold"
             app:layout_constraintTop_toBottomOf="@+id/imageView"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintEnd_toEndOf="parent" />
 
-        <EditText
-            android:id="@+id/editTextName"
+        <!-- Use CardView for the remaining views -->
+        <androidx.cardview.widget.CardView
+            android:id="@+id/cardView"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
-            android:hint="Nombre"
-            android:inputType="textPersonName"
+            android:layout_marginHorizontal="16dp"
+            app:cardCornerRadius="16dp"
+            app:cardElevation="4dp"
             app:layout_constraintTop_toBottomOf="@+id/textViewSignUp"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintEnd_toEndOf="parent"
-            android:layout_marginTop="0dp"
-            android:layout_marginHorizontal="16dp" />
+            android:layout_marginTop="16dp">
 
-        <EditText
-            android:id="@+id/editTextEmail"
-            android:layout_width="0dp"
-            android:layout_height="wrap_content"
-            android:hint="Email"
-            android:inputType="textEmailAddress"
-            app:layout_constraintTop_toBottomOf="@+id/editTextName"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintEnd_toEndOf="parent"
-            android:layout_marginTop="16dp"
-            android:layout_marginHorizontal="16dp" />
+            <androidx.constraintlayout.widget.ConstraintLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content">
 
-        <EditText
-            android:id="@+id/editTextPassword"
-            android:layout_width="0dp"
-            android:layout_height="wrap_content"
-            android:hint="Contraseña"
-            android:inputType="textPassword"
-            app:layout_constraintTop_toBottomOf="@+id/editTextEmail"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintEnd_toEndOf="parent"
-            android:layout_marginTop="16dp"
-            android:layout_marginHorizontal="16dp" />
+                <!-- Add your EditText, Spinner, DatePicker, and Button here -->
+                <EditText
+                    android:id="@+id/editTextName"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:hint="Nombre"
+                    android:inputType="textPersonName"
+                    app:layout_constraintTop_toTopOf="parent"
+                    app:layout_constraintStart_toStartOf="parent"
+                    app:layout_constraintEnd_toEndOf="parent"
+                    android:layout_marginTop="16dp"
+                    android:layout_marginHorizontal="16dp" />
 
-        <EditText
-            android:id="@+id/editTextVerifyPassword"
-            android:layout_width="0dp"
-            android:layout_height="wrap_content"
-            android:hint="Confirmar Contraseña"
-            android:inputType="textPassword"
-            app:layout_constraintTop_toBottomOf="@+id/editTextPassword"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintEnd_toEndOf="parent"
-            android:layout_marginTop="16dp"
-            android:layout_marginHorizontal="16dp" />
+                <EditText
+                    android:id="@+id/editTextEmail"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:hint="Email"
+                    android:inputType="textEmailAddress"
+                    app:layout_constraintTop_toBottomOf="@+id/editTextName"
+                    app:layout_constraintStart_toStartOf="parent"
+                    app:layout_constraintEnd_toEndOf="parent"
+                    android:layout_marginTop="16dp"
+                    android:layout_marginHorizontal="16dp" />
 
-        <Spinner
-            android:id="@+id/spinnerCareer"
-            android:layout_width="0dp"
-            android:layout_height="wrap_content"
-            android:hint="Choose a Career"
-            app:layout_constraintTop_toBottomOf="@+id/editTextVerifyPassword"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintEnd_toEndOf="parent"
-            android:layout_marginTop="16dp"
-            android:layout_marginHorizontal="16dp" />
+                <EditText
+                    android:id="@+id/editTextPassword"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:hint="Contraseña"
+                    android:inputType="textPassword"
+                    app:layout_constraintTop_toBottomOf="@+id/editTextEmail"
+                    app:layout_constraintStart_toStartOf="parent"
+                    app:layout_constraintEnd_toEndOf="parent"
+                    android:layout_marginTop="16dp"
+                    android:layout_marginHorizontal="16dp" />
 
-        <TextView
-            android:id="@+id/textViewBirthdateLabel"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="Fecha de nacimiento"
-            app:layout_constraintTop_toBottomOf="@+id/spinnerCareer"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintEnd_toEndOf="parent"
-            android:textSize="18sp"
-            android:textStyle="bold"
-            android:layout_marginTop="16dp"
-            android:layout_marginHorizontal="16dp" />
+                <EditText
+                    android:id="@+id/editTextVerifyPassword"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:hint="Confirmar Contraseña"
+                    android:inputType="textPassword"
+                    app:layout_constraintTop_toBottomOf="@+id/editTextPassword"
+                    app:layout_constraintStart_toStartOf="parent"
+                    app:layout_constraintEnd_toEndOf="parent"
+                    android:layout_marginTop="16dp"
+                    android:layout_marginHorizontal="16dp" />
 
-        <DatePicker
-            android:id="@+id/datePickerBirthdate"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:calendarViewShown="false"
-            android:datePickerMode="spinner"
-            android:spinnersShown="true"
-            app:layout_constraintTop_toBottomOf="@+id/textViewBirthdateLabel"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintEnd_toEndOf="parent"
-            android:layout_marginTop="10dp" />
+                <Spinner
+                    android:id="@+id/spinnerCareer"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:hint="Choose a Career"
+                    app:layout_constraintTop_toBottomOf="@+id/editTextVerifyPassword"
+                    app:layout_constraintStart_toStartOf="parent"
+                    app:layout_constraintEnd_toEndOf="parent"
+                    android:layout_marginTop="16dp"
+                    android:layout_marginHorizontal="16dp" />
 
-        <Button
-            android:id="@+id/buttonSignUp"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="Sign Up"
-            app:layout_constraintTop_toBottomOf="@+id/datePickerBirthdate"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintEnd_toEndOf="parent"
-            android:layout_marginTop="16dp" />
+                <TextView
+                    android:id="@+id/textViewBirthdateLabel"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="Fecha de nacimiento"
+                    app:layout_constraintTop_toBottomOf="@+id/spinnerCareer"
+                    app:layout_constraintStart_toStartOf="parent"
+                    app:layout_constraintEnd_toEndOf="parent"
+                    android:textSize="18sp"
+                    android:textStyle="bold"
+                    android:layout_marginTop="16dp"
+                    android:layout_marginHorizontal="16dp" />
+
+                <DatePicker
+                    android:id="@+id/datePickerBirthdate"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:calendarViewShown="false"
+                    android:datePickerMode="spinner"
+                    android:spinnersShown="true"
+                    app:layout_constraintTop_toBottomOf="@+id/textViewBirthdateLabel"
+                    app:layout_constraintStart_toStartOf="parent"
+                    app:layout_constraintEnd_toEndOf="parent"
+                    android:layout_marginTop="10dp" />
+
+                <Button
+                    android:id="@+id/buttonSignUp"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="Registrate"
+                    app:layout_constraintTop_toBottomOf="@+id/datePickerBirthdate"
+                    app:layout_constraintStart_toStartOf="parent"
+                    app:layout_constraintEnd_toEndOf="parent"
+                    android:layout_marginTop="16dp"
+                    android:backgroundTint="@color/blueButtonColor"/>
+
+                <!-- Last space without the CardView -->
+                <Space
+                    android:id="@+id/space1"
+                    android:layout_width="match_parent"
+                    android:layout_height="30dp"
+                    android:visibility="invisible"
+                    app:layout_constraintTop_toBottomOf="@id/buttonSignUp"/>
+
+            </androidx.constraintlayout.widget.ConstraintLayout>
+        </androidx.cardview.widget.CardView>
 
         <Space
             android:layout_width="match_parent"
             android:layout_height="30dp"
             android:visibility="invisible"
-            app:layout_constraintTop_toBottomOf="@+id/buttonSignUp"/>
+            app:layout_constraintTop_toBottomOf="@+id/cardView"/>
 
     </androidx.constraintlayout.widget.ConstraintLayout>
 </ScrollView>
-
