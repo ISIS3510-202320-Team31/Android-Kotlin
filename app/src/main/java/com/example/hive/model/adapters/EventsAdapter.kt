@@ -1,8 +1,10 @@
 package com.example.hive.model.adapters
 
+import android.app.Dialog
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.widget.TextView
 import androidx.recyclerview.widget.AsyncListDiffer
 import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.RecyclerView
@@ -42,6 +44,7 @@ class EventsAdapter : RecyclerView.Adapter<EventsAdapter.MListHolder>() {
 
     override fun onBindViewHolder(holder: MListHolder, position: Int) {
         val event = differ.currentList[position]
+        val cardView = holder.itemView.findViewById<androidx.cardview.widget.CardView>(R.id.eventCardView)
 
         // Change date format to "dd/mm/yyyy"
         val date = event.date.split("-")
@@ -52,6 +55,34 @@ class EventsAdapter : RecyclerView.Adapter<EventsAdapter.MListHolder>() {
             this.findViewById<android.widget.TextView>(R.id.nombre).text = event.name
             this.findViewById<android.widget.TextView>(R.id.descripcion).text = event.description
             this.findViewById<android.widget.TextView>(R.id.fecha).text = newDate
+        }
+
+        // Add a click listener to the card view
+        cardView.setOnClickListener {
+            val detailDialog = Dialog(holder.itemView.context)
+            detailDialog.setContentView(R.layout.fragment_event_detail)
+
+            val eventNameTextView = detailDialog.findViewById<TextView>(R.id.title)
+            eventNameTextView.text = event.name
+
+            val eventCreatorTextView = detailDialog.findViewById<TextView>(R.id.creador)
+            eventCreatorTextView.text = event.creator
+
+            val eventDateTextView = detailDialog.findViewById<TextView>(R.id.fecha)
+            eventDateTextView.text = newDate
+
+            val eventDescriptionTextView = detailDialog.findViewById<TextView>(R.id.descripcion)
+            eventDescriptionTextView.text = event.description
+
+            val eventLugarTextView = detailDialog.findViewById<TextView>(R.id.lugar)
+            eventLugarTextView.text = event.place
+
+            val eventParticipantTextView = detailDialog.findViewById<TextView>(R.id.personas)
+            val stringParticipant = "${event.participants.size} / ${event.num_participants} personas"
+            eventParticipantTextView.text = stringParticipant
+
+            // Show the detail dialog
+            detailDialog.show()
         }
 
     }
