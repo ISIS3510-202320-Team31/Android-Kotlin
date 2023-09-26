@@ -84,11 +84,9 @@
 
         <ImageView
             android:id="@+id/imagen"
-            android:layout_width="match_parent"
-            android:layout_height="match_parent"
-            android:layout_weight="2"
+            android:layout_width="100dp"
+            android:layout_height="100dp"
             android:src="@drawable/ic_baseline_person_24" />
-
     </LinearLayout>
 
 </androidx.cardview.widget.CardView>

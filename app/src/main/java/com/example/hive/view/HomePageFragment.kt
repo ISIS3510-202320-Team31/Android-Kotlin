@@ -7,6 +7,7 @@ import androidx.fragment.app.Fragment
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.widget.ProgressBar
 import android.widget.Toast
 import androidx.lifecycle.Observer
 import androidx.recyclerview.widget.LinearLayoutManager
@@ -47,13 +48,17 @@ class HomePageFragment : Fragment() {
         recyclerView.layoutManager = LinearLayoutManager(requireContext())
         recyclerView.adapter = eventsAdapter
 
+        val loadingProgressBar = view.findViewById<ProgressBar>(R.id.loadingProgressBar)
+
         // Observe LiveData from ViewModel
         viewModelEvent.eventsPage.observe(viewLifecycleOwner, Observer { resource ->
             when (resource) {
                 is Resource.Loading<*> -> {
-                    // Handle loading state (e.g., show a progress bar)
+                    // Show progress bar
+                    loadingProgressBar.visibility = View.VISIBLE
                 }
                 is Resource.Success<*> -> {
+                    loadingProgressBar.visibility = View.GONE
                     // Update the RecyclerView with the list of events
                     resource.data?.let { eventsAdapter.submitList(it) }
                 }
