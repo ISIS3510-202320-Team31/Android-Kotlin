@@ -37,6 +37,9 @@ data class Event
     @SerializedName("creator_id")
     var creator_id: String,
 
+    @SerializedName("creator")
+    var creator: String,
+
     @SerializedName("participants")
     var participants: List<Participant>,
 )

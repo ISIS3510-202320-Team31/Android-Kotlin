@@ -7,6 +7,6 @@ import retrofit2.http.Query
 
 interface ApiInterface {
 
-    @GET("/events")
+    @GET("/events/")
     suspend fun getEvents(): Response<List<EventResponse>>
 }
