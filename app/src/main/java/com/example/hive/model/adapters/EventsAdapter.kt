@@ -38,6 +38,7 @@ class EventsAdapter : RecyclerView.Adapter<EventsAdapter.MListHolder>() {
         )
     }
 
+
     override fun getItemCount(): Int {
         return differ.currentList.size
     }
@@ -65,11 +66,24 @@ class EventsAdapter : RecyclerView.Adapter<EventsAdapter.MListHolder>() {
             val eventNameTextView = detailDialog.findViewById<TextView>(R.id.title)
             eventNameTextView.text = event.name
 
+            val eventEstadoTextView = detailDialog.findViewById<TextView>(R.id.estado)
+            if (event.state) {
+                eventEstadoTextView.text = "Activo"
+            } else {
+                eventEstadoTextView.text = "Inactivo"
+            }
+
+            val eventCategoryTextView = detailDialog.findViewById<TextView>(R.id.categoria)
+            eventCategoryTextView.text = event.category
+
             val eventCreatorTextView = detailDialog.findViewById<TextView>(R.id.creador)
             eventCreatorTextView.text = event.creator
 
             val eventDateTextView = detailDialog.findViewById<TextView>(R.id.fecha)
             eventDateTextView.text = newDate
+
+            val eventDuracionTextView = detailDialog.findViewById<TextView>(R.id.duracion)
+            eventDuracionTextView.text = event.duration.toString()+" minutos"
 
             val eventDescriptionTextView = detailDialog.findViewById<TextView>(R.id.descripcion)
             eventDescriptionTextView.text = event.description
