@@ -1,0 +1,135 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.constraintlayout.widget.ConstraintLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent">
+
+    <androidx.cardview.widget.CardView
+        android:id="@+id/profileCard"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="50dp"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintWidth_percent="0.7"
+        app:cardBackgroundColor="#25221F">
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            android:layout_marginBottom="30dp"
+            android:layout_marginTop="20dp">
+
+            <ImageView
+                android:id="@+id/profilePicture"
+                android:layout_width="120dp"
+                android:layout_height="120dp"
+                android:layout_gravity="center"
+                android:src="@drawable/ic_baseline_person_24"
+                android:scaleType="centerCrop" />
+
+            <TextView
+                android:id="@+id/userName"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="John Doe"
+                android:layout_gravity="center"
+                android:textSize="18sp"
+                android:textStyle="bold"
+                android:textColor="#F8F8F8"/>
+
+        </LinearLayout>
+
+    </androidx.cardview.widget.CardView>
+
+    <LinearLayout
+        android:id="@+id/emailLayout"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="60dp"
+        android:orientation="vertical"
+        app:layout_constraintTop_toBottomOf="@+id/profileCard"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent">
+
+        <TextView
+            android:id="@+id/emailLabel"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Correo:"
+            android:textStyle="bold"
+            android:layout_gravity="start"
+            android:gravity="start"
+            android:textColor="@color/textColor"
+        />
+
+        <TextView
+            android:id="@+id/email"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="john.doe@email.com"
+            android:layout_marginTop="5dp"
+            android:layout_gravity="start"
+            android:gravity="start"
+            android:textColor="@color/textColor"
+        />
+
+        <TextView
+            android:id="@+id/timeSpentLabel"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Tiempo usado en la aplicación:"
+            android:textStyle="bold"
+            android:layout_marginTop="40dp"
+            android:layout_gravity="start"
+            android:gravity="start"
+            android:textColor="@color/textColor"/>
+
+        <TextView
+            android:id="@+id/timeSpent"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="5 horas"
+            android:layout_gravity="start"
+            android:gravity="start"
+            android:layout_marginTop="5dp"
+            android:textColor="@color/textColor"/>
+
+        <TextView
+            android:id="@+id/eventsJoinedLabel"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Eventos a los que perteneces:"
+            android:textStyle="bold"
+            android:layout_marginTop="40dp"
+            android:textColor="@color/textColor"/>
+
+        <TextView
+            android:id="@+id/eventsJoined"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="10"
+            android:layout_marginTop="5dp"
+            android:textColor="@color/textColor"/>
+
+    </LinearLayout>
+
+
+    <Button
+        android:id="@+id/signOutButton"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Cerrar Sesión"
+        app:layout_constraintTop_toBottomOf="@+id/emailLayout"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintBottom_toBottomOf="parent"
+        android:backgroundTint="@color/blueButtonColor"
+
+        />
+
+</androidx.constraintlayout.widget.ConstraintLayout>

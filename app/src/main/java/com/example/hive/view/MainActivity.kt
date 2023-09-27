@@ -18,7 +18,7 @@ class MainActivity : AppCompatActivity() {
         binding = ActivityMainBinding.inflate(layoutInflater)
         setContentView(binding.root)
 
-        replaceFragment(FirstFragment())
+        replaceFragment(LoginFragment())
 
         binding.bottomNavigation.setOnItemSelectedListener {
             when(it.itemId) {
@@ -31,11 +31,11 @@ class MainActivity : AppCompatActivity() {
                     true
                 }
                 R.id.ic_calendar -> {
-                    replaceFragment(FirstFragment())
+                    replaceFragment(CalendarFragment())
                     true
                 }
                 R.id.ic_profile -> {
-                    replaceFragment(FirstFragment())
+                    replaceFragment(UserProfileFragment())
                     true
                 }
                 else -> false
