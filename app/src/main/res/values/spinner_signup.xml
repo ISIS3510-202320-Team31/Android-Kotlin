@@ -38,4 +38,11 @@
         <item>Química</item>
         <item>Otro</item>
     </string-array>
+    <string-array name="createEvent">
+        <item>Académico</item>
+        <item>Cultural</item>
+        <item>Deportivo</item>
+        <item>Entretenimiento</item>
+        <item>Otro</item>
+    </string-array>
 </resources>
