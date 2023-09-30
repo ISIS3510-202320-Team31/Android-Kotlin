@@ -10,7 +10,6 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content">
 
-        <!-- First two views (ImageView and TextView) without the CardView -->
         <ImageView
             android:id="@+id/imageView"
             android:layout_width="150dp"
@@ -32,7 +31,6 @@
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintEnd_toEndOf="parent" />
 
-        <!-- Use CardView for the remaining views -->
         <androidx.cardview.widget.CardView
             android:id="@+id/cardView"
             android:layout_width="0dp"
@@ -49,7 +47,6 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content">
 
-                <!-- Add your EditText, Spinner, DatePicker, and Button here -->
                 <EditText
                     android:id="@+id/editTextName"
                     android:layout_width="0dp"
@@ -63,12 +60,24 @@
                     android:layout_marginHorizontal="16dp" />
 
                 <EditText
+                    android:id="@+id/editTextUsername"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:hint="Nombre de usuario"
+                    android:inputType="textPersonName"
+                    app:layout_constraintTop_toBottomOf="@+id/editTextName"
+                    app:layout_constraintStart_toStartOf="parent"
+                    app:layout_constraintEnd_toEndOf="parent"
+                    android:layout_marginTop="16dp"
+                    android:layout_marginHorizontal="16dp" />
+
+                <EditText
                     android:id="@+id/editTextEmail"
                     android:layout_width="0dp"
                     android:layout_height="wrap_content"
                     android:hint="Email"
                     android:inputType="textEmailAddress"
-                    app:layout_constraintTop_toBottomOf="@+id/editTextName"
+                    app:layout_constraintTop_toBottomOf="@+id/editTextUsername"
                     app:layout_constraintStart_toStartOf="parent"
                     app:layout_constraintEnd_toEndOf="parent"
                     android:layout_marginTop="16dp"
@@ -98,15 +107,31 @@
                     android:layout_marginTop="16dp"
                     android:layout_marginHorizontal="16dp" />
 
+                <TextView
+                    android:id="@+id/textViewCareerLabel"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="Carrera"
+                    app:layout_constraintTop_toBottomOf="@+id/editTextVerifyPassword"
+                    app:layout_constraintStart_toStartOf="parent"
+                    app:layout_constraintEnd_toEndOf="parent"
+                    android:textSize="15sp"
+                    android:textStyle="bold"
+                    android:layout_marginTop="30dp"
+                    android:layout_marginHorizontal="16dp" />
+
                 <Spinner
                     android:id="@+id/spinnerCareer"
                     android:layout_width="0dp"
                     android:layout_height="wrap_content"
+                    android:spinnerMode="dialog"
                     android:hint="Choose a Career"
-                    app:layout_constraintTop_toBottomOf="@+id/editTextVerifyPassword"
+                    android:prompt="@string/sign_up_spinner_prompt"
+                    android:entries="@array/spinnerSignUp"
+                    app:layout_constraintTop_toBottomOf="@id/textViewCareerLabel"
                     app:layout_constraintStart_toStartOf="parent"
                     app:layout_constraintEnd_toEndOf="parent"
-                    android:layout_marginTop="16dp"
+                    android:layout_marginTop="20dp"
                     android:layout_marginHorizontal="16dp" />
 
                 <TextView
@@ -117,9 +142,9 @@
                     app:layout_constraintTop_toBottomOf="@+id/spinnerCareer"
                     app:layout_constraintStart_toStartOf="parent"
                     app:layout_constraintEnd_toEndOf="parent"
-                    android:textSize="18sp"
+                    android:textSize="15sp"
                     android:textStyle="bold"
-                    android:layout_marginTop="16dp"
+                    android:layout_marginTop="30dp"
                     android:layout_marginHorizontal="16dp" />
 
                 <DatePicker
@@ -145,7 +170,6 @@
                     android:layout_marginTop="16dp"
                     android:backgroundTint="@color/blueButtonColor"/>
 
-                <!-- Last space without the CardView -->
                 <Space
                     android:id="@+id/space1"
                     android:layout_width="match_parent"
