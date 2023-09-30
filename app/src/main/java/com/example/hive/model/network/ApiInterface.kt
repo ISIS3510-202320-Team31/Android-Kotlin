@@ -1,5 +1,6 @@
 package com.example.hive.model.network
 
+import com.example.hive.model.network.requests.LoginRequest
 import com.example.hive.model.network.requests.RegisterRequest
 import com.example.hive.model.network.responses.EventDetailResponse
 import com.example.hive.model.network.responses.EventResponse
@@ -20,4 +21,8 @@ interface ApiInterface {
 
     @POST("/register/")
     suspend fun registerUser(@Body registerRequest: RegisterRequest): Response<UserResponse>
+
+    @POST("/login/")
+    suspend fun loginUser(@Body loginRequest: LoginRequest): Response<UserResponse>
+
 }
