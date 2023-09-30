@@ -1,5 +1,6 @@
 package com.example.hive.view
 
+import SignUpFragment
 import androidx.lifecycle.ViewModelProvider
 import android.os.Bundle
 import androidx.fragment.app.Fragment
