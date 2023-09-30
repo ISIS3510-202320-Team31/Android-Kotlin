@@ -1,5 +1,6 @@
 package com.example.hive.view
 
+import android.content.Intent
 import android.os.Bundle
 import androidx.appcompat.app.AppCompatActivity
 import androidx.navigation.ui.AppBarConfiguration
@@ -7,10 +8,13 @@ import android.view.Menu
 import androidx.fragment.app.Fragment
 import com.example.hive.R
 import com.example.hive.databinding.ActivityMainBinding
+import com.example.hive.model.adapters.SessionManager
+import com.example.hive.viewmodel.LoginViewModel
 
 class MainActivity : AppCompatActivity() {
 
     private lateinit var binding: ActivityMainBinding
+    private lateinit var sessionManager: SessionManager
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -18,7 +22,13 @@ class MainActivity : AppCompatActivity() {
         binding = ActivityMainBinding.inflate(layoutInflater)
         setContentView(binding.root)
 
-        replaceFragment(LoginFragment())
+        sessionManager = SessionManager(this)
+
+        if (!isUserLoggedIn()) {
+            navigateToLogin()
+        }
+
+        replaceFragment(HomePageFragment())
 
         binding.bottomNavigation.setOnItemSelectedListener {
             when(it.itemId) {
@@ -56,5 +66,18 @@ class MainActivity : AppCompatActivity() {
             transaction.replace(R.id.fragment_container, fragment)
             transaction.commit()
         }
+    }
+
+    private fun isUserLoggedIn(): Boolean {
+        // Check if the user is logged in using SessionManager
+        val userSession = sessionManager.getUserSession()
+        return userSession.authToken != null && userSession.userId != null
+    }
+
+    private fun navigateToLogin() {
+        // Redirect to the LoginActivity
+        val intent = Intent(this, LoginActivity::class.java)
+        startActivity(intent)
+        finish()
     }
 }
