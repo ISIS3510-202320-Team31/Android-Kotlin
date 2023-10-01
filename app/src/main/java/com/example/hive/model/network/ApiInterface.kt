@@ -6,6 +6,7 @@ import com.example.hive.model.network.responses.EventDetailResponse
 import com.example.hive.model.network.responses.EventResponse
 import com.example.hive.model.network.responses.UserResponse
 import retrofit2.Response
+import retrofit2.http.DELETE
 import retrofit2.http.Body
 import retrofit2.http.GET
 import retrofit2.http.POST
@@ -21,6 +22,12 @@ interface ApiInterface {
 
     @GET("/events/date/{date}/user/{user_id}/order/{future}")
     suspend fun getEventsByDateAndUser(@Path("date") date: String, @Path("user_id") user_id: String, @Path("future") future: String): Response<List<EventResponse>>
+    
+    @POST("/users/{userId}/events/{eventId}/")
+    suspend fun addParticipatEvent(@Path("userId") userId: String, @Path("eventId") eventId: String): Response<EventDetailResponse>
+
+    @DELETE("/users/{userId}/events/{eventId}/")
+    suspend fun deleteParticipatEvent(@Path("userId") userId: String, @Path("eventId") eventId: String): Response<EventDetailResponse>
 
     @POST("/register/")
     suspend fun registerUser(@Body registerRequest: RegisterRequest): Response<UserResponse>

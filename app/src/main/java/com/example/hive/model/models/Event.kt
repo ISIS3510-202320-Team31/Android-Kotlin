@@ -42,4 +42,7 @@ data class Event
 
     @SerializedName("participants")
     var participants: List<Participant>,
+
+    @SerializedName("links")
+    var links: List<Participant>,
 )

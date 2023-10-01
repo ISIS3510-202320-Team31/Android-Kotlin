@@ -1,7 +1,7 @@
 package com.example.hive.model.di
 
-import com.example.hive.util.Constants.BASE_URL
 import com.example.hive.model.network.ApiInterface
+import com.example.hive.util.Constants.BASE_URL
 import okhttp3.OkHttpClient
 import okhttp3.logging.HttpLoggingInterceptor
 import retrofit2.Retrofit
