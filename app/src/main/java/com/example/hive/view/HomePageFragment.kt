@@ -7,10 +7,7 @@ import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import android.widget.ImageView
-import android.widget.ProgressBar
-import android.widget.TextView
-import android.widget.Toast
+import android.widget.*
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProvider
@@ -19,6 +16,7 @@ import androidx.recyclerview.widget.RecyclerView
 import com.example.hive.R
 import com.example.hive.model.adapters.EventsAdapter
 import com.example.hive.model.adapters.SessionManager
+import com.example.hive.model.models.UserSession
 import com.example.hive.model.repository.EventRepository
 import com.example.hive.util.Resource
 import com.example.hive.viewmodel.*
@@ -42,6 +40,7 @@ class HomePageFragment : Fragment() {
     private lateinit var eventsAdapter: EventsAdapter
     private lateinit var viewModelEventDetail: EventDetailViewModel
     private lateinit var viewModelAddParticipant: AddParticipatEventViewModel
+    private lateinit var user : UserSession
 
 
     override fun onCreateView(
@@ -54,7 +53,7 @@ class HomePageFragment : Fragment() {
         // Initialize ViewModel
         val repository = EventRepository()
         val userSession = SessionManager(requireContext())
-        val user = userSession.getUserSession()
+        user = userSession.getUserSession()
         val viewModelFactory = EventsViewModelProviderFactory(repository, user)
         viewModelEvent = ViewModelProvider(this, viewModelFactory).get(EventListViewModel::class.java)
 
@@ -63,7 +62,7 @@ class HomePageFragment : Fragment() {
 
         // Set up RecyclerView
         val recyclerView = view.findViewById<RecyclerView>(R.id.recyclerView)
-        eventsAdapter = EventsAdapter(viewModelAddParticipant, this)
+        eventsAdapter = EventsAdapter(viewModelAddParticipant, this, userSession)
         recyclerView.layoutManager = LinearLayoutManager(requireContext())
         recyclerView.adapter = eventsAdapter
 
@@ -190,6 +189,8 @@ class HomePageFragment : Fragment() {
 
                                 val eventLinksInteresesTextView = detailDialog.findViewById<TextView>(R.id.linksInteres)
 
+                                val eventParticipants = resource.data?.participants
+
                                 if (resource.data?.links?.isNotEmpty() == true) {
                                     // If there are links, set the text to the links
                                     eventLinksInteresesTextView.text = resource.data.links.joinToString("\n")
@@ -210,6 +211,76 @@ class HomePageFragment : Fragment() {
                                 val qrCodeBitmap = generateQRCode(eventId, 300, 300)
                                 qrImageView.setImageBitmap(qrCodeBitmap)
 
+                                val joinEventButton = detailDialog.findViewById<Button>(R.id.submitButton)
+
+                                if (eventParticipants?.contains(user.userId) == true) {
+                                    joinEventButton.text = "No asistir"
+                                } else {
+                                    joinEventButton.text = "Unirse"
+                                }
+                                    joinEventButton.setOnClickListener {
+                                    val eventIDTextView = detailDialog.findViewById<TextView>(R.id.eventID)
+                                    val eventID = eventIDTextView.text.toString()
+                                    val userID = user.userId
+                                    if (userID != null && joinEventButton.text.toString() == "Unirse") {
+                                        viewModelAddParticipant.addParticipatEventVM(eventID, userID)
+                                        viewModelAddParticipant.addParticipatEvent.observe(this, Observer { resource ->
+                                            when (resource) {
+                                                is Resource.Loading<*> -> {
+                                                }
+                                                is Resource.Success<*> -> {
+
+                                                    if (!resource.data?.participants?.contains(userID)!!) {
+                                                        resource.data?.participants = resource.data?.participants?.plus(
+                                                            userID
+                                                        )!!
+                                                    }
+
+                                                    // change joinEventButton text to "salir"
+                                                    joinEventButton.text = "No asistir"
+
+                                                    // update the number of participants
+                                                    val stringParticipant = "${resource.data?.participants!!.size} / ${resource.data?.num_participants} personas"
+                                                    eventParticipantTextView.text = stringParticipant
+                                                }
+                                                is Resource.Error<*> -> {
+
+                                                }
+                                            }
+                                        })
+                                    }
+                                    if (userID != null && joinEventButton.text.toString() == "No asistir") {
+                                        viewModelAddParticipant.deleteParticipatEventVM(eventID, userID)
+                                        // Remove the ID from the event.participants
+                                        viewModelAddParticipant.deleteParticipatEvent.observe(this, Observer { resource ->
+                                            when (resource) {
+                                                is Resource.Loading<*> -> {
+                                                }
+                                                is Resource.Success<*> -> {
+                                                    if (resource.data?.participants?.contains(userID) == true) {
+                                                        resource.data.participants = resource.data.participants?.minus(
+                                                            userID
+                                                        )!!
+                                                    }
+                                                    // change joinEventButton text to "unirse"
+                                                    joinEventButton.text = "Unirse"
+
+                                                    // update the number of participants
+                                                    val stringParticipant = "${resource.data?.participants?.size} / ${resource.data?.num_participants} personas"
+                                                    eventParticipantTextView.text = stringParticipant
+
+                                                }
+                                                is Resource.Error<*> -> {
+
+                                                }
+                                            }
+                                        })
+                                    }
+
+
+                                }
+
+
 
                                 detailDialog.show()
                             }
@@ -219,8 +290,6 @@ class HomePageFragment : Fragment() {
                             }
                         }
                     })
-
-                    Toast.makeText(requireContext(), "Scanned: " + result.contents, Toast.LENGTH_LONG).show()
                 }
         } else {
             super.onActivityResult(requestCode, resultCode, data)

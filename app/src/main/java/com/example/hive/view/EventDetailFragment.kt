@@ -10,6 +10,7 @@ import androidx.fragment.app.Fragment
 import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProvider
 import com.example.hive.R
+import com.example.hive.model.adapters.SessionManager
 import com.example.hive.model.repository.EventRepository
 import com.example.hive.util.Resource
 import com.example.hive.viewmodel.AddParticipatEventViewModel
@@ -24,6 +25,7 @@ class EventDetailFragment : Fragment() {
 
     private lateinit var viewModel: EventDetailViewModel
     private lateinit var viewModelAddParticipant: AddParticipatEventViewModel
+    private lateinit var sessionManager: SessionManager
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?,
                               savedInstanceState: Bundle?): View? {
@@ -37,25 +39,10 @@ class EventDetailFragment : Fragment() {
         super.onActivityCreated(savedInstanceState)
         viewModel = ViewModelProvider(this).get(EventDetailViewModel::class.java)
 
-        val joinEventButton = requireView().findViewById<Button>(R.id.submitButton)
-        joinEventButton.setOnClickListener {
-            val eventIDTextView = requireView().findViewById<TextView>(R.id.eventID)
-            val eventID = eventIDTextView.text.toString()
-            val userID = "0f2dfb8a-df34-4026-a989-6607d2b399b7"
-            viewModelAddParticipant.addParticipatEventVM(eventID, userID)
-            viewModelAddParticipant.addParticipatEvent.observe(viewLifecycleOwner, Observer { resource ->
-                when (resource) {
-                    is Resource.Loading<*> -> {
-                    }
-                    is Resource.Success<*> -> {
-                        // change joinEventButton text to "salir"
-                        joinEventButton.text = "No asistir"
-                    }
-                    is Resource.Error<*> -> {
+        sessionManager = SessionManager(requireContext())
+        val userID = sessionManager.getUserSession().userId
 
-                    }
-                }
-            })
-        }
+        val joinEventButton = requireView().findViewById<Button>(R.id.submitButton)
+
     }
 }

@@ -23,7 +23,7 @@ import com.google.zxing.qrcode.QRCodeWriter
 import com.google.zxing.qrcode.decoder.ErrorCorrectionLevel
 import com.squareup.picasso.Picasso
 
-class EventsAdapter(private val viewModelAddParticipant: AddParticipatEventViewModel, private val lifecycleOwner: LifecycleOwner) : RecyclerView.Adapter<EventsAdapter.MListHolder>() {
+class EventsAdapter(private val viewModelAddParticipant: AddParticipatEventViewModel, private val lifecycleOwner: LifecycleOwner, private val sessionManager: SessionManager) : RecyclerView.Adapter<EventsAdapter.MListHolder>() {
 
     inner class MListHolder(itemView: View) : RecyclerView.ViewHolder(itemView)
 
@@ -109,6 +109,15 @@ class EventsAdapter(private val viewModelAddParticipant: AddParticipatEventViewM
             val stringParticipant = "${event.participants.size} / ${event.num_participants} personas"
             eventParticipantTextView.text = stringParticipant
 
+            val userSession = sessionManager.getUserSession()
+
+            // Check if userSession.id is in event.participants
+            if (event.participants.contains(userSession.userId)) {
+                // If userSession.id is in event.participants, change joinEventButton text to "salir"
+                val joinEventButton = detailDialog.findViewById<Button>(R.id.submitButton)
+                joinEventButton.text = "No asistir"
+            }
+
             val eventLinksInteresesTextView = detailDialog.findViewById<TextView>(R.id.linksInteres)
 
             if (event.links.isNotEmpty()) {
@@ -129,21 +138,57 @@ class EventsAdapter(private val viewModelAddParticipant: AddParticipatEventViewM
             joinEventButton.setOnClickListener {
                 val eventIDTextView = detailDialog.findViewById<TextView>(R.id.eventID)
                 val eventID = eventIDTextView.text.toString()
-                val userID = "0f2dfb8a-df34-4026-a989-6607d2b399b7"
-                viewModelAddParticipant.addParticipatEventVM(eventID, userID)
-                viewModelAddParticipant.addParticipatEvent.observe(lifecycleOwner, Observer { resource ->
-                    when (resource) {
-                        is Resource.Loading<*> -> {
-                        }
-                        is Resource.Success<*> -> {
-                            // change joinEventButton text to "salir"
-                            joinEventButton.text = "No asistir"
-                        }
-                        is Resource.Error<*> -> {
+                val userID = userSession.userId
+                if (userID != null && joinEventButton.text.toString() == "Unirse") {
+                    viewModelAddParticipant.addParticipatEventVM(eventID, userID)
+                    viewModelAddParticipant.addParticipatEvent.observe(lifecycleOwner, Observer { resource ->
+                        when (resource) {
+                            is Resource.Loading<*> -> {
+                            }
+                            is Resource.Success<*> -> {
 
+                                if (!event.participants.contains(userID)) {
+                                    event.participants+=userID
+                                }
+
+                                // change joinEventButton text to "salir"
+                                joinEventButton.text = "No asistir"
+
+                                // update the number of participants
+                                val stringParticipant = "${event.participants.size} / ${event.num_participants} personas"
+                                eventParticipantTextView.text = stringParticipant
+                            }
+                            is Resource.Error<*> -> {
+
+                            }
                         }
-                    }
-                })
+                    })
+                }
+                if (userID != null && joinEventButton.text.toString() == "No asistir") {
+                    viewModelAddParticipant.deleteParticipatEventVM(eventID, userID)
+                    // Remove the ID from the event.participants
+                    viewModelAddParticipant.deleteParticipatEvent.observe(lifecycleOwner, Observer { resource ->
+                        when (resource) {
+                            is Resource.Loading<*> -> {
+                            }
+                            is Resource.Success<*> -> {
+                                if (event.participants.contains(userID)) {
+                                    event.participants-=userID
+                                }
+                                // change joinEventButton text to "unirse"
+                                joinEventButton.text = "Unirse"
+
+                                // update the number of participants
+                                val stringParticipant = "${event.participants.size} / ${event.num_participants} personas"
+                                eventParticipantTextView.text = stringParticipant
+
+                            }
+                            is Resource.Error<*> -> {
+
+                            }
+                        }
+                    })
+                }
             }
 
             val eventQRImageView = detailDialog.findViewById<ImageView>(R.id.qr)
