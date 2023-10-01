@@ -126,5 +126,15 @@ class SignUpActivity : AppCompatActivity() {
                 }
             }
         })
+
+        // Obtain a reference to the TextView
+        val signUpTextView = findViewById<TextView>(R.id.textViewLoginLink)
+
+        // Set the click listener
+        signUpTextView?.setOnClickListener {
+            // Start login activity
+            val intent = Intent(this, LoginActivity::class.java)
+            startActivity(intent)
+        }
     }
 }

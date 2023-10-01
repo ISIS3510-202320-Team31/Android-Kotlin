@@ -44,7 +44,7 @@ class LoginActivity : AppCompatActivity() {
                     Toast.makeText(this, "Inicio de sesión falló", Toast.LENGTH_SHORT).show()
                 }
                 is Resource.Loading -> {
-                    Toast.makeText(this, "Logging in...", Toast.LENGTH_SHORT).show()
+                    Toast.makeText(this, "Iniciando sesión...", Toast.LENGTH_SHORT).show()
                 }
             }
         })
