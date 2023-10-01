@@ -16,10 +16,13 @@ import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.example.hive.R
 import com.example.hive.model.adapters.EventsAdapter
+import com.example.hive.model.adapters.SessionManager
 import com.example.hive.model.repository.EventRepository
 import com.example.hive.util.Resource
 import com.example.hive.viewmodel.*
 import com.google.zxing.integration.android.IntentIntegrator
+import java.text.SimpleDateFormat
+import java.util.*
 
 class HomePageFragment : Fragment() {
 
@@ -42,7 +45,9 @@ class HomePageFragment : Fragment() {
 
         // Initialize ViewModel
         val repository = EventRepository()
-        val viewModelFactory = EventsViewModelProviderFactory(repository)
+        val userSession = SessionManager(requireContext())
+        val user = userSession.getUserSession()
+        val viewModelFactory = EventsViewModelProviderFactory(repository, user)
         viewModelEvent = ViewModelProvider(this, viewModelFactory).get(EventListViewModel::class.java)
 
         // Set up RecyclerView
@@ -63,7 +68,21 @@ class HomePageFragment : Fragment() {
                 is Resource.Success<*> -> {
                     loadingProgressBar.visibility = View.GONE
                     // Update the RecyclerView with the list of events
-                    resource.data?.let { eventsAdapter.submitList(it) }
+                    resource.data?.let {
+
+                        // Filter the list for only the ones with date of today and after
+                        val today = Calendar.getInstance()
+                        val filteredList = it.filter { event ->
+                            val eventDate = Calendar.getInstance()
+
+                            //Transform the date from the event from string to Date
+                            val formatter = SimpleDateFormat("yyyy-MM-dd")
+                            val date = formatter.parse(event.date)
+                            eventDate.time = date
+                            eventDate.get(Calendar.DAY_OF_YEAR) >= today.get(Calendar.DAY_OF_YEAR)
+                        }
+
+                        eventsAdapter.submitList(filteredList) }
                 }
                 is Resource.Error<*> -> {
                     // Handle error state (e.g., show an error message)

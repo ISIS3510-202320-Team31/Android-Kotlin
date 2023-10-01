@@ -25,4 +25,9 @@ interface ApiInterface {
     @POST("/login/")
     suspend fun loginUser(@Body loginRequest: LoginRequest): Response<UserResponse>
 
+    @POST("/events/date/{date}/")
+    suspend fun getEventsByDate(@Path("date") date: String): Response<List<EventResponse>>
+    
+    @GET("/events/users/{id}/")
+    suspend fun getSmartFeature(@Path("id") id: String): Response<List<EventResponse>>
 }
