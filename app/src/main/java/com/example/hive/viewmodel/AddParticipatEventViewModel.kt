@@ -11,12 +11,18 @@ import retrofit2.Response
 
 class AddParticipatEventViewModel(private val repository: EventRepository) : ViewModel()  {
     val addParticipatEvent: MutableLiveData<Resource<EventDetailResponse>> = MutableLiveData()
-    
+    val deleteParticipatEvent: MutableLiveData<Resource<EventDetailResponse>> = MutableLiveData()
 
     fun addParticipatEventVM(eventID: String, userID: String) = viewModelScope.launch {
         addParticipatEvent.postValue(Resource.Loading())
         val peticion = repository.addParticipatEventR(userID, eventID)
         addParticipatEvent.postValue(handleAddParticipatEventResponse(peticion))
+    }
+
+    fun deleteParticipatEventVM(eventID: String, userID: String) = viewModelScope.launch {
+        deleteParticipatEvent.postValue(Resource.Loading())
+        val peticion = repository.deleteParticipatEventR(userID, eventID)
+        deleteParticipatEvent.postValue(handleAddParticipatEventResponse(peticion))
     }
 
     private fun handleAddParticipatEventResponse(response: Response<EventDetailResponse>): Resource<EventDetailResponse>? {
