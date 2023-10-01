@@ -1,12 +1,15 @@
 package com.example.hive.view
 
+import android.graphics.Color
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.FrameLayout
+import androidx.core.content.ContextCompat
 import androidx.fragment.app.Fragment
 import com.example.hive.R
+
 
 class CalendarFragment : Fragment() {
 
@@ -22,16 +25,22 @@ class CalendarFragment : Fragment() {
         val btnActivities = view.findViewById<android.widget.Button>(R.id.btnActivities)
         val btnHistorical = view.findViewById<android.widget.Button>(R.id.btnHistorical)
 
+        //Show ActivitiesFragment by default
+        showFragment(CalendarActivitiesFragment())
+
         btnActivities.setOnClickListener {
             showFragment(CalendarActivitiesFragment())
+            //Color BLUE
+            btnActivities.setBackgroundColor(Color.parseColor("#2196F3"))
+            //Color DARK GRAY
+            btnHistorical.setBackgroundColor(Color.parseColor("#A2AEBB"))
         }
 
         btnHistorical.setOnClickListener {
             showFragment(CalendarHistoricalFragment())
+            btnActivities.setBackgroundColor(Color.parseColor("#A2AEBB"))
+            btnHistorical.setBackgroundColor(Color.parseColor("#2196F3"))
         }
-
-        //Show ActivitiesFragment by default
-        showFragment(CalendarActivitiesFragment())
 
         return view
     }
