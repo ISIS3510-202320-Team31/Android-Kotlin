@@ -7,7 +7,6 @@ import java.time.format.DateTimeFormatter
 class EventRepository() {
 
     suspend fun getEventsR() = RetroFitInstance.api.getEvents()
-    suspend fun getEventsByIdR(id: String) = RetroFitInstance.api.getEventsById(id)
 
     //Get events by date
     private val currentDate: String = LocalDate.now().format(DateTimeFormatter.ofPattern("yyyy-MM-dd"))

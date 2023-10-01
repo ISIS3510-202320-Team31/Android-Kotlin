@@ -10,6 +10,4 @@
     <string name="hello_first_fragment">Hello first fragment</string>
     <string name="hello_second_fragment">Hello second fragment. Arg: %1$s</string>
     <string name="title_activity_calendar">CalendarActivity</string>
-    <string name="sign_up_spinner_prompt">Seleccione su carrera</string>
-    <string name="create_event_spinner_prompt">Seleccione el tipo de evento</string>
 </resources>
