@@ -1,5 +1,4 @@
 package com.example.hive.model.network.responses
-import com.example.hive.model.models.Participant
 import com.google.gson.annotations.SerializedName
 
 data class EventResponse(
@@ -42,5 +41,8 @@ data class EventResponse(
 
     @SerializedName("participants")
     var participants: List<String>,
+
+    @SerializedName("links")
+    var links: List<String>,
 
     )
