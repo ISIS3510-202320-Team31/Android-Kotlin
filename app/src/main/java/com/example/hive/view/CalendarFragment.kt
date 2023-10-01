@@ -13,7 +13,6 @@ import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.example.hive.R
 import com.example.hive.model.adapters.EventsByDateAdapter
-import com.example.hive.model.adapters.EventsByDateAndUserAdapter
 import com.example.hive.model.repository.EventRepository
 import com.example.hive.util.Resource
 import com.example.hive.viewmodel.*
@@ -26,7 +25,7 @@ class CalendarFragment : Fragment() {
 
     private lateinit var viewModel: CalendarViewModel
     private lateinit var viewModelCalendar: CalendarListViewModel
-    private lateinit var eventsByDateAndUserAdapter: EventsByDateAndUserAdapter
+    private lateinit var eventsByDateAdapter: EventsByDateAdapter
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
@@ -37,20 +36,20 @@ class CalendarFragment : Fragment() {
 
         // Initialize ViewModel
         val repository = EventRepository()
-        val viewModelFactory = CalendarViewModelProviderFactory(repository,"d961dbbb-84bb-454a-aa78-abbba3a8d6a7", "1")
+        val viewModelFactory = CalendarViewModelProviderFactory(repository)
         viewModelCalendar =
             ViewModelProvider(this, viewModelFactory).get(CalendarListViewModel::class.java)
 
         // Set up RecyclerView
         val recyclerView = view.findViewById<RecyclerView>(R.id.recycler_view)
-        eventsByDateAndUserAdapter = EventsByDateAndUserAdapter()
+        eventsByDateAdapter = EventsByDateAdapter()
         recyclerView.layoutManager = LinearLayoutManager(requireContext())
-        recyclerView.adapter = eventsByDateAndUserAdapter
+        recyclerView.adapter = eventsByDateAdapter
 
         val loadingProgressBar = view.findViewById<ProgressBar>(R.id.loadingProgressBar)
 
-        // Observe LiveData from ViewModel (eventsByDate)
-        viewModelCalendar.eventsByDate.observe(viewLifecycleOwner, Observer { resource ->
+        // Observe LiveData from ViewModel
+        viewModelCalendar.eventsPage.observe(viewLifecycleOwner, Observer { resource ->
             when (resource) {
                 is Resource.Loading<*> -> {
                     // Show progress bar
@@ -58,12 +57,8 @@ class CalendarFragment : Fragment() {
                 }
                 is Resource.Success<*> -> {
                     loadingProgressBar.visibility = View.GONE
-                    // Update the RecyclerView with the list of events grouped by date
-                    resource.data?.let { groupedEvents ->
-                        //Flatten the list of pairs into a single list of events
-                        val events = groupedEvents.flatMap { it.second }
-                        eventsByDateAndUserAdapter.submitList(events)
-                    }
+                    // Update the RecyclerView with the list of events
+                    resource.data?.let { eventsByDateAdapter.submitList(it) }
                 }
                 is Resource.Error<*> -> {
                     // Handle error state (e.g., show an error message)

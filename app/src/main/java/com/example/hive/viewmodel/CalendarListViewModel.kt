@@ -10,32 +10,19 @@ import kotlinx.coroutines.launch
 import retrofit2.Response
 
 
-class CalendarListViewModel (private val repository: EventRepository,
-                             private val user_id: String,
-                             private val future: String) : ViewModel() {
+class CalendarListViewModel (private val repository: EventRepository) : ViewModel() {
 
     val eventsPage: MutableLiveData<Resource<List<EventResponse>>> = MutableLiveData()
-    val eventsByDate: MutableLiveData<Resource<List<Pair<String, List<EventResponse>>>>> = MutableLiveData()
 
     init {
-        getEventsByDateAndUserVM(user_id, future)
+        getEventsByDateVM()
     }
 
-    private fun getEventsByDateAndUserVM(user_id: String, future: String) = viewModelScope.launch {
+    private fun getEventsByDateVM() = viewModelScope.launch {
         eventsPage.postValue(Resource.Loading())
-        val response = repository.getEventsByDateAndUserR(user_id, future)
+        val response = repository.getEventsByDateR()
         println(response.body())
         eventsPage.postValue((handleResponse(response)))
-
-        //Group events by date and update LiveData
-        if (response.isSuccessful){
-            response.body()?.let { events ->
-                val gropupedEvents = events.groupBy { it.date }.map{
-                    entry -> entry.key to entry.value
-                }
-                eventsByDate.postValue(Resource.Success(gropupedEvents))
-            }
-        }
     }
 
     private fun handleResponse(response: Response<List<EventResponse>>): Resource<List<EventResponse>>{
