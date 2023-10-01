@@ -3,13 +3,11 @@ package com.example.hive.view
 import android.content.Intent
 import android.os.Bundle
 import androidx.appcompat.app.AppCompatActivity
-import androidx.navigation.ui.AppBarConfiguration
 import android.view.Menu
 import androidx.fragment.app.Fragment
 import com.example.hive.R
 import com.example.hive.databinding.ActivityMainBinding
 import com.example.hive.model.adapters.SessionManager
-import com.example.hive.viewmodel.LoginViewModel
 
 class MainActivity : AppCompatActivity() {
 
