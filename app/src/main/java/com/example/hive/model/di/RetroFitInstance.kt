@@ -1,7 +1,7 @@
 package com.example.hive.model.di
 
-import com.example.hive.util.Constants.BASE_URL
 import com.example.hive.model.network.ApiInterface
+import com.example.hive.util.Constants.BASE_URL
 import okhttp3.OkHttpClient
 import okhttp3.logging.HttpLoggingInterceptor
 import retrofit2.Retrofit
@@ -15,7 +15,7 @@ class RetroFitInstance {
             val interceptor = HttpLoggingInterceptor()
             interceptor.setLevel(HttpLoggingInterceptor.Level.BODY)
 
-            val client = OkHttpClient.Builder().addInterceptor(interceptor).build()
+            val client = OkHttpClient.Builder().connectTimeout(120, java.util.concurrent.TimeUnit.SECONDS).readTimeout(120, java.util.concurrent.TimeUnit.SECONDS).writeTimeout(120, java.util.concurrent.TimeUnit.SECONDS).addInterceptor (interceptor).build()
 
             Retrofit.Builder()
                 .baseUrl(BASE_URL)

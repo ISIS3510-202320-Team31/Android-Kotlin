@@ -182,22 +182,11 @@
 
 
         <TextView
-            android:id="@+id/link1"
+            android:id="@+id/linksInteres"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
             android:layout_weight="1"
             android:text="https://web.whatsapp.com/GrupoFutbol"
-            android:textAlignment="center"
-            android:textColor="#2196F3"
-            android:textSize="10dp"
-            android:textStyle="bold" />
-
-        <TextView
-            android:id="@+id/link2"
-            android:layout_width="match_parent"
-            android:layout_height="match_parent"
-            android:layout_weight="1"
-            android:text="https://uniandes.edu.co/GrupoFutbol"
             android:textAlignment="center"
             android:textColor="#2196F3"
             android:textSize="10dp"
@@ -244,5 +233,11 @@
                 android:backgroundTint="#2196F3"
                 android:text="Unirse" />
         </LinearLayout>
+        <TextView
+            android:id="@+id/eventID"
+            android:layout_width="0dp"
+            android:layout_height="0dp"
+            android:visibility="invisible"
+            android:text="eventID" />
     </LinearLayout>
 </androidx.cardview.widget.CardView>

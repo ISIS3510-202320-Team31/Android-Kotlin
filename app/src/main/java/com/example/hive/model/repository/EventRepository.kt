@@ -6,5 +6,6 @@ class EventRepository() {
 
     suspend fun getEventsR() = RetroFitInstance.api.getEvents()
     suspend fun getEventsByIdR(id: String) = RetroFitInstance.api.getEventsById(id)
+    suspend fun addParticipatEventR(userId: String, eventId: String) = RetroFitInstance.api.addParticipatEvent(userId, eventId)
 
 }

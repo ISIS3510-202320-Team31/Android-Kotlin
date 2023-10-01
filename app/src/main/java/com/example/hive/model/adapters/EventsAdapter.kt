@@ -1,18 +1,29 @@
 package com.example.hive.model.adapters
 
 import android.app.Dialog
+import android.graphics.Bitmap
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.widget.Button
+import android.widget.ImageView
 import android.widget.TextView
+import androidx.lifecycle.LifecycleOwner
+import androidx.lifecycle.Observer
 import androidx.recyclerview.widget.AsyncListDiffer
 import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.RecyclerView
-import com.bumptech.glide.Glide
 import com.example.hive.R
 import com.example.hive.model.network.responses.EventResponse
+import com.example.hive.util.Resource
+import com.example.hive.viewmodel.AddParticipatEventViewModel
+import com.google.zxing.BarcodeFormat
+import com.google.zxing.EncodeHintType
+import com.google.zxing.qrcode.QRCodeWriter
+import com.google.zxing.qrcode.decoder.ErrorCorrectionLevel
+import com.squareup.picasso.Picasso
 
-class EventsAdapter : RecyclerView.Adapter<EventsAdapter.MListHolder>() {
+class EventsAdapter(private val viewModelAddParticipant: AddParticipatEventViewModel, private val lifecycleOwner: LifecycleOwner) : RecyclerView.Adapter<EventsAdapter.MListHolder>() {
 
     inner class MListHolder(itemView: View) : RecyclerView.ViewHolder(itemView)
 
@@ -73,6 +84,9 @@ class EventsAdapter : RecyclerView.Adapter<EventsAdapter.MListHolder>() {
                 eventEstadoTextView.text = "Inactivo"
             }
 
+            val eventIDTextView = detailDialog.findViewById<TextView>(R.id.eventID)
+            eventIDTextView.text = event.id
+
             val eventCategoryTextView = detailDialog.findViewById<TextView>(R.id.categoria)
             eventCategoryTextView.text = event.category
 
@@ -95,10 +109,77 @@ class EventsAdapter : RecyclerView.Adapter<EventsAdapter.MListHolder>() {
             val stringParticipant = "${event.participants.size} / ${event.num_participants} personas"
             eventParticipantTextView.text = stringParticipant
 
+            val eventLinksInteresesTextView = detailDialog.findViewById<TextView>(R.id.linksInteres)
+
+            if (event.links.isNotEmpty()) {
+                // If there are links, set the text to the links
+                eventLinksInteresesTextView.text = event.links.joinToString("\n")
+            } else {
+                // If there are no links, set an empty text
+                eventLinksInteresesTextView.text = ""
+            }
+
+            val eventImageView = detailDialog.findViewById<ImageView>(R.id.imagen)
+            val url = event.image
+            if (url != null) {
+                Picasso.get().load(url).into(eventImageView)
+            }
+
+            val joinEventButton = detailDialog.findViewById<Button>(R.id.submitButton)
+            joinEventButton.setOnClickListener {
+                val eventIDTextView = detailDialog.findViewById<TextView>(R.id.eventID)
+                val eventID = eventIDTextView.text.toString()
+                val userID = "0f2dfb8a-df34-4026-a989-6607d2b399b7"
+                viewModelAddParticipant.addParticipatEventVM(eventID, userID)
+                viewModelAddParticipant.addParticipatEvent.observe(lifecycleOwner, Observer { resource ->
+                    when (resource) {
+                        is Resource.Loading<*> -> {
+                        }
+                        is Resource.Success<*> -> {
+                            // change joinEventButton text to "salir"
+                            joinEventButton.text = "No asistir"
+                        }
+                        is Resource.Error<*> -> {
+
+                        }
+                    }
+                })
+            }
+
+            val eventQRImageView = detailDialog.findViewById<ImageView>(R.id.qr)
+            val eventId = event.id
+            val qrCodeBitmap = generateQRCode(eventId, 300, 300)
+
+            qrCodeBitmap?.let {
+                eventQRImageView.setImageBitmap(it)
+            }
+
             // Show the detail dialog
             detailDialog.show()
         }
 
+    }
+
+    private fun generateQRCode(eventId: String, width: Int, height: Int): Bitmap? {
+        try {
+            val hints = HashMap<EncodeHintType, Any>()
+            hints[EncodeHintType.CHARACTER_SET] = "UTF-8"
+            hints[EncodeHintType.ERROR_CORRECTION] = ErrorCorrectionLevel.Q
+
+            val writer = QRCodeWriter()
+            val bitMatrix = writer.encode(eventId, BarcodeFormat.QR_CODE, width, height, hints)
+
+            val bitmap = Bitmap.createBitmap(width, height, Bitmap.Config.RGB_565)
+            for (x in 0 until width) {
+                for (y in 0 until height) {
+                    bitmap.setPixel(x, y, if (bitMatrix[x, y]) 0xFF000000.toInt() else 0xFFFFFFFF.toInt())
+                }
+            }
+            return bitmap
+        } catch (e: Exception) {
+            e.printStackTrace()
+        }
+        return null
     }
 
     fun submitList(list: List<EventResponse>) {
