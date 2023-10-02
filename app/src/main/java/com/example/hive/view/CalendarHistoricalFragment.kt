@@ -13,12 +13,11 @@ import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.example.hive.R
 import com.example.hive.util.Resource
-import com.example.hive.model.adapters.CalendarAdapter
+import com.example.hive.model.adapters.CalendarActivitiesAdapter
+import com.example.hive.model.adapters.CalendarHistoricalAdapter
 import com.example.hive.model.adapters.SessionManager
 import com.example.hive.model.repository.EventRepository
-import com.example.hive.viewmodel.CalendarListViewModel
-import com.example.hive.viewmodel.CalendarViewModel
-import com.example.hive.viewmodel.CalendarViewModelProviderFactory
+import com.example.hive.viewmodel.*
 
 class CalendarHistoricalFragment : Fragment() {
     companion object {
@@ -28,7 +27,9 @@ class CalendarHistoricalFragment : Fragment() {
     private lateinit var sessionManager: SessionManager
     private lateinit var viewModel: CalendarViewModel
     private lateinit var viewModelCalendar: CalendarListViewModel
-    private lateinit var calendarAdapter: CalendarAdapter
+    private lateinit var calendarAdapter: CalendarHistoricalAdapter
+    private lateinit var viewModelAddParticipant: AddParticipatEventViewModel
+
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
@@ -42,9 +43,12 @@ class CalendarHistoricalFragment : Fragment() {
             userSession.userId?.let { CalendarViewModelProviderFactory(repository, it, "0") }
         viewModelCalendar = ViewModelProvider(this, viewModelFactory!!).get(CalendarListViewModel::class.java)
 
+        val viewModelAddPaticipantEventFactory = AddParticipatEventViewModelProviderFactory(repository)
+        viewModelAddParticipant = ViewModelProvider(this, viewModelAddPaticipantEventFactory).get(AddParticipatEventViewModel::class.java)
+
         //Set up RecyclerView
         val recyclerView = view.findViewById<RecyclerView>(R.id.recyclerCalendarlist)
-        calendarAdapter = CalendarAdapter()
+        calendarAdapter = CalendarHistoricalAdapter(viewModelAddParticipant,this,sessionManager)
         recyclerView.layoutManager = LinearLayoutManager(requireContext())
         recyclerView.adapter = calendarAdapter
 

@@ -13,12 +13,10 @@ import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.example.hive.R
 import com.example.hive.util.Resource
-import com.example.hive.model.adapters.CalendarAdapter
+import com.example.hive.model.adapters.CalendarActivitiesAdapter
 import com.example.hive.model.adapters.SessionManager
 import com.example.hive.model.repository.EventRepository
-import com.example.hive.viewmodel.CalendarListViewModel
-import com.example.hive.viewmodel.CalendarViewModel
-import com.example.hive.viewmodel.CalendarViewModelProviderFactory
+import com.example.hive.viewmodel.*
 
 class CalendarActivitiesFragment : Fragment() {
 
@@ -29,7 +27,8 @@ class CalendarActivitiesFragment : Fragment() {
     private lateinit var sessionManager: SessionManager
     private lateinit var viewModel: CalendarViewModel
     private lateinit var viewModelCalendar: CalendarListViewModel
-    private lateinit var calendarAdapter: CalendarAdapter
+    private lateinit var calendarActivitiesAdapter: CalendarActivitiesAdapter
+    private lateinit var viewModelAddParticipant: AddParticipatEventViewModel
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
@@ -43,11 +42,13 @@ class CalendarActivitiesFragment : Fragment() {
             userSession.userId?.let { CalendarViewModelProviderFactory(repository, it, "1") }
         viewModelCalendar = ViewModelProvider(this, viewModelFactory!!).get(CalendarListViewModel::class.java)
 
+        val viewModelAddPaticipantEventFactory = AddParticipatEventViewModelProviderFactory(repository)
+        viewModelAddParticipant = ViewModelProvider(this, viewModelAddPaticipantEventFactory).get(AddParticipatEventViewModel::class.java)
         //Set up RecyclerView
         val recyclerView = view.findViewById<RecyclerView>(R.id.recyclerCalendarlist)
-        calendarAdapter = CalendarAdapter()
+        calendarActivitiesAdapter = CalendarActivitiesAdapter(viewModelAddParticipant,this,sessionManager)
         recyclerView.layoutManager = LinearLayoutManager(requireContext())
-        recyclerView.adapter = calendarAdapter
+        recyclerView.adapter = calendarActivitiesAdapter
 
         val loadingProgressBar = view.findViewById<ProgressBar>(R.id.loadingProgressCalendar)
 
@@ -62,7 +63,7 @@ class CalendarActivitiesFragment : Fragment() {
                     //Hide progress bar
                     loadingProgressBar.visibility = View.INVISIBLE
                     //Update list in adapter
-                    resource.data?.let { calendarAdapter.submitList(it) }
+                    resource.data?.let { calendarActivitiesAdapter.submitList(it) }
                 }
                 is Resource.Error<*> -> {
                     //Hide progress bar
