@@ -1,6 +1,5 @@
 package com.example.hive.model.network.responses
 
-import com.example.hive.model.models.Creator
 import com.google.gson.annotations.SerializedName
 
 data class EventDetailResponse(
@@ -38,8 +37,14 @@ data class EventDetailResponse(
     var creator_id: String,
 
     @SerializedName("creator")
-    var creator: Creator,
+    var creator: String,
 
     @SerializedName("participants")
     var participants: List<String>,
+
+    @SerializedName("links")
+    var links: List<String>,
+
+    @SerializedName("tags")
+    var tags: List<String>
 )

@@ -23,7 +23,9 @@ import com.google.zxing.qrcode.QRCodeWriter
 import com.google.zxing.qrcode.decoder.ErrorCorrectionLevel
 import com.squareup.picasso.Picasso
 
-class EventsAdapter(private val viewModelAddParticipant: AddParticipatEventViewModel, private val lifecycleOwner: LifecycleOwner, private val sessionManager: SessionManager) : RecyclerView.Adapter<EventsAdapter.MListHolder>() {
+class CalendarActivitiesAdapter(private val viewModelAddParticipant: AddParticipatEventViewModel,
+                                private val lifecycleOwner: LifecycleOwner,
+                                private val sessionManager: SessionManager)  : RecyclerView.Adapter<CalendarActivitiesAdapter.MListHolder>(){
 
     inner class MListHolder(itemView: View) : RecyclerView.ViewHolder(itemView)
 
@@ -49,7 +51,6 @@ class EventsAdapter(private val viewModelAddParticipant: AddParticipatEventViewM
         )
     }
 
-
     override fun getItemCount(): Int {
         return differ.currentList.size
     }
@@ -69,7 +70,6 @@ class EventsAdapter(private val viewModelAddParticipant: AddParticipatEventViewM
             this.findViewById<android.widget.TextView>(R.id.fecha).text = newDate
         }
 
-        // Add a click listener to the card view
         cardView.setOnClickListener {
             val detailDialog = Dialog(holder.itemView.context)
             detailDialog.setContentView(R.layout.fragment_event_detail)
@@ -202,7 +202,6 @@ class EventsAdapter(private val viewModelAddParticipant: AddParticipatEventViewM
             // Show the detail dialog
             detailDialog.show()
         }
-
     }
 
     private fun generateQRCode(eventId: String, width: Int, height: Int): Bitmap? {
