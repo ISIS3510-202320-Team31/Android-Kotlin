@@ -1,61 +1,126 @@
 package com.example.hive.view
 
 import android.os.Bundle
+import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import android.widget.Button
-import android.widget.CalendarView
-import android.widget.EditText
-import android.widget.Spinner
+import android.widget.*
 import androidx.fragment.app.Fragment
+import androidx.lifecycle.Observer
+import androidx.lifecycle.ViewModelProvider
 import com.example.hive.R
 import com.example.hive.model.adapters.SessionManager
+import com.example.hive.model.network.requests.CreateEventRequest
 import com.example.hive.model.repository.EventRepository
+import com.example.hive.util.Resource
 import com.example.hive.viewmodel.EventCreationViewModel
 import com.example.hive.viewmodel.EventCreationViewModelProviderFactory
+import java.sql.Date
+import java.text.SimpleDateFormat
 
 class EventCreationFragment : Fragment() {
 
+    private lateinit var viewModel: EventCreationViewModel
+    private lateinit var viewModelFactory: EventCreationViewModelProviderFactory
     private lateinit var eventRepository: EventRepository
-    private lateinit var eventCreationViewModelProviderFactory: EventCreationViewModelProviderFactory
-    private lateinit var eventCreationViewModel: EventCreationViewModel
-
-
-    companion object {
-        fun newInstance() = EventCreationFragment()
-    }
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View? {
-        //Ojala me muera pa no tener que hacer mas moviles
-        //eventRepository = EventRepository()
-        //val eventCreationViewModelProviderFactory = EventCreationViewModelProviderFactory(eventRepository)
-        //eventCreationViewModel = ViewModelProvider(this, eventCreationViewModelProviderFactory).get(eventCreationViewModel::class.java)
+        eventRepository = EventRepository()
+        viewModelFactory = EventCreationViewModelProviderFactory(eventRepository)
+        viewModel = ViewModelProvider(this, viewModelFactory).get(EventCreationViewModel::class.java)
         return inflater.inflate(R.layout.fragment_event_creation, container, false)
     }
 
     override fun onActivityCreated(savedInstanceState: Bundle?) {
         super.onActivityCreated(savedInstanceState)
-        val buttonCreateEvent = view?.findViewById<Button>(R.id.submitButton)
         val session = SessionManager(requireContext())
-
+        val buttonCreateEvent = view?.findViewById<Button>(R.id.submitButton)
         buttonCreateEvent?.setOnClickListener{
-            //val image
-            val name = view?.findViewById<EditText>(R.id.inputBox)
-            val place = view?.findViewById<EditText>(R.id.inputBoxLugar)
-            val date = view?.findViewById<CalendarView>(R.id.calendarView)
-            val description = view?.findViewById<EditText>(R.id.textBoxDescription)
-            val num_participants = view?.findViewById<EditText>(R.id.inputBoxParticipant)
-            val category = view?.findViewById<Spinner>(R.id.spinner1)
+            val name = view?.findViewById<EditText>(R.id.inputBox)?.text.toString()
+            val place = view?.findViewById<EditText>(R.id.inputBoxLugar)?.text.toString()
+            val calendarDate = view?.findViewById<CalendarView>(R.id.calendarView)
+            val dateMillis = calendarDate?.date ?: 0
+            val date = Date(dateMillis)
+            val sdf = SimpleDateFormat("yyyy-MM-dd")
+            val formattedDate = sdf.format(date)
+            Log.d("date", "FECHA")
+            Log.d("date", formattedDate)
+            val description = view?.findViewById<EditText>(R.id.textBoxDescription)?.text.toString()
+            val num_participants = view?.findViewById<EditText>(R.id.inputBoxParticipant)?.text.toString().toInt()
+            val category = view?.findViewById<Spinner>(R.id.spinner1)?.selectedItem.toString()
             val state = true
-            val duration = view?.findViewById<EditText>(R.id.inputBoxDuration)
-            val creador = session.getUserSession().userId
-            //val tags
-            val links = view?.findViewById<EditText>(R.id.textBox)
+            val duration = view?.findViewById<EditText>(R.id.inputBoxDuration)?.text.toString().toInt()
+            val creador = session.getUserSession().userId.toString()
+            val tags = view?.findViewById<EditText>(R.id.textBox2)?.text.toString().split(" ")
+            val links = view?.findViewById<EditText>(R.id.textBox)?.text.toString().split(" ")
+
+
+            var createEventRequest = try {
+                CreateEventRequest(name, place, formattedDate, description, num_participants, category, state, duration, creador, tags, links)
+            } catch (e: Exception) {
+                Toast.makeText(requireContext(), "Error al registrar el evento", Toast.LENGTH_SHORT).show()
+                null
+            }
+
+            if (name.isEmpty() || place.isEmpty() || formattedDate.isEmpty() || description.isEmpty() || num_participants.toString().isEmpty() || category.isEmpty() || duration.toString().isEmpty() || creador.isEmpty()) {
+                // Show toast message
+                createEventRequest = null
+            }
+            if (createEventRequest != null) {
+                try {
+                    viewModel.createEventVM(createEventRequest)
+                } catch (e: Exception) {
+                    // Show toast message
+                    println(e.stackTrace)
+                    Toast.makeText(requireContext(), "Error al registrar el evento", Toast.LENGTH_SHORT).show()
+                }
+            }
+            else {
+                Toast.makeText(requireContext(), "Error al registrar el evento", Toast.LENGTH_SHORT).show()
+                // Print all the fields
+                println("Name: $name")
+                println("Place: $place")
+                println("Date: $date")
+                println("Description: $description")
+                println("Num_participants: $num_participants")
+                println("Category: $category")
+                println("State: $state")
+                println("Duration: $duration")
+                println("Creador: $creador")
+                println("Tags: $tags")
+                println("Links: $links")
+            }
         }
+
+        viewModel.eventCreationPage.observe(viewLifecycleOwner, Observer { resource ->
+            when (resource) {
+                is Resource.Success -> {
+                    println(resource.data)
+                    Toast.makeText(requireContext(), "El evento ha sido registrado exitosamente", Toast.LENGTH_SHORT).show()
+                    val transaction = requireActivity().supportFragmentManager.beginTransaction()
+                    transaction.replace(R.id.fragment_container, HomePageFragment())
+                    transaction.commit()
+                }
+                is Resource.Error -> {
+
+                    if (resource.message == "Bad Request") {
+                        // Show toast message
+                        Toast.makeText(requireContext(), "El evento no se ha registrado correctamente, por favor revisa que todos los campos esten diligenciados correctamente", Toast.LENGTH_SHORT).show()
+                    }
+                    else {
+                        // Show toast message
+                        Toast.makeText(requireContext(), "El evento no se ha registrado correctamente, por favor revisa que todos los campos esten diligenciados correctamente", Toast.LENGTH_SHORT).show()
+                    }
+                }
+                is Resource.Loading -> {
+                    // Show a loading indicator
+                }
+            }
+        })
     }
 
 }
