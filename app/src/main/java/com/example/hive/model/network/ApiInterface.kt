@@ -20,6 +20,9 @@ interface ApiInterface {
     @GET("/events/{id}")
     suspend fun getEventsById(@Path("id") id: String): Response<EventDetailResponse>
 
+    @GET("/events/date/{date}/user/{user_id}/order/{future}")
+    suspend fun getEventsByDateAndUser(@Path("date") date: String, @Path("user_id") user_id: String, @Path("future") future: String): Response<List<EventResponse>>
+    
     @POST("/users/{userId}/events/{eventId}/")
     suspend fun addParticipatEvent(@Path("userId") userId: String, @Path("eventId") eventId: String): Response<EventDetailResponse>
 

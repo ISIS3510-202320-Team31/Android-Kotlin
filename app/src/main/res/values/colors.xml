@@ -9,4 +9,11 @@
     <color name="white">#FFFFFFFF</color>
     <color name="textColor">#25221F</color>
     <color name="blueButtonColor">#2196F3</color>
+
+    <!-- Main palette -->
+    <color name="main_palette_gray">#A2AEBB</color>
+    <color name="main_palette_blue">#2196F3</color>
+    <color name="main_palette_black">#25221F</color>
+    <color name="main_palette_white">#F8F8F8</color>
+    <color name="main_palette_yellow">#FFF159</color>
 </resources>
