@@ -15,15 +15,16 @@
         />
 
     <item
+        android:id="@+id/ic_calendar"
+        android:icon="@drawable/ic_baseline_calendar_today_24"
+        android:title="Calendar"
+        />
+
+    <item
         android:id="@+id/ic_profile"
         android:icon="@drawable/ic_baseline_person_24"
         android:title="Profile"
         />
 
-    <item
-        android:id="@+id/ic_calendar"
-        android:icon="@drawable/ic_baseline_calendar_today_24"
-        android:title="Calendar"
-        />
 
 </menu>
