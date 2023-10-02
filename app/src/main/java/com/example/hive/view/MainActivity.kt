@@ -8,6 +8,7 @@ import androidx.appcompat.app.AppCompatActivity
 import android.app.NotificationChannel
 import android.app.NotificationManager
 import android.app.PendingIntent
+import android.graphics.Color
 import android.os.Build
 import androidx.core.app.NotificationCompat
 import androidx.core.app.NotificationManagerCompat
@@ -55,8 +56,16 @@ class MainActivity : AppCompatActivity() {
 
         sessionManager = SessionManager(this)
 
+        var notificationSent = sessionManager.getNotification()
+
         if (!isUserLoggedIn()) {
             navigateToLogin()
+        } else if (!notificationSent) {
+            // Send the notification
+            sendNotification()
+
+            // Set the notification status to "sent" in shared preferences
+            sessionManager.saveNotification(true)
         }
 
         replaceFragment(HomePageFragment())
@@ -205,6 +214,30 @@ class MainActivity : AppCompatActivity() {
     private fun startLocationMonitoringService() {
         val intent = Intent(this, LocationMonitoringService::class.java)
         startService(intent)
+    }
+
+    private fun sendNotification() {
+        val channelId = "123"
+
+        val notificationBuilder = NotificationCompat.Builder(this, channelId)
+            .setSmallIcon(R.drawable.ic_star)
+            .setContentTitle("Bienvenido a Hive!")
+            .setContentText("La mejor app de eventos")
+            .setPriority(NotificationCompat.PRIORITY_DEFAULT)
+            .setAutoCancel(true)
+
+        val notificationManager = NotificationManagerCompat.from(this)
+
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+            val channel = NotificationChannel(
+                channelId,
+                "Welcome Channel",
+                NotificationManager.IMPORTANCE_DEFAULT
+            )
+            notificationManager.createNotificationChannel(channel)
+        }
+
+        notificationManager.notify(1, notificationBuilder.build())
     }
 
 }
