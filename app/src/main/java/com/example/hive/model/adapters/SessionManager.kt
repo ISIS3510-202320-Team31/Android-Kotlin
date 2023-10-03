@@ -31,6 +31,16 @@ class SessionManager(context: Context) {
         return UserSession(authToken, userId)
     }
 
+    //Time tracker functions
+    fun saveElapsedTime(elapsedTimeSeconds: Long) {
+        editor.putLong("time_tracker", elapsedTimeSeconds)
+        editor.apply()
+    }
+
+    fun getElapsedTime(): Long {
+        return sharedPreferences.getLong("time_tracker", 0)
+    }
+
     fun clearSession() {
         editor.clear().apply()
     }

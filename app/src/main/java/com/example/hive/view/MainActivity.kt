@@ -7,8 +7,6 @@ import android.os.Bundle
 import androidx.appcompat.app.AppCompatActivity
 import android.app.NotificationChannel
 import android.app.NotificationManager
-import android.app.PendingIntent
-import android.graphics.Color
 import android.os.Build
 import androidx.core.app.NotificationCompat
 import androidx.core.app.NotificationManagerCompat
@@ -22,7 +20,6 @@ import com.example.hive.model.adapters.SessionManager
 import com.google.android.gms.location.FusedLocationProviderClient
 import com.google.android.gms.location.LocationServices
 import com.google.android.gms.maps.model.LatLng
-import kotlin.properties.Delegates
 
 
 class MainActivity : AppCompatActivity() {
@@ -31,6 +28,11 @@ class MainActivity : AppCompatActivity() {
     private lateinit var sessionManager: SessionManager
     private lateinit var fusedLocationClient: FusedLocationProviderClient
     private var hasLocationStarted = false
+
+    //time tracker
+    private var startTimeMillis: Long = 0
+    private var isTracking = false //Indicates if the user is currently tracking time
+    private var elapsedTimeSeconds: Long = 0 // Total elapsed time in seconds
 
     private val polygonPoints = listOf(
         LatLng(4.6053640, -74.0666571),
@@ -106,8 +108,19 @@ class MainActivity : AppCompatActivity() {
             startLocationMonitoringService()
         }
 
+        //TIME TRACKER
+        //Get the elapsed time from the session manager
+        elapsedTimeSeconds = sessionManager.getElapsedTime()
+
+        //Start the timer if it is not already running
+        if (!isTracking) {
+            startTimeMillis = System.currentTimeMillis()
+            isTracking = true
+        }
+
         binding.bottomNavigation.setOnItemSelectedListener {
             when(it.itemId) {
+
                 R.id.ic_home -> {
                     replaceFragment(HomePageFragment())
                     true
@@ -121,6 +134,7 @@ class MainActivity : AppCompatActivity() {
                     true
                 }
                 R.id.ic_profile -> {
+                    sessionManager.saveElapsedTime(elapsedTimeSeconds)
                     replaceFragment(UserProfileFragment())
                     true
                 }
@@ -134,6 +148,35 @@ class MainActivity : AppCompatActivity() {
         // Inflate the menu; this adds items to the action bar if it is present.
         menuInflater.inflate(R.menu.menu_main, menu)
         return true
+    }
+
+    //TIME TRACKER STATUS
+    override fun onStop(){
+        super.onStop()
+
+        //Stop the timer if it is running
+        if (isTracking) {
+            val endTimeMillis = System.currentTimeMillis()
+            elapsedTimeSeconds += (endTimeMillis-startTimeMillis)/1000
+            isTracking = false
+        }
+        sessionManager.saveElapsedTime(elapsedTimeSeconds)
+    }
+
+    override fun onRestart() {
+        super.onRestart()
+
+        //Restart the timer if the app is restarted
+        startTimeMillis = System.currentTimeMillis()
+        isTracking = true
+        sessionManager.saveElapsedTime(elapsedTimeSeconds)
+    }
+
+    override fun onDestroy() {
+        super.onDestroy()
+
+        //Save the elapsed time in the session manager
+        sessionManager.saveElapsedTime(elapsedTimeSeconds)
     }
 
     private fun replaceFragment(fragment: Fragment) {
@@ -240,5 +283,7 @@ class MainActivity : AppCompatActivity() {
 
         notificationManager.notify(1, notificationBuilder.build())
     }
+
+
 
 }
