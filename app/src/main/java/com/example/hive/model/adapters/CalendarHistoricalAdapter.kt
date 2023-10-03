@@ -123,8 +123,14 @@ class CalendarHistoricalAdapter(private val viewModelAddParticipant: AddParticip
 
             val eventImageView = detailDialog.findViewById<ImageView>(R.id.imagen_historical)
             val url = event.image
-            if (url != null) {
-                Picasso.get().load(url).into(eventImageView)
+            if (url != null || url != "") {
+
+                //In case it is not a loadable image just leave the eventImageView empty using a try catch
+                try {
+                    Picasso.get().load(url).into(eventImageView)
+                } catch (e: Exception) {
+                    eventImageView.setImageResource(R.drawable.ic_baseline_calendar_day)
+                }
             }
 
             val eventQRImageView = detailDialog.findViewById<ImageView>(R.id.qr_historical)
