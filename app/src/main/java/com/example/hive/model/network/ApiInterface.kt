@@ -45,4 +45,7 @@ interface ApiInterface {
 
     @GET("/events/users/{userId}/participation/")
     suspend fun getParticipation(@Path("userId") userId: String): Response<UserParticipationResponse>
+
+    @GET("/users/{userId}/")
+    suspend fun getUserById(@Path("userId") userId: String): Response<UserResponse>
 }

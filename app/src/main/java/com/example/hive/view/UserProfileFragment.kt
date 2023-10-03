@@ -49,6 +49,7 @@ class UserProfileFragment : Fragment() {
         viewModel.elapsedTimeLiveData.observe(viewLifecycleOwner, Observer{ elapsedTime ->
             handleTracking(elapsedTime)
         })
+
         //Update user participation
         viewModel.userParticipation.observe(viewLifecycleOwner, Observer { resource ->
             val participationTextView = view?.findViewById<TextView>(R.id.eventsJoined)
@@ -74,6 +75,39 @@ class UserProfileFragment : Fragment() {
 
         })
 
+        //update user detail
+        viewModel.userDetail.observe(viewLifecycleOwner, Observer { resource ->
+            val nameTextView = view?.findViewById<TextView>(R.id.userName)
+            val emailTextView = view?.findViewById<TextView>(R.id.email)
+
+            when (resource){
+                is Resource.Loading<*> -> {
+                    if (nameTextView != null) {
+                        nameTextView.text = "..."
+                    }
+                    if (emailTextView != null) {
+                        emailTextView.text = "..."
+                    }
+                }
+                is Resource.Success<*> -> {
+                    if (nameTextView != null) {
+                        nameTextView.text = resource.data?.name
+                    }
+                    if (emailTextView != null) {
+                        emailTextView.text = resource.data?.email
+                    }
+                }
+                is Resource.Error<*> -> {
+                    if (nameTextView != null) {
+                        nameTextView.text = ""
+                    }
+                    if (emailTextView != null) {
+                        emailTextView.text = ""
+                    }
+                }
+            }
+        })
+
         viewModel.updateElapsedTime()
 
         val buttonSignOut = view?.findViewById<Button>(R.id.signOutButton)
@@ -93,14 +127,44 @@ class UserProfileFragment : Fragment() {
             elapsedTimeSeconds > 3599 -> {
                 val hours = elapsedTimeSeconds / 3600
                 val minutes = (elapsedTimeSeconds % 3600) / 60
-                "$hours:$minutes horas"
+                if (minutes <10 && hours <10){
+                    "0$hours:0$minutes horas"
+                }else if (minutes <10){
+                    "0$hours:$minutes horas"
+                }
+                else if (hours <10){
+                    "$hours:0$minutes horas"
+                }
+                else{
+                    "$hours:$minutes horas"
+                }
             }
             elapsedTimeSeconds > 59 -> {
                 val minutes = elapsedTimeSeconds / 60
                 val seconds = elapsedTimeSeconds % 60
-                "$minutes:$seconds minutos"
+
+                if (seconds <10 && minutes <10){
+                    "0$minutes:0$seconds minutos"
+                }else if (seconds <10){
+                    "0$minutes:$seconds minutos"
+                }
+                else if (minutes <10){
+                    "$minutes:0$seconds minutos"
+                }
+                else{
+                    "$minutes:$seconds minutos"
+                }
             }
-            else -> "$elapsedTimeSeconds segundos"
+            else -> {
+                val seconds = elapsedTimeSeconds
+                if (seconds <10){
+                    "00:0$seconds segundos"
+                }
+                else{
+                    "00:$seconds segundos"
+                }
+            }
+
         }
 
         elapsedTimeTextView.text = formattedTime
