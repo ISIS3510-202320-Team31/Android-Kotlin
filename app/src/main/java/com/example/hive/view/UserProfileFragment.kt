@@ -130,10 +130,10 @@ class UserProfileFragment : Fragment() {
                 if (minutes <10 && hours <10){
                     "0$hours:0$minutes horas"
                 }else if (minutes <10){
-                    "0$hours:$minutes horas"
+                    "$hours:0$minutes horas"
                 }
                 else if (hours <10){
-                    "$hours:0$minutes horas"
+                    "0$hours:$minutes horas"
                 }
                 else{
                     "$hours:$minutes horas"
@@ -146,10 +146,10 @@ class UserProfileFragment : Fragment() {
                 if (seconds <10 && minutes <10){
                     "0$minutes:0$seconds minutos"
                 }else if (seconds <10){
-                    "0$minutes:$seconds minutos"
+                    "$minutes:0$seconds minutos"
                 }
                 else if (minutes <10){
-                    "$minutes:0$seconds minutos"
+                    "0$minutes:$seconds minutos"
                 }
                 else{
                     "$minutes:$seconds minutos"
