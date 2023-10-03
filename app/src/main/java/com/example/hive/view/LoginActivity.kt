@@ -35,13 +35,13 @@ class LoginActivity : AppCompatActivity() {
         viewModel._loginResult.observe(this, Observer { response ->
             when (response) {
                 is Resource.Success -> {
-                    Toast.makeText(this, "Inicio de sesión correctamente", Toast.LENGTH_SHORT).show()
+                    Toast.makeText(this, "Iniciaste sesión correctamente", Toast.LENGTH_SHORT).show()
                     val intent = Intent(this, MainActivity::class.java)
                     startActivity(intent)
                     finish()
                 }
                 is Resource.Error -> {
-                    Toast.makeText(this, "Inicio de sesión falló", Toast.LENGTH_SHORT).show()
+                    Toast.makeText(this, "Error al inciar sesión, revise sus datos", Toast.LENGTH_SHORT).show()
                 }
                 is Resource.Loading -> {
                     Toast.makeText(this, "Iniciando sesión...", Toast.LENGTH_SHORT).show()
@@ -52,6 +52,19 @@ class LoginActivity : AppCompatActivity() {
         loginButton.setOnClickListener {
             val username = findViewById<EditText>(R.id.editTextEmail).text.toString()
             val password = findViewById<EditText>(R.id.editTextPassword).text.toString()
+
+            if (username.isEmpty()) {
+                findViewById<EditText>(R.id.editTextEmail).error = "Por favor ingrese su usuario"
+                findViewById<EditText>(R.id.editTextEmail).requestFocus()
+                return@setOnClickListener
+            }
+
+            if (password.isEmpty()) {
+                findViewById<EditText>(R.id.editTextPassword).error = "Por favor ingrese su contraseña"
+                findViewById<EditText>(R.id.editTextPassword).requestFocus()
+                return@setOnClickListener
+            }
+
 
             val request = LoginRequest(username, password)
 
