@@ -3,10 +3,7 @@ package com.example.hive.model.network
 import com.example.hive.model.network.requests.CreateEventRequest
 import com.example.hive.model.network.requests.LoginRequest
 import com.example.hive.model.network.requests.RegisterRequest
-import com.example.hive.model.network.responses.CreateEventResponse
-import com.example.hive.model.network.responses.EventDetailResponse
-import com.example.hive.model.network.responses.EventResponse
-import com.example.hive.model.network.responses.UserResponse
+import com.example.hive.model.network.responses.*
 import retrofit2.Response
 import retrofit2.http.DELETE
 import retrofit2.http.Body
@@ -45,4 +42,7 @@ interface ApiInterface {
     
     @GET("/events/users/{id}/")
     suspend fun getSmartFeature(@Path("id") id: String): Response<List<EventResponse>>
+
+    @GET("/events/users/{userId}/participation/")
+    suspend fun getParticipation(@Path("userId") userId: String): Response<UserParticipationResponse>
 }

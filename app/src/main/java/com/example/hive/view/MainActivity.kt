@@ -7,8 +7,6 @@ import android.os.Bundle
 import androidx.appcompat.app.AppCompatActivity
 import android.app.NotificationChannel
 import android.app.NotificationManager
-import android.app.PendingIntent
-import android.graphics.Color
 import android.os.Build
 import androidx.core.app.NotificationCompat
 import androidx.core.app.NotificationManagerCompat
@@ -22,7 +20,6 @@ import com.example.hive.model.adapters.SessionManager
 import com.google.android.gms.location.FusedLocationProviderClient
 import com.google.android.gms.location.LocationServices
 import com.google.android.gms.maps.model.LatLng
-import kotlin.properties.Delegates
 
 
 class MainActivity : AppCompatActivity() {
@@ -106,8 +103,6 @@ class MainActivity : AppCompatActivity() {
             )
         }
 
-
-
         if (!hasLocationStarted) {
             hasLocationStarted = true
             startLocationMonitoringService()
@@ -125,6 +120,7 @@ class MainActivity : AppCompatActivity() {
 
         binding.bottomNavigation.setOnItemSelectedListener {
             when(it.itemId) {
+
                 R.id.ic_home -> {
                     replaceFragment(HomePageFragment())
                     true
@@ -138,9 +134,9 @@ class MainActivity : AppCompatActivity() {
                     true
                 }
                 R.id.ic_profile -> {
+                    sessionManager.saveElapsedTime(elapsedTimeSeconds)
                     replaceFragment(UserProfileFragment())
                     true
-
                 }
                 else -> false
             }
@@ -164,6 +160,7 @@ class MainActivity : AppCompatActivity() {
             elapsedTimeSeconds += (endTimeMillis-startTimeMillis)/1000
             isTracking = false
         }
+        sessionManager.saveElapsedTime(elapsedTimeSeconds)
     }
 
     override fun onRestart() {
@@ -172,6 +169,7 @@ class MainActivity : AppCompatActivity() {
         //Restart the timer if the app is restarted
         startTimeMillis = System.currentTimeMillis()
         isTracking = true
+        sessionManager.saveElapsedTime(elapsedTimeSeconds)
     }
 
     override fun onDestroy() {

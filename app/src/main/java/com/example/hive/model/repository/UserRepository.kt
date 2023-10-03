@@ -8,5 +8,6 @@ class UserRepository {
 
     suspend fun registerR(registerRequest: RegisterRequest) = RetroFitInstance.api.registerUser(registerRequest)
     suspend fun loginR(loginRequest: LoginRequest) = RetroFitInstance.api.loginUser(loginRequest)
+    suspend fun getParticipationR(user_id: String) = RetroFitInstance.api.getParticipation(user_id)
 
 }
