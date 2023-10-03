@@ -8,6 +8,7 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.Button
+import android.widget.TextView
 import com.example.hive.R
 import com.example.hive.model.adapters.SessionManager
 import com.example.hive.viewmodel.UserProfileViewModel
@@ -19,6 +20,7 @@ class UserProfileFragment : Fragment() {
     }
 
     private lateinit var viewModel: UserProfileViewModel
+    private lateinit var sessionManager: SessionManager
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
@@ -33,7 +35,8 @@ class UserProfileFragment : Fragment() {
 
         val buttonSignOut = view?.findViewById<Button>(R.id.signOutButton)
 
-        val sessionManager = SessionManager(requireContext())
+        //Time tracker
+        handdleTracking()
 
         buttonSignOut?.setOnClickListener {
             sessionManager.clearSession()
@@ -41,6 +44,38 @@ class UserProfileFragment : Fragment() {
             intent.flags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TASK // Clear the back stack
             startActivity(intent)
             activity?.finish()
+        }
+    }
+
+    override fun onResume() {
+        super.onResume()
+        handdleTracking()
+    }
+
+
+    private fun handdleTracking() {
+
+        val sessionManager = SessionManager(requireContext())
+        val elapsedTimeSeconds = sessionManager.getElapsedTime()
+
+        val elapsedTimeTextView = view?.findViewById<TextView>(R.id.timeSpent)
+
+        //Si hay más de 59 segundos dar el timepo en minutos
+        if (elapsedTimeSeconds > 59) {
+            val elapsedTimeMinutes = elapsedTimeSeconds / 60
+            val elapsedTimeSeconds = elapsedTimeSeconds % 60
+
+            elapsedTimeTextView?.text = "$elapsedTimeMinutes:$elapsedTimeSeconds minutos"
+        }
+        // si hay más de 59minutos y 59 segundos dar en horas
+        else if (elapsedTimeSeconds > 3599) {
+            val elapsedTimeHours = elapsedTimeSeconds / 3600
+            val elapsedTimeMinutes = (elapsedTimeSeconds % 3600) / 60
+            val elapsedTimeSeconds = elapsedTimeSeconds % 60
+            elapsedTimeTextView?.text = "$elapsedTimeHours:$elapsedTimeMinutes horas"
+        }
+        else {
+            elapsedTimeTextView?.text = "$elapsedTimeSeconds segundos"
         }
     }
 

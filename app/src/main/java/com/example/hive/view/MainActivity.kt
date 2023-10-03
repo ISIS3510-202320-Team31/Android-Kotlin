@@ -32,6 +32,11 @@ class MainActivity : AppCompatActivity() {
     private lateinit var fusedLocationClient: FusedLocationProviderClient
     private var hasLocationStarted = false
 
+    //time tracker
+    private var startTimeMillis: Long = 0
+    private var isTracking = false //Indicates if the user is currently tracking time
+    private var elapsedTimeSeconds: Long = 0 // Total elapsed time in seconds
+
     private val polygonPoints = listOf(
         LatLng(4.6053640, -74.0666571),
         LatLng(4.6029762, -74.0677709),
@@ -101,9 +106,21 @@ class MainActivity : AppCompatActivity() {
             )
         }
 
+
+
         if (!hasLocationStarted) {
             hasLocationStarted = true
             startLocationMonitoringService()
+        }
+
+        //TIME TRACKER
+        //Get the elapsed time from the session manager
+        elapsedTimeSeconds = sessionManager.getElapsedTime()
+
+        //Start the timer if it is not already running
+        if (!isTracking) {
+            startTimeMillis = System.currentTimeMillis()
+            isTracking = true
         }
 
         binding.bottomNavigation.setOnItemSelectedListener {
@@ -123,6 +140,7 @@ class MainActivity : AppCompatActivity() {
                 R.id.ic_profile -> {
                     replaceFragment(UserProfileFragment())
                     true
+
                 }
                 else -> false
             }
@@ -134,6 +152,33 @@ class MainActivity : AppCompatActivity() {
         // Inflate the menu; this adds items to the action bar if it is present.
         menuInflater.inflate(R.menu.menu_main, menu)
         return true
+    }
+
+    //TIME TRACKER STATUS
+    override fun onStop(){
+        super.onStop()
+
+        //Stop the timer if it is running
+        if (isTracking) {
+            val endTimeMillis = System.currentTimeMillis()
+            elapsedTimeSeconds += (endTimeMillis-startTimeMillis)/1000
+            isTracking = false
+        }
+    }
+
+    override fun onRestart() {
+        super.onRestart()
+
+        //Restart the timer if the app is restarted
+        startTimeMillis = System.currentTimeMillis()
+        isTracking = true
+    }
+
+    override fun onDestroy() {
+        super.onDestroy()
+
+        //Save the elapsed time in the session manager
+        sessionManager.saveElapsedTime(elapsedTimeSeconds)
     }
 
     private fun replaceFragment(fragment: Fragment) {
@@ -240,5 +285,7 @@ class MainActivity : AppCompatActivity() {
 
         notificationManager.notify(1, notificationBuilder.build())
     }
+
+
 
 }
