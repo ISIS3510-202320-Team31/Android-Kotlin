@@ -76,6 +76,7 @@ class EventsAdapter(private val viewModelAddParticipant: AddParticipatEventViewM
         // Add a click listener to the card view
         cardView.setOnClickListener {
             val detailDialog = Dialog(holder.itemView.context)
+            detailDialog.setContentView(R.layout.fragment_event_detail)
 
             val eventRepository = EventRepository()
 
@@ -83,51 +84,69 @@ class EventsAdapter(private val viewModelAddParticipant: AddParticipatEventViewM
 
             eventDetailViewModel.getEventByIdVM(event.id)
 
+            val eventNameTextView = detailDialog.findViewById<TextView>(R.id.title)
+            val eventEstadoTextView = detailDialog.findViewById<TextView>(R.id.estado)
+            val eventIDTextView = detailDialog.findViewById<TextView>(R.id.eventID)
+            val eventCategoryTextView = detailDialog.findViewById<TextView>(R.id.categoria)
+            val eventCreatorTextView = detailDialog.findViewById<TextView>(R.id.creador)
+            val eventDateTextView = detailDialog.findViewById<TextView>(R.id.fecha)
+            val eventDuracionTextView = detailDialog.findViewById<TextView>(R.id.duracion)
+            val eventDescriptionTextView = detailDialog.findViewById<TextView>(R.id.descripcion)
+            val eventLugarTextView = detailDialog.findViewById<TextView>(R.id.lugar)
+            val eventParticipantTextView = detailDialog.findViewById<TextView>(R.id.personas)
+            val eventQRImageView = detailDialog.findViewById<ImageView>(R.id.qr)
+            val joinEventButton = detailDialog.findViewById<Button>(R.id.submitButton)
+            val eventLinksInteresesTextView = detailDialog.findViewById<TextView>(R.id.linksInteres)
+            val eventImageView = detailDialog.findViewById<ImageView>(R.id.imagen)
+
             eventDetailViewModel.eventById.observe(lifecycleOwner, Observer { resource ->
                 when (resource) {
                     is Resource.Loading<*> -> {
                         // Show progress bar
-                        detailDialog.setContentView(R.layout.progress_bar)
+                        // Hide all components except progress bar
+                        val dialogLinearLayout = detailDialog.findViewById<LinearLayout>(R.id.layoutCard)
+                        val dialogProgressBar = detailDialog.findViewById<ProgressBar>(R.id.loadingProgressBar)
+
+                        dialogLinearLayout.visibility = View.GONE
+                        dialogProgressBar.visibility = View.VISIBLE
                     }
                     is Resource.Success<*> -> {
-                        detailDialog.setContentView(R.layout.fragment_event_detail)
+
+                        // Hide progress bar
+                        // Show all components except progress bar
+                        val dialogLinearLayout = detailDialog.findViewById<LinearLayout>(R.id.layoutCard)
+                        val dialogProgressBar = detailDialog.findViewById<ProgressBar>(R.id.loadingProgressBar)
+
+                        dialogLinearLayout.visibility = View.VISIBLE
+                        dialogProgressBar.visibility = View.GONE
+
                         val eventDetailResponse = resource.data as EventDetailResponse
-                        val eventNameTextView = detailDialog.findViewById<TextView>(R.id.title)
+
                         eventNameTextView.text = eventDetailResponse.name
 
-                        val eventEstadoTextView = detailDialog.findViewById<TextView>(R.id.estado)
                         if (eventDetailResponse.state) {
                             eventEstadoTextView.text = "Activo"
                         } else {
                             eventEstadoTextView.text = "Inactivo"
                         }
 
-                        val eventIDTextView = detailDialog.findViewById<TextView>(R.id.eventID)
                         eventIDTextView.text = eventDetailResponse.id
 
-                        val eventCategoryTextView = detailDialog.findViewById<TextView>(R.id.categoria)
                         eventCategoryTextView.text = eventDetailResponse.category
 
-                        val eventCreatorTextView = detailDialog.findViewById<TextView>(R.id.creador)
                         eventCreatorTextView.text = eventDetailResponse.creator
 
-                        val eventDateTextView = detailDialog.findViewById<TextView>(R.id.fecha)
                         eventDateTextView.text = newDate
 
-                        val eventDuracionTextView = detailDialog.findViewById<TextView>(R.id.duracion)
                         eventDuracionTextView.text = eventDetailResponse.duration.toString()+" minutos"
 
-                        val eventDescriptionTextView = detailDialog.findViewById<TextView>(R.id.descripcion)
                         eventDescriptionTextView.text = eventDetailResponse.description
 
-                        val eventLugarTextView = detailDialog.findViewById<TextView>(R.id.lugar)
                         eventLugarTextView.text = eventDetailResponse.place
 
-                        val eventParticipantTextView = detailDialog.findViewById<TextView>(R.id.personas)
                         val stringParticipant = "${eventDetailResponse.participants.size} / ${eventDetailResponse.num_participants} personas"
                         eventParticipantTextView.text = stringParticipant
 
-                        val eventQRImageView = detailDialog.findViewById<ImageView>(R.id.qr)
                         val eventId = eventDetailResponse.id
                         val qrCodeBitmap = generateQRCode(eventId, 300, 300)
 
@@ -140,11 +159,8 @@ class EventsAdapter(private val viewModelAddParticipant: AddParticipatEventViewM
                         // Check if userSession.id is in event.participants
                         if (eventDetailResponse.participants.contains(userSession.userId)) {
                             // If userSession.id is in event.participants, change joinEventButton text to "salir"
-                            val joinEventButton = detailDialog.findViewById<Button>(R.id.submitButton)
                             joinEventButton.text = "No asistir"
                         }
-
-                        val eventLinksInteresesTextView = detailDialog.findViewById<TextView>(R.id.linksInteres)
 
                         if (eventDetailResponse.links.isNotEmpty()) {
                             // If there are links, set the text to the links
@@ -154,7 +170,6 @@ class EventsAdapter(private val viewModelAddParticipant: AddParticipatEventViewM
                             eventLinksInteresesTextView.text = ""
                         }
 
-                        val eventImageView = detailDialog.findViewById<ImageView>(R.id.imagen)
                         val url = eventDetailResponse.image
 
                         if (url != null || url != "") {
@@ -167,7 +182,6 @@ class EventsAdapter(private val viewModelAddParticipant: AddParticipatEventViewM
                             }
                         }
 
-                        val joinEventButton = detailDialog.findViewById<Button>(R.id.submitButton)
                         joinEventButton.setOnClickListener {
                             val eventIDTextView = detailDialog.findViewById<TextView>(R.id.eventID)
                             val eventID = eventIDTextView.text.toString()
