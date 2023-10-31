@@ -202,7 +202,11 @@ class HomePageFragment : Fragment() {
                                 val eventImageView = detailDialog.findViewById<ImageView>(R.id.imagen)
                                 val url = resource.data?.image
                                 if (url != null) {
-                                    Picasso.get().load(url).into(eventImageView)
+                                    try {
+                                        Picasso.get().load(url).into(eventImageView)
+                                    } catch (e: Exception) {
+                                        eventImageView.setImageResource(R.drawable.ic_baseline_calendar_day)
+                                    }
                                 }
 
 
