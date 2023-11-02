@@ -1,9 +1,9 @@
 package com.example.hive.view
 
 import android.content.Intent
-import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import android.widget.*
+import androidx.appcompat.app.AppCompatActivity
 import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProvider
 import com.example.hive.R
@@ -70,6 +70,11 @@ class SignUpActivity : AppCompatActivity() {
                 findViewById<EditText>(R.id.editTextEmail).requestFocus()
                 return@setOnClickListener
             }
+            if (!android.util.Patterns.EMAIL_ADDRESS.matcher(email).matches()) {
+                findViewById<EditText>(R.id.editTextEmail).error = "Por favor ingrese un correo electrónico válido"
+                findViewById<EditText>(R.id.editTextEmail).requestFocus()
+                return@setOnClickListener
+            }
             if (password.isEmpty()) {
                 findViewById<EditText>(R.id.editTextPassword).error = "Por favor ingrese su contraseña"
                 findViewById<EditText>(R.id.editTextPassword).requestFocus()
@@ -84,15 +89,6 @@ class SignUpActivity : AppCompatActivity() {
                 // Show toast message
                 Toast.makeText(this, "La contraseña debe ser igual a su confirmación", Toast.LENGTH_SHORT).show()
             }
-
-            // Check that the email is valid
-            if (!android.util.Patterns.EMAIL_ADDRESS.matcher(email).matches()) {
-                findViewById<EditText>(R.id.editTextEmail).error = "Por favor ingrese un correo electrónico válido"
-                findViewById<EditText>(R.id.editTextEmail).requestFocus()
-                return@setOnClickListener
-            }
-
-
             //Check that the username is at least 4 characters long
             if (username.length < 4) {
                 findViewById<EditText>(R.id.editTextUsername).error = "El usuario debe tener al menos 4 caracteres"
