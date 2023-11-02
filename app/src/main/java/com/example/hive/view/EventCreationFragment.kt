@@ -50,26 +50,60 @@ class EventCreationFragment : Fragment() {
             Log.d("date", "FECHA")
             Log.d("date", formattedDate)
             val description = view?.findViewById<EditText>(R.id.textBoxDescription)?.text.toString()
-            val num_participants = view?.findViewById<EditText>(R.id.inputBoxParticipant)?.text.toString().toInt()
+            val num_participants = view?.findViewById<EditText>(R.id.inputBoxParticipant)?.text.toString()
             val category = view?.findViewById<Spinner>(R.id.spinner1)?.selectedItem.toString()
             val state = true
-            val duration = view?.findViewById<EditText>(R.id.inputBoxDuration)?.text.toString().toInt()
+            val duration = view?.findViewById<EditText>(R.id.inputBoxDuration)?.text.toString()
             val creador = session.getUserSession().userId.toString()
             val tags = view?.findViewById<EditText>(R.id.textBox2)?.text.toString().split(" ")
             val links = view?.findViewById<EditText>(R.id.textBox)?.text.toString().split(" ")
 
-
+            if (name.isEmpty()) {
+                view?.findViewById<EditText>(R.id.inputBox)?.error = "Por favor ingrese su nombre"
+                view?.findViewById<EditText>(R.id.inputBox)?.requestFocus()
+                return@setOnClickListener
+            }
+            if (place.isEmpty()) {
+                view?.findViewById<EditText>(R.id.inputBoxLugar)?.error = "Por favor ingrese el lugar del evento"
+                view?.findViewById<EditText>(R.id.inputBoxLugar)?.requestFocus()
+                return@setOnClickListener
+            }
+            if (description.isEmpty()) {
+                view?.findViewById<EditText>(R.id.textBoxDescription)?.error = "Por favor ingrese la descripcion del evento"
+                view?.findViewById<EditText>(R.id.textBoxDescription)?.requestFocus()
+                return@setOnClickListener
+            }
+            if (num_participants.isEmpty()) {
+                view?.findViewById<EditText>(R.id.inputBoxParticipant)?.error = "Por favor la cantidad de participantes"
+                view?.findViewById<EditText>(R.id.inputBoxParticipant)?.requestFocus()
+                return@setOnClickListener
+            }
+            if (duration.isEmpty()) {
+                view?.findViewById<EditText>(R.id.inputBoxDuration)?.error = "Ingrese la duracion del evento"
+                view?.findViewById<EditText>(R.id.inputBoxDuration)?.requestFocus()
+                return@setOnClickListener
+            }
+            if (links.all { it.isNotBlank() }){
+                for (link in links) {
+                    if (!android.util.Patterns.WEB_URL.matcher(link).matches()) {
+                        view?.findViewById<EditText>(R.id.textBox)?.error = "Por favor ingrese correctamente los links del evento"
+                        view?.findViewById<EditText>(R.id.textBox)?.requestFocus()
+                        return@setOnClickListener
+                    }
+                }
+            }
             var createEventRequest = try {
-                CreateEventRequest(name, place, formattedDate, description, num_participants, category, state, duration, creador, tags, links)
+                CreateEventRequest(name, place, formattedDate, description, num_participants.toInt(), category, state, duration.toInt(), creador, tags, links)
             } catch (e: Exception) {
                 Toast.makeText(requireContext(), "Error al registrar el evento", Toast.LENGTH_SHORT).show()
                 null
             }
 
-            if (name.isEmpty() || place.isEmpty() || formattedDate.isEmpty() || description.isEmpty() || num_participants.toString().isEmpty() || category.isEmpty() || duration.toString().isEmpty() || creador.isEmpty()) {
+            if (name.isEmpty() || place.isEmpty() || formattedDate.isEmpty() || description.isEmpty() || num_participants.isEmpty() || category.isEmpty() || duration.isEmpty() || creador.isEmpty()) {
                 // Show toast message
                 createEventRequest = null
             }
+
             if (createEventRequest != null) {
                 try {
                     viewModel.createEventVM(createEventRequest)
@@ -81,18 +115,6 @@ class EventCreationFragment : Fragment() {
             }
             else {
                 Toast.makeText(requireContext(), "Error al registrar el evento", Toast.LENGTH_SHORT).show()
-                // Print all the fields
-                println("Name: $name")
-                println("Place: $place")
-                println("Date: $date")
-                println("Description: $description")
-                println("Num_participants: $num_participants")
-                println("Category: $category")
-                println("State: $state")
-                println("Duration: $duration")
-                println("Creador: $creador")
-                println("Tags: $tags")
-                println("Links: $links")
             }
         }
 

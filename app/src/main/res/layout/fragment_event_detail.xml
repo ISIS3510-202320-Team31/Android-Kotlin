@@ -166,7 +166,7 @@
             android:layout_margin="10dp"
             android:background="@drawable/round_grey"
             android:padding="5dp"
-            android:text="Links de Interes"
+            android:text="Links de Interés"
             android:textAlignment="center"
             android:textColor="#F8F8F8"
             android:textSize="15dp"

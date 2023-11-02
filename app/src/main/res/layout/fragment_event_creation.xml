@@ -43,7 +43,7 @@
                     android:layout_width="0dp"
                     android:layout_height="wrap_content"
                     android:textSize="16sp"
-                    android:hint="Ingrese el titulo del evento"
+                    android:hint="Ingrese el título del evento."
                     android:maxLength="20"
                     app:layout_constraintStart_toStartOf="parent"
                     app:layout_constraintEnd_toEndOf="parent"
@@ -64,6 +64,7 @@
                     android:layout_marginTop="16dp"
                     android:layout_marginLeft="20dp"
                     android:layout_marginRight="20dp"
+                    android:maxLength="50"
                     app:layout_constraintTop_toBottomOf="@+id/inputBox"
                     />
 
@@ -72,13 +73,14 @@
                     android:layout_width="0dp"
                     android:layout_height="wrap_content"
                     android:textSize="16sp"
-                    android:hint="Ingrese la duracion (en minutos)"
+                    android:hint="Ingrese la duración (en minutos)."
                     app:layout_constraintStart_toStartOf="parent"
                     app:layout_constraintEnd_toEndOf="parent"
                     android:layout_marginTop="16dp"
                     android:layout_marginLeft="20dp"
                     android:layout_marginRight="20dp"
                     android:inputType="number"
+                    android:maxLength="10"
                     app:layout_constraintTop_toBottomOf="@+id/inputBoxLugar"
                     />
 
@@ -94,6 +96,7 @@
                     android:layout_marginLeft="20dp"
                     android:layout_marginRight="20dp"
                     android:inputType="number"
+                    android:maxLength="3"
                     app:layout_constraintTop_toBottomOf="@+id/inputBoxDuration"
                     />
 
@@ -169,7 +172,7 @@
                     android:layout_width="0dp"
                     android:layout_height="wrap_content"
                     android:textSize="16sp"
-                    android:hint="Links de interes (separelos por un espacio)"
+                    android:hint= "Enlaces de interés (sepárelos por un espacio)"
                     android:layout_marginTop="16dp"
                     app:layout_constraintStart_toStartOf="parent"
                     app:layout_constraintEnd_toEndOf="parent"
@@ -183,7 +186,7 @@
                     android:layout_width="0dp"
                     android:layout_height="wrap_content"
                     android:textSize="16sp"
-                    android:hint="Palabras clave (separelos por un espacio)"
+                    android:hint="Palabras clave (sepárelos por un espacio)"
                     android:layout_marginTop="16dp"
                     app:layout_constraintStart_toStartOf="parent"
                     app:layout_constraintEnd_toEndOf="parent"
