@@ -50,14 +50,12 @@ class HomePageFragment : Fragment() {
         // Inflate the layout for this fragment
         val view = inflater.inflate(R.layout.fragment_home_page, container, false)
 
-        // Initialize ViewModel
-        val repository = EventRepository()
         val userSession = SessionManager(requireContext())
         user = userSession.getUserSession()
-        val viewModelFactory = EventsViewModelProviderFactory(repository, user)
+        val viewModelFactory = EventsViewModelProviderFactory(user)
         viewModelEvent = ViewModelProvider(this, viewModelFactory).get(EventListViewModel::class.java)
 
-        val viewModelAddParticipatEventFactory = AddParticipatEventViewModelProviderFactory(repository)
+        val viewModelAddParticipatEventFactory = AddParticipatEventViewModelProviderFactory()
         viewModelAddParticipant = ViewModelProvider(this, viewModelAddParticipatEventFactory).get(AddParticipatEventViewModel::class.java)
 
         // Set up RecyclerView
@@ -134,8 +132,7 @@ class HomePageFragment : Fragment() {
                 if (result.contents == null) {
                     Toast.makeText(requireContext(), requireContext().getString(R.string.evento_cancelado), Toast.LENGTH_LONG).show()
                 } else {
-                    val repository = EventRepository()
-                    val viewModelFactoryDetail = EventDetailViewModelProviderFactory(repository, result.contents)
+                    val viewModelFactoryDetail = EventDetailViewModelProviderFactory(result.contents)
                     viewModelEventDetail = ViewModelProvider(this, viewModelFactoryDetail).get(EventDetailViewModel::class.java)
 
                     viewModelEventDetail.eventById.observe(viewLifecycleOwner, Observer { resource ->
@@ -202,7 +199,11 @@ class HomePageFragment : Fragment() {
                                 val eventImageView = detailDialog.findViewById<ImageView>(R.id.imagen)
                                 val url = resource.data?.image
                                 if (url != null) {
-                                    Picasso.get().load(url).into(eventImageView)
+                                    try {
+                                        Picasso.get().load(url).into(eventImageView)
+                                    } catch (e: Exception) {
+                                        eventImageView.setImageResource(R.drawable.ic_baseline_calendar_day)
+                                    }
                                 }
 
 

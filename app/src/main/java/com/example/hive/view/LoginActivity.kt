@@ -11,7 +11,6 @@ import androidx.lifecycle.ViewModelProvider
 import com.example.hive.R
 import com.example.hive.model.adapters.SessionManager
 import com.example.hive.model.network.requests.LoginRequest
-import com.example.hive.model.repository.UserRepository
 import com.example.hive.util.Resource
 import com.example.hive.viewmodel.LoginViewModel
 import com.example.hive.viewmodel.LoginViewModelProviderFactory
@@ -24,9 +23,8 @@ class LoginActivity : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.fragment_login)
 
-        val repository = UserRepository()
         val session = SessionManager(this)
-        val viewModelFactory = LoginViewModelProviderFactory(repository, session)
+        val viewModelFactory = LoginViewModelProviderFactory(session)
 
         viewModel = ViewModelProvider(this, viewModelFactory).get(LoginViewModel::class.java)
 

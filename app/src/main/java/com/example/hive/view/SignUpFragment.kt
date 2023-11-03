@@ -24,8 +24,8 @@ class SignUpFragment : Fragment() {
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View? {
-        userRepository = UserRepository()
-        viewModelFactory = SignUpViewModelProviderFactory(userRepository)
+
+        viewModelFactory = SignUpViewModelProviderFactory()
         viewModel = ViewModelProvider(this, viewModelFactory).get(SignUpViewModel::class.java)
         return inflater.inflate(R.layout.fragment_sign_up, container, false)
     }

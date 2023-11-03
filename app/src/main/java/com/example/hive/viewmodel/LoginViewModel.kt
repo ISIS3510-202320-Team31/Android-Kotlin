@@ -1,6 +1,6 @@
 package com.example.hive.viewmodel
-import androidx.lifecycle.ViewModel
 import androidx.lifecycle.MutableLiveData
+import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.hive.model.adapters.SessionManager
 import com.example.hive.model.models.UserSession
@@ -11,9 +11,10 @@ import com.example.hive.util.Resource
 import kotlinx.coroutines.launch
 import retrofit2.Response
 
-class LoginViewModel(private val repository: UserRepository, private val sessionManager: SessionManager) : ViewModel() {
+class LoginViewModel(private val sessionManager: SessionManager) : ViewModel() {
 
     val _loginResult = MutableLiveData<Resource<UserResponse>>()
+    val repository = UserRepository()
 
     fun loginVM(request: LoginRequest) = viewModelScope.launch {
         _loginResult.postValue(Resource.Loading())

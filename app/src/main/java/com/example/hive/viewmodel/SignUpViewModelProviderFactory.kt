@@ -2,10 +2,9 @@ package com.example.hive.viewmodel
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
-import com.example.hive.model.repository.UserRepository
 
-class SignUpViewModelProviderFactory(private val repository: UserRepository): ViewModelProvider.Factory {
+class SignUpViewModelProviderFactory(): ViewModelProvider.Factory {
     override fun <T : ViewModel> create(modelClass: Class<T>): T {
-        return SignUpViewModel(repository) as T
+        return SignUpViewModel() as T
     }
 }
