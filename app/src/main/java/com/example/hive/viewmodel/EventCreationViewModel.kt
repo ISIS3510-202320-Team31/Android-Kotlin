@@ -10,8 +10,9 @@ import com.example.hive.util.Resource
 import kotlinx.coroutines.launch
 import retrofit2.Response
 
-class EventCreationViewModel (private val repository: EventRepository): ViewModel() {
+class EventCreationViewModel (): ViewModel() {
     val eventCreationPage: MutableLiveData<Resource<CreateEventResponse>> = MutableLiveData()
+    val repository = EventRepository()
 
     fun createEventVM(request: CreateEventRequest) = viewModelScope.launch {
         eventCreationPage.postValue(Resource.Loading())

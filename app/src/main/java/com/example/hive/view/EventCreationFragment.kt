@@ -1,7 +1,6 @@
 package com.example.hive.view
 
 import android.os.Bundle
-import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -12,7 +11,6 @@ import androidx.lifecycle.ViewModelProvider
 import com.example.hive.R
 import com.example.hive.model.adapters.SessionManager
 import com.example.hive.model.network.requests.CreateEventRequest
-import com.example.hive.model.repository.EventRepository
 import com.example.hive.util.Resource
 import com.example.hive.viewmodel.EventCreationViewModel
 import com.example.hive.viewmodel.EventCreationViewModelProviderFactory
@@ -23,14 +21,12 @@ class EventCreationFragment : Fragment() {
 
     private lateinit var viewModel: EventCreationViewModel
     private lateinit var viewModelFactory: EventCreationViewModelProviderFactory
-    private lateinit var eventRepository: EventRepository
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View? {
-        eventRepository = EventRepository()
-        viewModelFactory = EventCreationViewModelProviderFactory(eventRepository)
+        viewModelFactory = EventCreationViewModelProviderFactory()
         viewModel = ViewModelProvider(this, viewModelFactory).get(EventCreationViewModel::class.java)
         return inflater.inflate(R.layout.fragment_event_creation, container, false)
     }
@@ -47,8 +43,6 @@ class EventCreationFragment : Fragment() {
             val date = Date(dateMillis)
             val sdf = SimpleDateFormat("yyyy-MM-dd")
             val formattedDate = sdf.format(date)
-            Log.d("date", "FECHA")
-            Log.d("date", formattedDate)
             val description = view?.findViewById<EditText>(R.id.textBoxDescription)?.text.toString()
             val num_participants = view?.findViewById<EditText>(R.id.inputBoxParticipant)?.text.toString()
             val category = view?.findViewById<Spinner>(R.id.spinner1)?.selectedItem.toString()

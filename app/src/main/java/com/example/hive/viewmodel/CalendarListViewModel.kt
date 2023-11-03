@@ -1,7 +1,7 @@
 package com.example.hive.viewmodel
 
-import androidx.lifecycle.ViewModel
 import androidx.lifecycle.MutableLiveData
+import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.hive.model.network.responses.EventResponse
 import com.example.hive.model.repository.EventRepository
@@ -10,9 +10,10 @@ import kotlinx.coroutines.launch
 import retrofit2.Response
 
 
-class CalendarListViewModel(private val repository: EventRepository, private val user_id: String, private val future: String) : ViewModel() {
+class CalendarListViewModel(private val user_id: String, private val future: String) : ViewModel() {
 
     val eventsPage: MutableLiveData<Resource<List<EventResponse>>> = MutableLiveData()
+    val repository = EventRepository()
 
     init{
         getEventsByDateAndUserVM(user_id,future)

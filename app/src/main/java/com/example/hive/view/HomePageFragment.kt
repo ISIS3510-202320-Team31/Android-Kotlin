@@ -50,14 +50,12 @@ class HomePageFragment : Fragment() {
         // Inflate the layout for this fragment
         val view = inflater.inflate(R.layout.fragment_home_page, container, false)
 
-        // Initialize ViewModel
-        val repository = EventRepository()
         val userSession = SessionManager(requireContext())
         user = userSession.getUserSession()
-        val viewModelFactory = EventsViewModelProviderFactory(repository, user)
+        val viewModelFactory = EventsViewModelProviderFactory(user)
         viewModelEvent = ViewModelProvider(this, viewModelFactory).get(EventListViewModel::class.java)
 
-        val viewModelAddParticipatEventFactory = AddParticipatEventViewModelProviderFactory(repository)
+        val viewModelAddParticipatEventFactory = AddParticipatEventViewModelProviderFactory()
         viewModelAddParticipant = ViewModelProvider(this, viewModelAddParticipatEventFactory).get(AddParticipatEventViewModel::class.java)
 
         // Set up RecyclerView

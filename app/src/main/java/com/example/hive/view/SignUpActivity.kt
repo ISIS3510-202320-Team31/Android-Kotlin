@@ -23,8 +23,7 @@ class SignUpActivity : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.fragment_sign_up)
 
-        userRepository = UserRepository()
-        viewModelFactory = SignUpViewModelProviderFactory(userRepository)
+        viewModelFactory = SignUpViewModelProviderFactory()
         viewModel = ViewModelProvider(this, viewModelFactory).get(SignUpViewModel::class.java)
 
         val buttonSignUp = findViewById<Button>(R.id.buttonSignUp)
