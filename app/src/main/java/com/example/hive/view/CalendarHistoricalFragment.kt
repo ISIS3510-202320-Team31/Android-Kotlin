@@ -37,11 +37,24 @@ class CalendarHistoricalFragment : Fragment() {
         sessionManager = SessionManager(requireContext())
         val userSession = sessionManager.getUserSession()
         val viewModelFactory =
-            userSession.userId?.let { CalendarViewModelProviderFactory(it, "0") }
+            userSession.userId?.let { context?.let { it1 ->
+                CalendarViewModelProviderFactory(it, "0",
+                    it1
+                )
+            } }
         viewModelCalendar = ViewModelProvider(this, viewModelFactory!!).get(CalendarListViewModel::class.java)
 
-        val viewModelAddPaticipantEventFactory = AddParticipatEventViewModelProviderFactory()
-        viewModelAddParticipant = ViewModelProvider(this, viewModelAddPaticipantEventFactory).get(AddParticipatEventViewModel::class.java)
+        val viewModelAddPaticipantEventFactory = context?.let {
+            AddParticipatEventViewModelProviderFactory(
+                it
+            )
+        }
+        viewModelAddParticipant =
+            viewModelAddPaticipantEventFactory?.let {
+                ViewModelProvider(this,
+                    it
+                ).get(AddParticipatEventViewModel::class.java)
+            }!!
 
         //Set up RecyclerView
         val recyclerView = view.findViewById<RecyclerView>(R.id.recyclerCalendarlist)

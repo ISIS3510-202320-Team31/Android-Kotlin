@@ -1,6 +1,7 @@
 package com.example.hive.model.adapters
 
 import android.app.Dialog
+import android.content.Context
 import android.graphics.Bitmap
 import android.view.LayoutInflater
 import android.view.View
@@ -25,7 +26,7 @@ import com.google.zxing.qrcode.QRCodeWriter
 import com.google.zxing.qrcode.decoder.ErrorCorrectionLevel
 import com.squareup.picasso.Picasso
 
-class EventsAdapter(private val viewModelAddParticipant: AddParticipatEventViewModel, private val lifecycleOwner: LifecycleOwner, private val sessionManager: SessionManager) : RecyclerView.Adapter<EventsAdapter.MListHolder>() {
+class EventsAdapter(private val viewModelAddParticipant: AddParticipatEventViewModel, private val lifecycleOwner: LifecycleOwner, private val sessionManager: SessionManager, private val context: Context) : RecyclerView.Adapter<EventsAdapter.MListHolder>() {
 
     inner class MListHolder(itemView: View) : RecyclerView.ViewHolder(itemView)
 
@@ -78,8 +79,7 @@ class EventsAdapter(private val viewModelAddParticipant: AddParticipatEventViewM
             val detailDialog = Dialog(holder.itemView.context)
             detailDialog.setContentView(R.layout.fragment_event_detail)
 
-
-            eventDetailViewModel = EventDetailViewModel(event.id)
+            eventDetailViewModel = EventDetailViewModel(event.id, context)
 
             eventDetailViewModel.getEventByIdVM(event.id)
 

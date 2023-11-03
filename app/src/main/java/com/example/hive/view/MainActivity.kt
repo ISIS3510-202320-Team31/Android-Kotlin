@@ -11,15 +11,24 @@ import android.os.Build
 import androidx.core.app.NotificationCompat
 import androidx.core.app.NotificationManagerCompat
 import android.view.Menu
+import android.view.View
+import android.widget.Toast
 import androidx.core.app.ActivityCompat
+import androidx.core.content.ContentProviderCompat.requireContext
 import androidx.core.content.ContextCompat
 import androidx.fragment.app.Fragment
 import com.example.hive.R
 import com.example.hive.databinding.ActivityMainBinding
 import com.example.hive.model.adapters.SessionManager
+import com.example.hive.util.Resource
+import com.example.hive.viewmodel.EventListViewModel
+import com.example.hive.viewmodel.EventsViewModelProviderFactory
 import com.google.android.gms.location.FusedLocationProviderClient
 import com.google.android.gms.location.LocationServices
 import com.google.android.gms.maps.model.LatLng
+import java.text.SimpleDateFormat
+import java.util.*
+import androidx.lifecycle.Observer
 
 
 class MainActivity : AppCompatActivity() {
@@ -28,6 +37,7 @@ class MainActivity : AppCompatActivity() {
     private lateinit var sessionManager: SessionManager
     private lateinit var fusedLocationClient: FusedLocationProviderClient
     private var hasLocationStarted = false
+    private lateinit var viewModelEvent : EventListViewModel
 
     //time tracker
     private var startTimeMillis: Long = 0
@@ -141,6 +151,26 @@ class MainActivity : AppCompatActivity() {
                 else -> false
             }
         }
+
+        var userSession = sessionManager.getUserSession()
+        val viewModelFactory = EventsViewModelProviderFactory(userSession, this)
+        viewModelEvent = viewModelFactory.create(EventListViewModel::class.java)
+
+        viewModelEvent.eventsPage.observe(this, Observer { resource ->
+            when (resource) {
+                is Resource.Loading<*> -> {
+
+                }
+                is Resource.Success<*> -> {
+
+                }
+                is Resource.Error<*> -> {
+
+                }
+            }
+        })
+
+
 
     }
 

@@ -1,5 +1,6 @@
 package com.example.hive.viewmodel
 
+import android.content.Context
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
@@ -10,10 +11,10 @@ import com.example.hive.util.Resource
 import kotlinx.coroutines.launch
 import retrofit2.Response
 
-class EventListViewModel(private val userSession: UserSession) : ViewModel() {
+class EventListViewModel(private val userSession: UserSession, private val context: Context) : ViewModel() {
 
     val eventsPage: MutableLiveData<Resource<List<EventResponse>>> = MutableLiveData()
-    val repository = EventRepository()
+    val repository = EventRepository(context)
 
     init {
         getEventsVM()

@@ -52,15 +52,32 @@ class HomePageFragment : Fragment() {
 
         val userSession = SessionManager(requireContext())
         user = userSession.getUserSession()
-        val viewModelFactory = EventsViewModelProviderFactory(user)
-        viewModelEvent = ViewModelProvider(this, viewModelFactory).get(EventListViewModel::class.java)
+        val viewModelFactory = context?.let { EventsViewModelProviderFactory(user, it) }
+        viewModelEvent = viewModelFactory?.let {
+            ViewModelProvider(this,
+                it
+            ).get(EventListViewModel::class.java)
+        }!!
 
-        val viewModelAddParticipatEventFactory = AddParticipatEventViewModelProviderFactory()
-        viewModelAddParticipant = ViewModelProvider(this, viewModelAddParticipatEventFactory).get(AddParticipatEventViewModel::class.java)
+        val viewModelAddParticipatEventFactory = context?.let {
+            AddParticipatEventViewModelProviderFactory(
+                it
+            )
+        }
+        viewModelAddParticipant =
+            viewModelAddParticipatEventFactory?.let {
+                ViewModelProvider(this,
+                    it
+                ).get(AddParticipatEventViewModel::class.java)
+            }!!
 
         // Set up RecyclerView
         val recyclerView = view.findViewById<RecyclerView>(R.id.recyclerView)
-        eventsAdapter = EventsAdapter(viewModelAddParticipant, this, userSession)
+        eventsAdapter = context?.let {
+            EventsAdapter(viewModelAddParticipant, this, userSession,
+                it
+            )
+        }!!
         recyclerView.layoutManager = LinearLayoutManager(requireContext())
         recyclerView.adapter = eventsAdapter
 
@@ -132,8 +149,13 @@ class HomePageFragment : Fragment() {
                 if (result.contents == null) {
                     Toast.makeText(requireContext(), "Cancelled", Toast.LENGTH_LONG).show()
                 } else {
-                    val viewModelFactoryDetail = EventDetailViewModelProviderFactory(result.contents)
-                    viewModelEventDetail = ViewModelProvider(this, viewModelFactoryDetail).get(EventDetailViewModel::class.java)
+                    val viewModelFactoryDetail =
+                        context?.let { EventDetailViewModelProviderFactory(result.contents, it) }
+                    viewModelEventDetail = viewModelFactoryDetail?.let {
+                        ViewModelProvider(this,
+                            it
+                        ).get(EventDetailViewModel::class.java)
+                    }!!
 
                     viewModelEventDetail.eventById.observe(viewLifecycleOwner, Observer { resource ->
                         when (resource) {

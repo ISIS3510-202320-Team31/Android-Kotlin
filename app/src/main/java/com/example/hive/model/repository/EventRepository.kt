@@ -1,11 +1,15 @@
 package com.example.hive.model.repository
 
+import android.content.Context
 import com.example.hive.model.di.RetroFitInstance
 import com.example.hive.model.network.requests.CreateEventRequest
 import java.time.LocalDate
 import java.time.format.DateTimeFormatter
+import com.example.hive.model.room.HiveDatabase
 
-class EventRepository() {
+class EventRepository(context: Context) {
+
+    private val hiveDatabase = HiveDatabase.getInstance(context)
 
     //Get current date as yyyy-mm-dd
     private val currentDate: String = LocalDate.now().format(DateTimeFormatter.ofPattern("yyyy-MM-dd"))

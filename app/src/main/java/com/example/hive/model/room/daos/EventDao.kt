@@ -18,8 +18,5 @@ interface EventDao {
     fun insertAll(vararg events: Event)
 
     @Query("DELETE FROM event")
-    fun delete(event: Event)
-
-    @Query("DELETE FROM event")
     fun deleteAll()
 }
