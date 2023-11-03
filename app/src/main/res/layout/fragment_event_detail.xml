@@ -7,6 +7,7 @@
     app:cardBackgroundColor="#F8F8F8">
 
     <LinearLayout
+        android:id="@+id/layoutCard"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:orientation="vertical">
@@ -239,5 +240,17 @@
             android:layout_height="0dp"
             android:visibility="invisible"
             android:text="eventID" />
+
     </LinearLayout>
+
+    <ProgressBar
+        android:id="@+id/loadingProgressBar"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:visibility="gone"
+        android:layout_gravity="center"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/layoutCard"/>
+
 </androidx.cardview.widget.CardView>
