@@ -133,7 +133,7 @@ class HomePageFragment : Fragment() {
                     Toast.makeText(requireContext(), "Cancelled", Toast.LENGTH_LONG).show()
                 } else {
                     val repository = EventRepository()
-                    val viewModelFactoryDetail = EventDetailViewModelProviderFactory(repository, result.contents)
+                    val viewModelFactoryDetail = EventDetailViewModelProviderFactory(result.contents)
                     viewModelEventDetail = ViewModelProvider(this, viewModelFactoryDetail).get(EventDetailViewModel::class.java)
 
                     viewModelEventDetail.eventById.observe(viewLifecycleOwner, Observer { resource ->

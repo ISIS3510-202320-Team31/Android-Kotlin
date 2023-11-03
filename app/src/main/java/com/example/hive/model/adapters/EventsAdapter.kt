@@ -78,9 +78,8 @@ class EventsAdapter(private val viewModelAddParticipant: AddParticipatEventViewM
             val detailDialog = Dialog(holder.itemView.context)
             detailDialog.setContentView(R.layout.fragment_event_detail)
 
-            val eventRepository = EventRepository()
 
-            eventDetailViewModel = EventDetailViewModel(eventRepository, event.id)
+            eventDetailViewModel = EventDetailViewModel(event.id)
 
             eventDetailViewModel.getEventByIdVM(event.id)
 

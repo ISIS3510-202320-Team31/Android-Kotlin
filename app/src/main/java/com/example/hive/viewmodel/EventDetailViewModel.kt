@@ -9,8 +9,9 @@ import com.example.hive.util.Resource
 import kotlinx.coroutines.launch
 import retrofit2.Response
 
-class EventDetailViewModel(private val repository: EventRepository, private val id: String) : ViewModel() {
+class EventDetailViewModel(private val id: String) : ViewModel() {
     val eventById: MutableLiveData<Resource<EventDetailResponse>> = MutableLiveData()
+    val repository = EventRepository()
 
     init {
         getEventByIdVM(id)
