@@ -79,9 +79,9 @@ class CalendarHistoricalAdapter(private val viewModelAddParticipant: AddParticip
 
             val eventEstadoTextView = detailDialog.findViewById<TextView>(R.id.estado_historical)
             if (event.state) {
-                eventEstadoTextView.text = "Activo"
+                eventEstadoTextView.text = holder.itemView.context.getString(R.string.event_state_activo)
             } else {
-                eventEstadoTextView.text = "Inactivo"
+                eventEstadoTextView.text = holder.itemView.context.getString(R.string.event_state_inactivo)
             }
 
             val eventIDTextView = detailDialog.findViewById<TextView>(R.id.eventID_historical)
@@ -97,7 +97,7 @@ class CalendarHistoricalAdapter(private val viewModelAddParticipant: AddParticip
             eventDateTextView.text = newDate
 
             val eventDuracionTextView = detailDialog.findViewById<TextView>(R.id.duracion_historical)
-            eventDuracionTextView.text = event.duration.toString()+" minutos"
+            eventDuracionTextView.text = event.duration.toString() +" "+ holder.itemView.context.getString(R.string.event_duration_minutos)
 
             val eventDescriptionTextView = detailDialog.findViewById<TextView>(R.id.descripcion_historical)
             eventDescriptionTextView.text = event.description
@@ -106,7 +106,7 @@ class CalendarHistoricalAdapter(private val viewModelAddParticipant: AddParticip
             eventLugarTextView.text = event.place
 
             val eventParticipantTextView = detailDialog.findViewById<TextView>(R.id.personas_historical)
-            val stringParticipant = "${event.participants.size} / ${event.num_participants} personas"
+            val stringParticipant = "${event.participants.size} / ${event.num_participants} " + holder.itemView.context.getString(R.string.event_participants_personas)
             eventParticipantTextView.text = stringParticipant
 
             val userSession = sessionManager.getUserSession()

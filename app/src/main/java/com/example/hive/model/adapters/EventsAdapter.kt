@@ -85,11 +85,19 @@ class EventsAdapter(private val viewModelAddParticipant: AddParticipatEventViewM
 
             val eventNameTextView = detailDialog.findViewById<TextView>(R.id.title)
             val eventEstadoTextView = detailDialog.findViewById<TextView>(R.id.estado)
+            if (event.state) {
+                eventEstadoTextView.text = holder.itemView.context.getString(R.string.event_state_activo)
+            } else {
+                eventEstadoTextView.text = holder.itemView.context.getString(R.string.event_state_inactivo)
+            }
+
             val eventIDTextView = detailDialog.findViewById<TextView>(R.id.eventID)
             val eventCategoryTextView = detailDialog.findViewById<TextView>(R.id.categoria)
             val eventCreatorTextView = detailDialog.findViewById<TextView>(R.id.creador)
             val eventDateTextView = detailDialog.findViewById<TextView>(R.id.fecha)
             val eventDuracionTextView = detailDialog.findViewById<TextView>(R.id.duracion)
+            eventDuracionTextView.text = event.duration.toString()+" "+ holder.itemView.context.getString(R.string.event_duration_minutos)
+
             val eventDescriptionTextView = detailDialog.findViewById<TextView>(R.id.descripcion)
             val eventLugarTextView = detailDialog.findViewById<TextView>(R.id.lugar)
             val eventParticipantTextView = detailDialog.findViewById<TextView>(R.id.personas)
@@ -124,9 +132,9 @@ class EventsAdapter(private val viewModelAddParticipant: AddParticipatEventViewM
                         eventNameTextView.text = eventDetailResponse.name
 
                         if (eventDetailResponse.state) {
-                            eventEstadoTextView.text = "Activo"
+                            eventEstadoTextView.text = holder.itemView.context.getString(R.string.event_state_activo)
                         } else {
-                            eventEstadoTextView.text = "Inactivo"
+                            eventEstadoTextView.text = holder.itemView.context.getString(R.string.event_state_inactivo)
                         }
 
                         eventIDTextView.text = eventDetailResponse.id
@@ -137,13 +145,13 @@ class EventsAdapter(private val viewModelAddParticipant: AddParticipatEventViewM
 
                         eventDateTextView.text = newDate
 
-                        eventDuracionTextView.text = eventDetailResponse.duration.toString()+" minutos"
+                        eventDuracionTextView.text = eventDetailResponse.duration.toString()+" "+ holder.itemView.context.getString(R.string.event_duration_minutos)
 
                         eventDescriptionTextView.text = eventDetailResponse.description
 
                         eventLugarTextView.text = eventDetailResponse.place
 
-                        val stringParticipant = "${eventDetailResponse.participants.size} / ${eventDetailResponse.num_participants} personas"
+                        val stringParticipant = "${eventDetailResponse.participants.size} / ${eventDetailResponse.num_participants} " + holder.itemView.context.getString(R.string.event_participants_personas)
                         eventParticipantTextView.text = stringParticipant
 
                         val eventId = eventDetailResponse.id
@@ -158,7 +166,7 @@ class EventsAdapter(private val viewModelAddParticipant: AddParticipatEventViewM
                         // Check if userSession.id is in event.participants
                         if (eventDetailResponse.participants.contains(userSession.userId)) {
                             // If userSession.id is in event.participants, change joinEventButton text to "salir"
-                            joinEventButton.text = "No asistir"
+                            joinEventButton.text = holder.itemView.context.getString(R.string.event_detail_no_asistir)
                         }
 
                         if (eventDetailResponse.links.isNotEmpty()) {
@@ -185,7 +193,7 @@ class EventsAdapter(private val viewModelAddParticipant: AddParticipatEventViewM
                             val eventIDTextView = detailDialog.findViewById<TextView>(R.id.eventID)
                             val eventID = eventIDTextView.text.toString()
                             val userID = userSession.userId
-                            if (userID != null && joinEventButton.text.toString() == "Unirse") {
+                            if (userID != null && joinEventButton.text.toString() == holder.itemView.context.getString(R.string.event_detail_unirse)) {
                                 viewModelAddParticipant.addParticipatEventVM(eventID, userID)
                                 viewModelAddParticipant.addParticipatEvent.observe(lifecycleOwner, Observer { resource ->
                                     when (resource) {
@@ -198,10 +206,10 @@ class EventsAdapter(private val viewModelAddParticipant: AddParticipatEventViewM
                                             }
 
                                             // change joinEventButton text to "salir"
-                                            joinEventButton.text = "No asistir"
+                                            joinEventButton.text = holder.itemView.context.getString(R.string.event_detail_no_asistir)
 
                                             // update the number of participants
-                                            val stringParticipant = "${eventDetailResponse.participants.size} / ${eventDetailResponse.num_participants} personas"
+                                            val stringParticipant = "${eventDetailResponse.participants.size} / ${eventDetailResponse.num_participants} " + holder.itemView.context.getString(R.string.event_participants_personas)
                                             eventParticipantTextView.text = stringParticipant
                                         }
                                         is Resource.Error<*> -> {
@@ -210,7 +218,7 @@ class EventsAdapter(private val viewModelAddParticipant: AddParticipatEventViewM
                                     }
                                 })
                             }
-                            if (userID != null && joinEventButton.text.toString() == "No asistir") {
+                            if (userID != null && joinEventButton.text.toString() == holder.itemView.context.getString(R.string.event_detail_no_asistir)) {
                                 viewModelAddParticipant.deleteParticipatEventVM(eventID, userID)
                                 // Remove the ID from the event.participants
                                 viewModelAddParticipant.deleteParticipatEvent.observe(lifecycleOwner, Observer { resource ->
@@ -222,10 +230,10 @@ class EventsAdapter(private val viewModelAddParticipant: AddParticipatEventViewM
                                                 eventDetailResponse.participants-=userID
                                             }
                                             // change joinEventButton text to "unirse"
-                                            joinEventButton.text = "Unirse"
+                                            joinEventButton.text = holder.itemView.context.getString(R.string.event_detail_unirse)
 
                                             // update the number of participants
-                                            val stringParticipant = "${eventDetailResponse.participants.size} / ${eventDetailResponse.num_participants} personas"
+                                            val stringParticipant = "${eventDetailResponse.participants.size} / ${eventDetailResponse.num_participants} " + holder.itemView.context.getString(R.string.event_participants_personas)
                                             eventParticipantTextView.text = stringParticipant
 
                                         }
