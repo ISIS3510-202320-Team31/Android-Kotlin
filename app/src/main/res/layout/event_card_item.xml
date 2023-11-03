@@ -86,7 +86,7 @@
             android:id="@+id/imagen"
             android:layout_width="100dp"
             android:layout_height="100dp"
-            android:src="@drawable/ic_baseline_person_24" />
+            android:src="@drawable/ic_baseline_calendar_today_24" />
     </LinearLayout>
 
 </androidx.cardview.widget.CardView>
