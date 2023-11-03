@@ -9,9 +9,10 @@ import com.example.hive.util.Resource
 import kotlinx.coroutines.launch
 import retrofit2.Response
 
-class AddParticipatEventViewModel(private val repository: EventRepository) : ViewModel()  {
+class AddParticipatEventViewModel() : ViewModel()  {
     val addParticipatEvent: MutableLiveData<Resource<EventDetailResponse>> = MutableLiveData()
     val deleteParticipatEvent: MutableLiveData<Resource<EventDetailResponse>> = MutableLiveData()
+    val repository = EventRepository()
 
     fun addParticipatEventVM(eventID: String, userID: String) = viewModelScope.launch {
         addParticipatEvent.postValue(Resource.Loading())

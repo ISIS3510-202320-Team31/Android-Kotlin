@@ -1,22 +1,20 @@
 package com.example.hive.view
 
-import androidx.lifecycle.Observer
-import androidx.lifecycle.ViewModelProvider
 import android.os.Bundle
-import androidx.fragment.app.Fragment
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.ProgressBar
 import android.widget.Toast
+import androidx.fragment.app.Fragment
+import androidx.lifecycle.Observer
+import androidx.lifecycle.ViewModelProvider
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.example.hive.R
-import com.example.hive.util.Resource
-import com.example.hive.model.adapters.CalendarActivitiesAdapter
 import com.example.hive.model.adapters.CalendarHistoricalAdapter
 import com.example.hive.model.adapters.SessionManager
-import com.example.hive.model.repository.EventRepository
+import com.example.hive.util.Resource
 import com.example.hive.viewmodel.*
 
 class CalendarHistoricalFragment : Fragment() {
@@ -36,14 +34,13 @@ class CalendarHistoricalFragment : Fragment() {
         savedInstanceState: Bundle?
     ): View? {
         val view = inflater.inflate(R.layout.fragment_calendar_list, container, false)
-        val repository = EventRepository()
         sessionManager = SessionManager(requireContext())
         val userSession = sessionManager.getUserSession()
         val viewModelFactory =
-            userSession.userId?.let { CalendarViewModelProviderFactory(repository, it, "0") }
+            userSession.userId?.let { CalendarViewModelProviderFactory(it, "0") }
         viewModelCalendar = ViewModelProvider(this, viewModelFactory!!).get(CalendarListViewModel::class.java)
 
-        val viewModelAddPaticipantEventFactory = AddParticipatEventViewModelProviderFactory(repository)
+        val viewModelAddPaticipantEventFactory = AddParticipatEventViewModelProviderFactory()
         viewModelAddParticipant = ViewModelProvider(this, viewModelAddPaticipantEventFactory).get(AddParticipatEventViewModel::class.java)
 
         //Set up RecyclerView
