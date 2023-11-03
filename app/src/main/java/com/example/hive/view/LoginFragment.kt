@@ -45,7 +45,7 @@ class LoginFragment : Fragment() {
         viewModel._loginResult.observe(viewLifecycleOwner, Observer { response ->
             when (response) {
                 is Resource.Success -> {
-                    Toast.makeText(requireContext(), "Inicio de sesión correctamente", Toast.LENGTH_SHORT).show()
+                    Toast.makeText(requireContext(), getString(R.string.login_success), Toast.LENGTH_SHORT).show()
                     val fragmentManager = requireActivity().supportFragmentManager
                     val transaction = fragmentManager.beginTransaction()
                     val homeFragment = HomePageFragment()
@@ -54,10 +54,10 @@ class LoginFragment : Fragment() {
                     transaction.commit()
                 }
                 is Resource.Error -> {
-                    Toast.makeText(requireContext(), "Inicio de sesión falló", Toast.LENGTH_SHORT).show()
+                    Toast.makeText(requireContext(), getString(R.string.login_error), Toast.LENGTH_SHORT).show()
                 }
                 is Resource.Loading -> {
-                    Toast.makeText(requireContext(), "Logging in...", Toast.LENGTH_SHORT).show()
+                    Toast.makeText(requireContext(), getString(R.string.login_loading), Toast.LENGTH_SHORT).show()
                 }
             }
         })

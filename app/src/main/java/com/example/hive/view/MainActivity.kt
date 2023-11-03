@@ -265,8 +265,8 @@ class MainActivity : AppCompatActivity() {
 
         val notificationBuilder = NotificationCompat.Builder(this, channelId)
             .setSmallIcon(R.drawable.ic_star)
-            .setContentTitle("Bienvenido a Hive!")
-            .setContentText("La mejor app de eventos")
+            .setContentTitle(getString(R.string.main_welcome))
+            .setContentText(getString(R.string.main_description))
             .setPriority(NotificationCompat.PRIORITY_DEFAULT)
             .setAutoCancel(true)
 

@@ -128,15 +128,15 @@ class UserProfileFragment : Fragment() {
                 val hours = elapsedTimeSeconds / 3600
                 val minutes = (elapsedTimeSeconds % 3600) / 60
                 if (minutes <10 && hours <10){
-                    "0$hours:0$minutes horas"
+                    "0$hours:0$minutes " + getString(R.string.profile_time_horas)
                 }else if (minutes <10){
-                    "$hours:0$minutes horas"
+                    "$hours:0$minutes " + getString(R.string.profile_time_horas)
                 }
                 else if (hours <10){
-                    "0$hours:$minutes horas"
+                    "0$hours:$minutes " + getString(R.string.profile_time_horas)
                 }
                 else{
-                    "$hours:$minutes horas"
+                    "$hours:$minutes " + getString(R.string.profile_time_horas)
                 }
             }
             elapsedTimeSeconds > 59 -> {
@@ -144,24 +144,24 @@ class UserProfileFragment : Fragment() {
                 val seconds = elapsedTimeSeconds % 60
 
                 if (seconds <10 && minutes <10){
-                    "0$minutes:0$seconds minutos"
+                    "0$minutes:0$seconds " + getString(R.string.profile_time_minutos)
                 }else if (seconds <10){
-                    "$minutes:0$seconds minutos"
+                    "$minutes:0$seconds " + getString(R.string.profile_time_minutos)
                 }
                 else if (minutes <10){
-                    "0$minutes:$seconds minutos"
+                    "0$minutes:$seconds " + getString(R.string.profile_time_minutos)
                 }
                 else{
-                    "$minutes:$seconds minutos"
+                    "$minutes:$seconds " + getString(R.string.profile_time_minutos)
                 }
             }
             else -> {
                 val seconds = elapsedTimeSeconds
                 if (seconds <10){
-                    "00:0$seconds segundos"
+                    "00:0$seconds " + getString(R.string.profile_time_segundos)
                 }
                 else{
-                    "00:$seconds segundos"
+                    "00:$seconds " + getString(R.string.profile_time_segundos)
                 }
             }
 

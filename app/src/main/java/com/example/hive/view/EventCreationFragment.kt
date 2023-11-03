@@ -59,34 +59,34 @@ class EventCreationFragment : Fragment() {
             val links = view?.findViewById<EditText>(R.id.textBox)?.text.toString().split(" ")
 
             if (name.isEmpty()) {
-                view?.findViewById<EditText>(R.id.inputBox)?.error = "Por favor ingrese su nombre"
+                view?.findViewById<EditText>(R.id.inputBox)?.error = requireContext().getString(R.string.error_nombre_evento)
                 view?.findViewById<EditText>(R.id.inputBox)?.requestFocus()
                 return@setOnClickListener
             }
             if (place.isEmpty()) {
-                view?.findViewById<EditText>(R.id.inputBoxLugar)?.error = "Por favor ingrese el lugar del evento"
+                view?.findViewById<EditText>(R.id.inputBoxLugar)?.error = requireContext().getString(R.string.error_lugar_evento)
                 view?.findViewById<EditText>(R.id.inputBoxLugar)?.requestFocus()
                 return@setOnClickListener
             }
             if (description.isEmpty()) {
-                view?.findViewById<EditText>(R.id.textBoxDescription)?.error = "Por favor ingrese la descripcion del evento"
+                view?.findViewById<EditText>(R.id.textBoxDescription)?.error = requireContext().getString(R.string.error_descripcion_evento)
                 view?.findViewById<EditText>(R.id.textBoxDescription)?.requestFocus()
                 return@setOnClickListener
             }
             if (num_participants.isEmpty()) {
-                view?.findViewById<EditText>(R.id.inputBoxParticipant)?.error = "Por favor la cantidad de participantes"
+                view?.findViewById<EditText>(R.id.inputBoxParticipant)?.error = requireContext().getString(R.string.error_participantes_evento)
                 view?.findViewById<EditText>(R.id.inputBoxParticipant)?.requestFocus()
                 return@setOnClickListener
             }
             if (duration.isEmpty()) {
-                view?.findViewById<EditText>(R.id.inputBoxDuration)?.error = "Ingrese la duracion del evento"
+                view?.findViewById<EditText>(R.id.inputBoxDuration)?.error = requireContext().getString(R.string.error_duracion_evento)
                 view?.findViewById<EditText>(R.id.inputBoxDuration)?.requestFocus()
                 return@setOnClickListener
             }
             if (links.all { it.isNotBlank() }){
                 for (link in links) {
                     if (!android.util.Patterns.WEB_URL.matcher(link).matches()) {
-                        view?.findViewById<EditText>(R.id.textBox)?.error = "Por favor ingrese correctamente los links del evento"
+                        view?.findViewById<EditText>(R.id.textBox)?.error = requireContext().getString(R.string.error_enlaces_evento)
                         view?.findViewById<EditText>(R.id.textBox)?.requestFocus()
                         return@setOnClickListener
                     }
@@ -95,7 +95,7 @@ class EventCreationFragment : Fragment() {
             var createEventRequest = try {
                 CreateEventRequest(name, place, formattedDate, description, num_participants.toInt(), category, state, duration.toInt(), creador, tags, links)
             } catch (e: Exception) {
-                Toast.makeText(requireContext(), "Error al registrar el evento", Toast.LENGTH_SHORT).show()
+                Toast.makeText(requireContext(), requireContext().getString(R.string.error_registro_evento), Toast.LENGTH_SHORT).show()
                 null
             }
 
@@ -110,11 +110,11 @@ class EventCreationFragment : Fragment() {
                 } catch (e: Exception) {
                     // Show toast message
                     println(e.stackTrace)
-                    Toast.makeText(requireContext(), "Error al registrar el evento", Toast.LENGTH_SHORT).show()
+                    Toast.makeText(requireContext(), requireContext().getString(R.string.error_registro_evento), Toast.LENGTH_SHORT).show()
                 }
             }
             else {
-                Toast.makeText(requireContext(), "Error al registrar el evento", Toast.LENGTH_SHORT).show()
+                Toast.makeText(requireContext(), requireContext().getString(R.string.error_registro_evento), Toast.LENGTH_SHORT).show()
             }
         }
 
@@ -122,7 +122,7 @@ class EventCreationFragment : Fragment() {
             when (resource) {
                 is Resource.Success -> {
                     println(resource.data)
-                    Toast.makeText(requireContext(), "El evento ha sido registrado exitosamente", Toast.LENGTH_SHORT).show()
+                    Toast.makeText(requireContext(), requireContext().getString(R.string.evento_registrado), Toast.LENGTH_SHORT).show()
                     val transaction = requireActivity().supportFragmentManager.beginTransaction()
                     transaction.replace(R.id.fragment_container, HomePageFragment())
                     transaction.commit()
@@ -131,11 +131,11 @@ class EventCreationFragment : Fragment() {
 
                     if (resource.message == "Bad Request") {
                         // Show toast message
-                        Toast.makeText(requireContext(), "El evento no se ha registrado correctamente, por favor revisa que todos los campos esten diligenciados correctamente", Toast.LENGTH_SHORT).show()
+                        Toast.makeText(requireContext(), requireContext().getString(R.string.error_registro_bad_request), Toast.LENGTH_SHORT).show()
                     }
                     else {
                         // Show toast message
-                        Toast.makeText(requireContext(), "El evento no se ha registrado correctamente, por favor revisa que todos los campos esten diligenciados correctamente", Toast.LENGTH_SHORT).show()
+                        Toast.makeText(requireContext(), requireContext().getString(R.string.error_registro_bad_request), Toast.LENGTH_SHORT).show()
                     }
                 }
                 is Resource.Loading -> {

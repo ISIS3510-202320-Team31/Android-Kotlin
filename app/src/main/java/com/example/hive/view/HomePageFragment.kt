@@ -123,7 +123,7 @@ class HomePageFragment : Fragment() {
         val integrator = IntentIntegrator.forSupportFragment(this) // Cambiar a forSupportFragment si usas AndroidX
         integrator.setDesiredBarcodeFormats(IntentIntegrator.QR_CODE)
         integrator.setBeepEnabled(false)
-        integrator.setPrompt("Unete a un Evento")
+        integrator.setPrompt(requireContext().getString(R.string.event_promotion))
         integrator.initiateScan()
     }
 
@@ -132,7 +132,7 @@ class HomePageFragment : Fragment() {
         val result = IntentIntegrator.parseActivityResult(requestCode, resultCode, data)
         if (result != null) {
                 if (result.contents == null) {
-                    Toast.makeText(requireContext(), "Cancelled", Toast.LENGTH_LONG).show()
+                    Toast.makeText(requireContext(), requireContext().getString(R.string.evento_cancelado), Toast.LENGTH_LONG).show()
                 } else {
                     val repository = EventRepository()
                     val viewModelFactoryDetail = EventDetailViewModelProviderFactory(repository, result.contents)
@@ -157,9 +157,9 @@ class HomePageFragment : Fragment() {
 
                                 val eventEstadoTextView = detailDialog.findViewById<TextView>(R.id.estado)
                                 if (resource.data?.state == true) {
-                                    eventEstadoTextView.text = "Activo"
+                                    eventEstadoTextView.text = requireContext().getString(R.string.event_state_activo)
                                 } else {
-                                    eventEstadoTextView.text = "Inactivo"
+                                    eventEstadoTextView.text = requireContext().getString(R.string.event_state_inactivo)
                                 }
 
                                 val eventIDTextView = detailDialog.findViewById<TextView>(R.id.eventID)
@@ -175,7 +175,7 @@ class HomePageFragment : Fragment() {
                                 eventDateTextView.text = resource.data?.date
 
                                 val eventDuracionTextView = detailDialog.findViewById<TextView>(R.id.duracion)
-                                eventDuracionTextView.text = resource.data?.duration.toString()+" minutos"
+                                eventDuracionTextView.text = resource.data?.duration.toString()+" "+ requireContext().getString(R.string.event_duration_minutos)
 
                                 val eventDescriptionTextView = detailDialog.findViewById<TextView>(R.id.descripcion)
                                 eventDescriptionTextView.text = resource.data?.description
@@ -184,7 +184,7 @@ class HomePageFragment : Fragment() {
                                 eventLugarTextView.text = resource.data?.place
 
                                 val eventParticipantTextView = detailDialog.findViewById<TextView>(R.id.personas)
-                                val stringParticipant = "${resource.data?.participants?.size} / ${resource.data?.num_participants} personas"
+                                val stringParticipant = "${resource.data?.participants?.size} / ${resource.data?.num_participants} "+ requireContext().getString(R.string.event_participants_personas)
                                 eventParticipantTextView.text = stringParticipant
 
                                 val eventLinksInteresesTextView = detailDialog.findViewById<TextView>(R.id.linksInteres)
@@ -214,15 +214,15 @@ class HomePageFragment : Fragment() {
                                 val joinEventButton = detailDialog.findViewById<Button>(R.id.submitButton)
 
                                 if (eventParticipants?.contains(user.userId) == true) {
-                                    joinEventButton.text = "No asistir"
+                                    joinEventButton.text = requireContext().getString(R.string.event_detail_no_asistir)
                                 } else {
-                                    joinEventButton.text = "Unirse"
+                                    joinEventButton.text = requireContext().getString(R.string.event_detail_unirse)
                                 }
                                     joinEventButton.setOnClickListener {
                                     val eventIDTextView = detailDialog.findViewById<TextView>(R.id.eventID)
                                     val eventID = eventIDTextView.text.toString()
                                     val userID = user.userId
-                                    if (userID != null && joinEventButton.text.toString() == "Unirse") {
+                                    if (userID != null && joinEventButton.text.toString() == requireContext().getString(R.string.event_detail_unirse)) {
                                         viewModelAddParticipant.addParticipatEventVM(eventID, userID)
                                         viewModelAddParticipant.addParticipatEvent.observe(this, Observer { resource ->
                                             when (resource) {
@@ -237,10 +237,10 @@ class HomePageFragment : Fragment() {
                                                     }
 
                                                     // change joinEventButton text to "salir"
-                                                    joinEventButton.text = "No asistir"
+                                                    joinEventButton.text = requireContext().getString(R.string.event_detail_no_asistir)
 
                                                     // update the number of participants
-                                                    val stringParticipant = "${resource.data?.participants!!.size} / ${resource.data?.num_participants} personas"
+                                                    val stringParticipant = "${resource.data?.participants!!.size} / ${resource.data?.num_participants} "+requireContext().getString(R.string.event_participants_personas)
                                                     eventParticipantTextView.text = stringParticipant
                                                 }
                                                 is Resource.Error<*> -> {
@@ -249,7 +249,7 @@ class HomePageFragment : Fragment() {
                                             }
                                         })
                                     }
-                                    if (userID != null && joinEventButton.text.toString() == "No asistir") {
+                                    if (userID != null && joinEventButton.text.toString() == requireContext().getString(R.string.event_detail_no_asistir)) {
                                         viewModelAddParticipant.deleteParticipatEventVM(eventID, userID)
                                         // Remove the ID from the event.participants
                                         viewModelAddParticipant.deleteParticipatEvent.observe(this, Observer { resource ->
@@ -263,10 +263,10 @@ class HomePageFragment : Fragment() {
                                                         )!!
                                                     }
                                                     // change joinEventButton text to "unirse"
-                                                    joinEventButton.text = "Unirse"
+                                                    joinEventButton.text = requireContext().getString(R.string.event_detail_unirse)
 
                                                     // update the number of participants
-                                                    val stringParticipant = "${resource.data?.participants?.size} / ${resource.data?.num_participants} personas"
+                                                    val stringParticipant = "${resource.data?.participants?.size} / ${resource.data?.num_participants} "+requireContext().getString(R.string.event_participants_personas)
                                                     eventParticipantTextView.text = stringParticipant
 
                                                 }
