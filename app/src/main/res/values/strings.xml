@@ -79,4 +79,7 @@
     <string name="profile_cerrar_sesion">CERRAR SESIÓN</string>
     <string name="profile_events_number">Eventos a los que perteneces</string>
 
+    <!-- STRINGS SWIPE DOWN -->
+    <string name="swipe_down_success">Datos actualizados correctamente</string>
+    <string name="swipe_down_error">Error al actualizar los datos</string>
 </resources>

@@ -1,6 +1,7 @@
 package com.example.hive.view
 
 import android.app.Dialog
+import android.content.Context
 import android.content.Intent
 import android.graphics.Bitmap
 import android.os.Bundle
@@ -8,11 +9,14 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.*
+import androidx.appcompat.app.AppCompatActivity
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProvider
+import androidx.lifecycle.lifecycleScope
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
+import androidx.swiperefreshlayout.widget.SwipeRefreshLayout
 import com.example.hive.R
 import com.example.hive.model.adapters.EventsAdapter
 import com.example.hive.model.adapters.SessionManager
@@ -26,6 +30,7 @@ import com.google.zxing.integration.android.IntentIntegrator
 import com.google.zxing.qrcode.QRCodeWriter
 import com.google.zxing.qrcode.decoder.ErrorCorrectionLevel
 import com.squareup.picasso.Picasso
+import kotlinx.coroutines.launch
 import java.text.SimpleDateFormat
 import java.util.*
 
@@ -49,6 +54,13 @@ class HomePageFragment : Fragment() {
     ): View? {
         // Inflate the layout for this fragment
         val view = inflater.inflate(R.layout.fragment_home_page, container, false)
+
+        // Refresh fragment
+        val swipeRefreshLayout: SwipeRefreshLayout = view.findViewById(R.id.swipeRefreshLayout)
+
+        swipeRefreshLayout.setOnRefreshListener {
+            refreshFragment(swipeRefreshLayout)
+        }
 
         val userSession = SessionManager(requireContext())
         user = userSession.getUserSession()
@@ -317,6 +329,32 @@ class HomePageFragment : Fragment() {
             e.printStackTrace()
         }
         return null
+    }
+
+    private fun refreshFragment( swipeRefreshLayout: SwipeRefreshLayout ) {
+        swipeRefreshLayout.isRefreshing = true
+
+        viewModelEvent.getEventsVM()
+
+        viewModelEvent.eventsPage.observe(viewLifecycleOwner, Observer { resource ->
+            when (resource) {
+                is Resource.Loading<*> -> {
+                    // loading indicator will be kept
+                }
+                is Resource.Success<*> -> {
+                    // Stop the loading indicator once the data has been loaded
+                    swipeRefreshLayout.isRefreshing = false
+                    // Manage the success state (e.g., show an success message)
+                    Toast.makeText(requireContext(), getString(R.string.swipe_down_success), Toast.LENGTH_SHORT).show()
+                }
+                is Resource.Error<*> -> {
+                    // Stop the loading indicator in case of error
+                    swipeRefreshLayout.isRefreshing = false
+                    // Manage the error state (e.g., show an error message)
+                    Toast.makeText(requireContext(), getString(R.string.swipe_down_error), Toast.LENGTH_SHORT).show()
+                }
+            }
+        })
     }
 
 }
