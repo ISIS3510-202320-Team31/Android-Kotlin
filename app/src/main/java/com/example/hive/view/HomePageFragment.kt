@@ -344,8 +344,6 @@ class HomePageFragment : Fragment() {
                 is Resource.Success<*> -> {
                     // Stop the loading indicator once the data has been loaded
                     swipeRefreshLayout.isRefreshing = false
-                    // Manage the success state (e.g., show an success message)
-                    Toast.makeText(requireContext(), getString(R.string.swipe_down_success), Toast.LENGTH_SHORT).show()
                 }
                 is Resource.Error<*> -> {
                     // Stop the loading indicator in case of error
