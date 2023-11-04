@@ -23,7 +23,6 @@ class CalendarListViewModel(private val user_id: String, private val future: Str
     private fun getEventsByDateAndUserVM(user_id: String,future: String) = viewModelScope.launch {
         eventsPage.postValue(Resource.Loading())
         val response = repository.getEventsByDateAndUserR(user_id,future)
-        println(response.body())
         eventsPage.postValue(handleResponse(response))
     }
 

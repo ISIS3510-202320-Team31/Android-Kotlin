@@ -94,14 +94,6 @@ class SignUpFragment : Fragment() {
             else {
                 // Show toast message
                 Toast.makeText(requireContext(), "Error al registrar usuario", Toast.LENGTH_SHORT).show()
-                // Print all the fields
-                println("Name: $name")
-                println("Username: $username")
-                println("Email: $email")
-                println("Password: $password")
-                println("Confirm Password: $confirmPassword")
-                println("Career: $selectedCareer")
-                println("Birthdate: $birthdateStr")
             }
         }
 
@@ -110,7 +102,6 @@ class SignUpFragment : Fragment() {
             when (resource) {
                 is Resource.Success -> {
                     // Registration was successful, go to the login page and print the response
-                    println(resource.data)
                     Toast.makeText(requireContext(), "Usuario registrado exitosamente", Toast.LENGTH_SHORT).show()
                     val transaction = requireActivity().supportFragmentManager.beginTransaction()
                     transaction.replace(R.id.fragment_container, LoginFragment())

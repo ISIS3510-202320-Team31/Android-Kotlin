@@ -4,7 +4,7 @@ import androidx.room.ColumnInfo
 import androidx.room.Entity
 import androidx.room.PrimaryKey
 
-@Entity
+@Entity(tableName = "event")
 data class Event(
     @PrimaryKey val id: String,
     @ColumnInfo(name = "image") val image: String?,
@@ -17,6 +17,7 @@ data class Event(
     @ColumnInfo(name = "state") val state: Boolean?,
     @ColumnInfo(name = "duration") val duration: Int?,
     @ColumnInfo(name = "creator_id") val creator_id: String?,
+    @ColumnInfo(name = "creator") val creator: String?,
     @ColumnInfo(name = "participants") val participants: List<String>?,
     @ColumnInfo(name = "links") val links: List<String>?,
 )

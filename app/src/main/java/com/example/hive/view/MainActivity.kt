@@ -8,6 +8,7 @@ import androidx.appcompat.app.AppCompatActivity
 import android.app.NotificationChannel
 import android.app.NotificationManager
 import android.os.Build
+import android.util.Log
 import androidx.core.app.NotificationCompat
 import androidx.core.app.NotificationManagerCompat
 import android.view.Menu
@@ -29,6 +30,8 @@ import com.google.android.gms.maps.model.LatLng
 import java.text.SimpleDateFormat
 import java.util.*
 import androidx.lifecycle.Observer
+import com.example.hive.model.network.responses.EventResponse
+import com.example.hive.model.room.entities.Event
 
 
 class MainActivity : AppCompatActivity() {
@@ -151,27 +154,6 @@ class MainActivity : AppCompatActivity() {
                 else -> false
             }
         }
-
-        var userSession = sessionManager.getUserSession()
-        val viewModelFactory = EventsViewModelProviderFactory(userSession, this)
-        viewModelEvent = viewModelFactory.create(EventListViewModel::class.java)
-
-        viewModelEvent.eventsPage.observe(this, Observer { resource ->
-            when (resource) {
-                is Resource.Loading<*> -> {
-
-                }
-                is Resource.Success<*> -> {
-
-                }
-                is Resource.Error<*> -> {
-
-                }
-            }
-        })
-
-
-
     }
 
     override fun onCreateOptionsMenu(menu: Menu): Boolean {
@@ -207,6 +189,7 @@ class MainActivity : AppCompatActivity() {
 
         //Save the elapsed time in the session manager
         sessionManager.saveElapsedTime(elapsedTimeSeconds)
+        sessionManager.saveDatabase(false)
     }
 
     private fun replaceFragment(fragment: Fragment) {

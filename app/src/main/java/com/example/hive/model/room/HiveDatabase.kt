@@ -10,7 +10,7 @@ import com.example.hive.model.room.entities.Event
 import com.example.hive.model.room.entities.User
 import com.example.hive.util.Converters
 
-@Database(entities = [User::class, Event::class], version = 1)
+@Database(entities = arrayOf(User::class, Event::class), version = 3, exportSchema = false)
 @TypeConverters(Converters::class)
 abstract class HiveDatabase : RoomDatabase() {
     abstract fun userDao(): UserDao

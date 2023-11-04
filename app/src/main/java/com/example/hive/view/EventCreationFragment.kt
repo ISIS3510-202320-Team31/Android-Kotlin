@@ -115,7 +115,6 @@ class EventCreationFragment : Fragment() {
         viewModel.eventCreationPage.observe(viewLifecycleOwner, Observer { resource ->
             when (resource) {
                 is Resource.Success -> {
-                    println(resource.data)
                     Toast.makeText(requireContext(), "El evento ha sido registrado exitosamente", Toast.LENGTH_SHORT).show()
                     val transaction = requireActivity().supportFragmentManager.beginTransaction()
                     transaction.replace(R.id.fragment_container, HomePageFragment())
