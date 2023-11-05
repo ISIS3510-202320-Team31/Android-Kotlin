@@ -9,6 +9,7 @@ import android.location.LocationListener
 import android.location.LocationManager
 import android.os.Build
 import android.os.IBinder
+import android.util.Log
 import androidx.core.app.ActivityCompat
 import androidx.core.app.NotificationCompat
 import androidx.core.app.NotificationManagerCompat
@@ -168,7 +169,11 @@ class LocationMonitoringService : Service() {
 
     override fun onDestroy() {
         super.onDestroy()
-        locationManager.removeUpdates(locationListener)
+        try {
+            locationManager.removeUpdates(locationListener)
+        } catch (ex: Exception) {
+            Log.e("LocationMonitoring", "Failed to remove location listeners", ex)
+        }
     }
 
     companion object {
