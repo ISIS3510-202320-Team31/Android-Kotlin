@@ -180,6 +180,29 @@ class HomePageFragment : Fragment() {
                                 }
 
                                 eventsAdapter.submitList(filteredList) }
+
+                            viewModelEventListOffline.removeEventDatabase()
+
+                            // Loop over the filtered list and create an EventEntity for each event
+                            resource.data?.forEach { event ->
+                                val eventToAdd = Event(
+                                    event.id,
+                                    event.image?:"",
+                                    event.name?:"",
+                                    event.description?:"",
+                                    event.date?:"",
+                                    event.place?:"",
+                                    event.num_participants?:0,
+                                    event.category?:"",
+                                    event.state?:false,
+                                    event.duration?:0,
+                                    event.creator_id?:"",
+                                    event.creator?:"",
+                                    event.participants?: emptyList(),
+                                    event.links?: emptyList()
+                                )
+                                viewModelEventListOffline.insertOneToDatabase(eventToAdd)
+                            }
                         }
                         is Resource.Error<*> -> {
                             // Handle error state (e.g., show an error message)
