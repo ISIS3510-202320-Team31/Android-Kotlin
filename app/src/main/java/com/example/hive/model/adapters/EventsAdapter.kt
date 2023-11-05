@@ -78,18 +78,24 @@ class EventsAdapter(private val viewModelAddParticipant: AddParticipatEventViewM
 
         connectionLiveData = ConnectionLiveData(context)
         val detailDialog = Dialog(holder.itemView.context)
-        detailDialog.setContentView(R.layout.fragment_no_internet_connection)
         // Add a click listener to the card view
         cardView.setOnClickListener {
 
             connectionLiveData.observe(lifecycleOwner, Observer { isConnected ->
                 if (isConnected) {
-                    detailDialog.setContentView(R.layout.fragment_event_detail)
                     // If the user is connected to the internet, show the event detail
 
                     eventDetailViewModel = EventDetailViewModel(event.id, context)
 
                     eventDetailViewModel.getEventByIdVM(event.id)
+
+                    detailDialog.setContentView(R.layout.fragment_event_detail)
+
+                    val dialogLinearLayout = detailDialog.findViewById<LinearLayout>(R.id.layoutCard)
+                    val dialogProgressBar = detailDialog.findViewById<ProgressBar>(R.id.loadingProgressBar)
+
+                    dialogLinearLayout.visibility = View.GONE
+                    dialogProgressBar.visibility = View.VISIBLE
 
                     val eventNameTextView = detailDialog.findViewById<TextView>(R.id.title)
                     val eventEstadoTextView = detailDialog.findViewById<TextView>(R.id.estado)
@@ -133,8 +139,8 @@ class EventsAdapter(private val viewModelAddParticipant: AddParticipatEventViewM
                                 val dialogLinearLayout = detailDialog.findViewById<LinearLayout>(R.id.layoutCard)
                                 val dialogProgressBar = detailDialog.findViewById<ProgressBar>(R.id.loadingProgressBar)
 
-                                dialogLinearLayout.visibility = View.VISIBLE
                                 dialogProgressBar.visibility = View.GONE
+                                dialogLinearLayout.visibility = View.VISIBLE
 
                                 val eventDetailResponse = resource.data as EventDetailResponse
 
@@ -257,6 +263,7 @@ class EventsAdapter(private val viewModelAddParticipant: AddParticipatEventViewM
                             }
                             is Resource.Error<*> -> {
                                 // Handle error state (e.g., show an error message)
+                                detailDialog.setContentView(R.layout.fragment_no_internet_connection)
                             }
                         }
                     })
