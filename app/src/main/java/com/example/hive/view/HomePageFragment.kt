@@ -59,13 +59,9 @@ class HomePageFragment : Fragment() {
     ): View? {
         // Inflate the layout for this fragment
         val view = inflater.inflate(R.layout.fragment_home_page, container, false)
-
-        // Refresh fragment
-        val swipeRefreshLayout: SwipeRefreshLayout = view.findViewById(R.id.swipeRefreshLayout)
-
-        swipeRefreshLayout.setOnRefreshListener {
-            refreshFragment(swipeRefreshLayout)
-        }
+        val swipeRefreshLayout: SwipeRefreshLayout = view?.findViewById(R.id.swipeRefreshLayout)!!
+        swipeRefreshLayout.isRefreshing = false;
+        swipeRefreshLayout.isEnabled = false;
 
         val userSession = SessionManager(requireContext())
         user = userSession.getUserSession()
@@ -156,15 +152,21 @@ class HomePageFragment : Fragment() {
         viewModel = ViewModelProvider(this).get(HomePageViewModel::class.java)
         val loadingProgressBar = view?.findViewById<ProgressBar>(R.id.loadingProgressBar)
         connectionLiveData = ConnectionLiveData(requireContext())
+        val swipeRefreshLayout: SwipeRefreshLayout = view?.findViewById(R.id.swipeRefreshLayout)!!
         connectionLiveData.observe(viewLifecycleOwner, Observer { isConnected ->
             if (isConnected) {
+                // Refresh fragment
+                swipeRefreshLayout.isEnabled = true
+
+                swipeRefreshLayout.setOnRefreshListener {
+                    refreshFragment(swipeRefreshLayout)
+                }
                 val viewModelFactory = context?.let { EventsViewModelProviderFactory(user, it) }
                 viewModelEvent = viewModelFactory?.let {
                     ViewModelProvider(this,
                         it
                     ).get(EventListViewModel::class.java)
                 }!!
-                Toast.makeText(requireContext(), "Conectado", Toast.LENGTH_SHORT).show()
 
                 viewModelEvent.eventsPage.observe(viewLifecycleOwner, Observer { resource ->
                     when (resource) {
@@ -224,7 +226,8 @@ class HomePageFragment : Fragment() {
                 })
 
             } else {
-                Toast.makeText(requireContext(), "Desconectado", Toast.LENGTH_SHORT).show()
+                swipeRefreshLayout.isEnabled = false
+                Toast.makeText(requireContext(), getString(R.string.no_internet), Toast.LENGTH_SHORT).show()
             }
         })
 
@@ -406,11 +409,7 @@ class HomePageFragment : Fragment() {
                                             }
                                         })
                                     }
-
-
                                 }
-
-
 
                                 detailDialog.show()
                             }
@@ -450,24 +449,29 @@ class HomePageFragment : Fragment() {
 
     private fun refreshFragment( swipeRefreshLayout: SwipeRefreshLayout ) {
         swipeRefreshLayout.isRefreshing = true
-
-        viewModelEvent.getEventsVM()
-
-        viewModelEvent.eventsPage.observe(viewLifecycleOwner, Observer { resource ->
-            when (resource) {
-                is Resource.Loading<*> -> {
-                    // loading indicator will be kept
-                }
-                is Resource.Success<*> -> {
-                    // Stop the loading indicator once the data has been loaded
-                    swipeRefreshLayout.isRefreshing = false
-                }
-                is Resource.Error<*> -> {
-                    // Stop the loading indicator in case of error
-                    swipeRefreshLayout.isRefreshing = false
-                    // Manage the error state (e.g., show an error message)
-                    Toast.makeText(requireContext(), getString(R.string.swipe_down_error), Toast.LENGTH_SHORT).show()
-                }
+        connectionLiveData.observe(viewLifecycleOwner, Observer { isAvailable ->
+            if (isAvailable) {
+                viewModelEvent.getEventsVM()
+                viewModelEvent.eventsPage.observe(viewLifecycleOwner, Observer { resource ->
+                    when (resource) {
+                        is Resource.Loading<*> -> {
+                            // loading indicator will be kept
+                        }
+                        is Resource.Success<*> -> {
+                            // Stop the loading indicator once the data has been loaded
+                            swipeRefreshLayout.isRefreshing = false
+                        }
+                        is Resource.Error<*> -> {
+                            // Stop the loading indicator in case of error
+                            swipeRefreshLayout.isRefreshing = false
+                            // Manage the error state (e.g., show an error message)
+                            Toast.makeText(requireContext(), getString(R.string.swipe_down_error), Toast.LENGTH_SHORT).show()
+                        }
+                    }
+                })
+            } else {
+                swipeRefreshLayout.isRefreshing = false
+                Toast.makeText(requireContext(), getString(R.string.no_internet), Toast.LENGTH_SHORT).show()
             }
         })
     }

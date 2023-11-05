@@ -75,9 +75,9 @@ class EventsAdapter(private val viewModelAddParticipant: AddParticipatEventViewM
             this.findViewById<android.widget.TextView>(R.id.descripcion).text = event.description
             this.findViewById<android.widget.TextView>(R.id.fecha).text = newDate
         }
-
         connectionLiveData = ConnectionLiveData(context)
         val detailDialog = Dialog(holder.itemView.context)
+        detailDialog.setContentView(R.layout.fragment_no_internet_connection)
         // Add a click listener to the card view
         cardView.setOnClickListener {
 
