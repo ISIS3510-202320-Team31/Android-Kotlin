@@ -11,6 +11,7 @@ import androidx.lifecycle.ViewModelProvider
 import com.example.hive.R
 import com.example.hive.model.adapters.SessionManager
 import com.example.hive.model.network.requests.CreateEventRequest
+import com.example.hive.util.FormProgressCache
 import com.example.hive.util.Resource
 import com.example.hive.viewmodel.EventCreationViewModel
 import com.example.hive.viewmodel.EventCreationViewModelProviderFactory
@@ -21,6 +22,19 @@ class EventCreationFragment : Fragment() {
 
     private lateinit var viewModel: EventCreationViewModel
     private lateinit var viewModelFactory: EventCreationViewModelProviderFactory
+    companion object {
+        val formProgressCache = FormProgressCache<String, FormData>(3)
+    }
+
+    data class FormData(val name: String,
+                            val place: String,
+                            val formattedDate: String,
+                            val description: String,
+                            val num_participants: String,
+                            val category: String,
+                            val duration: String,
+                            val tags: String,
+                            val links: String)
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
@@ -33,9 +47,11 @@ class EventCreationFragment : Fragment() {
 
     override fun onActivityCreated(savedInstanceState: Bundle?) {
         super.onActivityCreated(savedInstanceState)
+
         val session = SessionManager(requireContext())
         val buttonCreateEvent = view?.findViewById<Button>(R.id.submitButton)
         buttonCreateEvent?.setOnClickListener{
+
             val name = view?.findViewById<EditText>(R.id.inputBox)?.text.toString()
             val place = view?.findViewById<EditText>(R.id.inputBoxLugar)?.text.toString()
             val calendarDate = view?.findViewById<CalendarView>(R.id.calendarView)
@@ -86,6 +102,7 @@ class EventCreationFragment : Fragment() {
                     }
                 }
             }
+
             var createEventRequest = try {
                 CreateEventRequest(name, place, formattedDate, description, num_participants.toInt(), category, state, duration.toInt(), creador, tags, links)
             } catch (e: Exception) {
@@ -139,4 +156,70 @@ class EventCreationFragment : Fragment() {
         })
     }
 
+    override fun onPause() {
+        super.onPause()
+
+        if (resourceHasSucceeded()) {
+            formProgressCache.remove("formData")
+            println("Borrado")
+            println(formProgressCache.get("formData"))
+        }
+        else {
+
+            val name = view?.findViewById<EditText>(R.id.inputBox)?.text.toString()
+            val place = view?.findViewById<EditText>(R.id.inputBoxLugar)?.text.toString()
+            val calendarDate = view?.findViewById<CalendarView>(R.id.calendarView)
+            val dateMillis = calendarDate?.date ?: 0
+            val date = Date(dateMillis)
+            val sdf = SimpleDateFormat("yyyy-MM-dd")
+            val formattedDate = sdf.format(date)
+            val description = view?.findViewById<EditText>(R.id.textBoxDescription)?.text.toString()
+            val num_participants = view?.findViewById<EditText>(R.id.inputBoxParticipant)?.text.toString()
+            val category = view?.findViewById<Spinner>(R.id.spinner1)?.selectedItem.toString()
+            val duration = view?.findViewById<EditText>(R.id.inputBoxDuration)?.text.toString()
+            val tags = view?.findViewById<EditText>(R.id.textBox2)?.text.toString()
+            val links = view?.findViewById<EditText>(R.id.textBox)?.text.toString()
+
+            val formData = FormData(name, place, formattedDate, description, num_participants, category, duration, tags, links)
+            formProgressCache.put("formData", formData)
+            println("Pause")
+            println(formProgressCache.get("formData"))
+        }
+    }
+
+    override fun onResume() {
+        super.onResume()
+
+        val formData = formProgressCache.get("formData")
+        println("Resume")
+        println(formData)
+
+        view?.findViewById<EditText>(R.id.inputBox)?.setText(formData?.name ?: "")
+        view?.findViewById<EditText>(R.id.inputBoxLugar)?.setText(formData?.place ?: "")
+
+        val calendarDate = view?.findViewById<CalendarView>(R.id.calendarView)
+        if (formData != null) {
+            val date = SimpleDateFormat("yyyy-MM-dd").parse(formData.formattedDate)
+            calendarDate?.date = date.time
+        }
+
+        view?.findViewById<EditText>(R.id.textBoxDescription)?.setText(formData?.description ?: "")
+        view?.findViewById<EditText>(R.id.inputBoxParticipant)?.setText(formData?.num_participants ?: "")
+
+        val categorySpinner = view?.findViewById<Spinner>(R.id.spinner1)
+        if (formData != null) {
+            val categoryAdapter = categorySpinner?.adapter as ArrayAdapter<String>
+            val categoryIndex = categoryAdapter.getPosition(formData.category)
+            categorySpinner.setSelection(categoryIndex)
+        }
+
+        view?.findViewById<EditText>(R.id.inputBoxDuration)?.setText(formData?.duration ?: "")
+        view?.findViewById<EditText>(R.id.textBox2)?.setText(formData?.tags ?: "")
+        view?.findViewById<EditText>(R.id.textBox)?.setText(formData?.links ?: "")
+    }
+
+    private fun resourceHasSucceeded(): Boolean {
+        val resource = viewModel.eventCreationPage.value
+        return resource is Resource.Success
+    }
 }
