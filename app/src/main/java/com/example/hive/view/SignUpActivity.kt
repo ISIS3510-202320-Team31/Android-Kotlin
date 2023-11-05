@@ -55,42 +55,42 @@ class SignUpActivity : AppCompatActivity() {
 
             // Check that no field is empty and show error
             if (name.isEmpty()) {
-                findViewById<EditText>(R.id.editTextName).error = "Por favor ingrese su nombre"
+                findViewById<EditText>(R.id.editTextName).error = getString(R.string.sign_up_error_name)
                 findViewById<EditText>(R.id.editTextName).requestFocus()
                 return@setOnClickListener
             }
             if (username.isEmpty()) {
-                findViewById<EditText>(R.id.editTextUsername).error = "Por favor ingrese su usuario"
+                findViewById<EditText>(R.id.editTextUsername).error = getString(R.string.sign_up_error_user)
                 findViewById<EditText>(R.id.editTextUsername).requestFocus()
                 return@setOnClickListener
             }
             if (email.isEmpty()) {
-                findViewById<EditText>(R.id.editTextEmail).error = "Por favor ingrese su correo electrónico"
+                findViewById<EditText>(R.id.editTextEmail).error = getString(R.string.sign_up_error_mail)
                 findViewById<EditText>(R.id.editTextEmail).requestFocus()
                 return@setOnClickListener
             }
             if (!android.util.Patterns.EMAIL_ADDRESS.matcher(email).matches()) {
-                findViewById<EditText>(R.id.editTextEmail).error = "Por favor ingrese un correo electrónico válido"
+                findViewById<EditText>(R.id.editTextEmail).error = getString(R.string.sign_up_error_mail_invalid)
                 findViewById<EditText>(R.id.editTextEmail).requestFocus()
                 return@setOnClickListener
             }
             if (password.isEmpty()) {
-                findViewById<EditText>(R.id.editTextPassword).error = "Por favor ingrese su contraseña"
+                findViewById<EditText>(R.id.editTextPassword).error = getString(R.string.sign_up_error_password)
                 findViewById<EditText>(R.id.editTextPassword).requestFocus()
                 return@setOnClickListener
             }
             if (confirmPassword.isEmpty()) {
-                findViewById<EditText>(R.id.editTextVerifyPassword).error = "Por favor ingrese su contraseña"
+                findViewById<EditText>(R.id.editTextVerifyPassword).error = getString(R.string.sign_up_error_password_confirm)
                 findViewById<EditText>(R.id.editTextVerifyPassword).requestFocus()
                 return@setOnClickListener
             }
             if (password != confirmPassword) {
                 // Show toast message
-                Toast.makeText(this, "La contraseña debe ser igual a su confirmación", Toast.LENGTH_SHORT).show()
+                Toast.makeText(this, getString(R.string.sign_up_error_password_match), Toast.LENGTH_SHORT).show()
             }
             //Check that the username is at least 4 characters long
             if (username.length < 4) {
-                findViewById<EditText>(R.id.editTextUsername).error = "El usuario debe tener al menos 4 caracteres"
+                findViewById<EditText>(R.id.editTextUsername).error = getString(R.string.sign_up_error_user_length)
                 findViewById<EditText>(R.id.editTextUsername).requestFocus()
                 return@setOnClickListener
             }
@@ -98,7 +98,7 @@ class SignUpActivity : AppCompatActivity() {
             // Check that the password should have at least one uppercase letter, 1 lowercase letter, 1 number, and 1 special character
             val regex = Regex("^(?=.*[a-z])(?=.*[A-Z])(?=.*\\d)(?=.*[@\$!%*?&.])[A-Za-z\\d@\$!%.*?&]{8,}\$")
             if (!regex.matches(password)) {
-                findViewById<EditText>(R.id.editTextPassword).error = "La contraseña debe tener al menos 1 mayúscula, 1 número y 1 carácter especial y al menos 8 caracteres"
+                findViewById<EditText>(R.id.editTextPassword).error = getString(R.string.sign_up_error_password_validation)
                 findViewById<EditText>(R.id.editTextPassword).requestFocus()
                 return@setOnClickListener
             }
@@ -108,7 +108,7 @@ class SignUpActivity : AppCompatActivity() {
                 RegisterRequest(username, name, selectedCareer, birthdateStr, email, password)
             } catch (e: Exception) {
                 // Show toast message
-                Toast.makeText(this, "Error al registrar usuario, revise los datos ingresados", Toast.LENGTH_SHORT).show()
+                Toast.makeText(this, getString(R.string.sign_up_error), Toast.LENGTH_SHORT).show()
                 null
             }
 
@@ -125,11 +125,11 @@ class SignUpActivity : AppCompatActivity() {
                 } catch (e: Exception) {
                     // Show toast message
                     println(e.stackTrace)
-                    Toast.makeText(this, "Error al registrar usuario, revise los datos ingresados", Toast.LENGTH_SHORT).show()
+                    Toast.makeText(this, getString(R.string.sign_up_error), Toast.LENGTH_SHORT).show()
                 }
             }
             else {
-                Toast.makeText(this, "Error al registrar usuario, ningún campo puede estar vacío", Toast.LENGTH_SHORT).show()
+                Toast.makeText(this, getString(R.string.sign_up_empty), Toast.LENGTH_SHORT).show()
             }
         }
 
@@ -140,17 +140,17 @@ class SignUpActivity : AppCompatActivity() {
                     // Start login activity
                     val intent = Intent(this, LoginActivity::class.java)
                     startActivity(intent)
-                    Toast.makeText(this, "Usuario registrado exitosamente", Toast.LENGTH_SHORT).show()
+                    Toast.makeText(this, getString(R.string.sign_up_success), Toast.LENGTH_SHORT).show()
                 }
                 is Resource.Error -> {
 
                     if (resource.message == "Bad Request") {
                         // Show toast message
-                        Toast.makeText(this, "El usuario ya existe", Toast.LENGTH_SHORT).show()
+                        Toast.makeText(this, getString(R.string.sign_up_user_exists), Toast.LENGTH_SHORT).show()
                     }
                     else {
                         // Show toast message
-                        Toast.makeText(this, "Error al registrar usuario, revise los datos ingresados", Toast.LENGTH_SHORT).show()
+                        Toast.makeText(this, getString(R.string.sign_up_error), Toast.LENGTH_SHORT).show()
                     }
                 }
                 is Resource.Loading -> {

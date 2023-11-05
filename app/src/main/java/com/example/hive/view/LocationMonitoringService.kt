@@ -82,8 +82,8 @@ class LocationMonitoringService : Service() {
         // Build the notification using NotificationCompat.Builder
         val notificationBuilder = NotificationCompat.Builder(this, channelId)
             .setSmallIcon(R.drawable.ic_notification)
-            .setContentTitle("Estas muy cerca a Uniandes!")
-            .setContentText("Descubre los eventos que estan esperando por ti")
+            .setContentTitle(getString(R.string.cas_tittle))
+            .setContentText(getString(R.string.cas_description))
             .setPriority(NotificationCompat.PRIORITY_DEFAULT)
             .setContentIntent(pendingIntent)
             .setAutoCancel(true)
@@ -118,8 +118,8 @@ class LocationMonitoringService : Service() {
 
         val notificationBuilder = NotificationCompat.Builder(this, channelId)
             .setSmallIcon(R.drawable.ic_notification)
-            .setContentTitle("Estas muy cerca a Uniandes!")
-            .setContentText("Descubre los eventos que estan esperando por ti")
+            .setContentTitle(getString(R.string.cas_tittle))
+            .setContentText(getString(R.string.cas_description))
             .setPriority(NotificationCompat.PRIORITY_DEFAULT)
             .setContentIntent(pendingIntent)
             .setAutoCancel(true)

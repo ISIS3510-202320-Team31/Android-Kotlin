@@ -19,7 +19,7 @@ class EventListViewModel(private val userSession: UserSession, private val conte
         getEventsVM()
     }
 
-    private fun getEventsVM() = viewModelScope.launch {
+    fun getEventsVM() = viewModelScope.launch {
         eventsPage.postValue(Resource.Loading())
         // Get today's date
         val response = userSession.userId?.let { repository.getSmartFeatureR(it) }

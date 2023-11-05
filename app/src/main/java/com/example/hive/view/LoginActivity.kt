@@ -33,16 +33,16 @@ class LoginActivity : AppCompatActivity() {
         viewModel._loginResult.observe(this, Observer { response ->
             when (response) {
                 is Resource.Success -> {
-                    Toast.makeText(this, "Iniciaste sesión correctamente", Toast.LENGTH_SHORT).show()
+                    Toast.makeText(this, getString(R.string.login_success), Toast.LENGTH_SHORT).show()
                     val intent = Intent(this, MainActivity::class.java)
                     startActivity(intent)
                     finish()
                 }
                 is Resource.Error -> {
-                    Toast.makeText(this, "Error al inciar sesión, revise sus datos", Toast.LENGTH_SHORT).show()
+                    Toast.makeText(this, getString(R.string.login_error), Toast.LENGTH_SHORT).show()
                 }
                 is Resource.Loading -> {
-                    Toast.makeText(this, "Iniciando sesión...", Toast.LENGTH_SHORT).show()
+                    Toast.makeText(this, getString(R.string.login_loading), Toast.LENGTH_SHORT).show()
                 }
             }
         })
@@ -52,13 +52,13 @@ class LoginActivity : AppCompatActivity() {
             val password = findViewById<EditText>(R.id.editTextPassword).text.toString()
 
             if (username.isEmpty()) {
-                findViewById<EditText>(R.id.editTextEmail).error = "Por favor ingrese su usuario"
+                findViewById<EditText>(R.id.editTextEmail).error = getString(R.string.login_error_username)
                 findViewById<EditText>(R.id.editTextEmail).requestFocus()
                 return@setOnClickListener
             }
 
             if (password.isEmpty()) {
-                findViewById<EditText>(R.id.editTextPassword).error = "Por favor ingrese su contraseña"
+                findViewById<EditText>(R.id.editTextPassword).error = getString(R.string.login_error_password)
                 findViewById<EditText>(R.id.editTextPassword).requestFocus()
                 return@setOnClickListener
             }

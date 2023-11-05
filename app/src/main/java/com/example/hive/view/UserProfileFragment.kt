@@ -6,10 +6,13 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.Button
+import android.widget.ProgressBar
 import android.widget.TextView
+import android.widget.Toast
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProvider
+import androidx.swiperefreshlayout.widget.SwipeRefreshLayout
 import com.example.hive.R
 import com.example.hive.model.adapters.SessionManager
 import com.example.hive.util.Resource
@@ -48,6 +51,13 @@ class UserProfileFragment : Fragment() {
             handleTracking(elapsedTime)
         })
 
+        // Progress bar
+        val loadingProgressBar = view.findViewById<ProgressBar>(R.id.loadingProgressBarProfile)
+        // Swipe refresh layout
+        val swipeRefreshLayout = view.findViewById<SwipeRefreshLayout>(R.id.swipeRefreshLayoutProfile)
+        swipeRefreshLayout.setOnRefreshListener {
+            refreshFragment(swipeRefreshLayout)
+        }
         //Update user participation
         viewModel.userParticipation.observe(viewLifecycleOwner, Observer { resource ->
             val participationTextView = view?.findViewById<TextView>(R.id.eventsJoined)
@@ -57,11 +67,15 @@ class UserProfileFragment : Fragment() {
                     if (participationTextView != null) {
                         participationTextView.text = "..."
                     }
+                    // Show progress bar
+                    loadingProgressBar.visibility = View.VISIBLE
                 }
                 is Resource.Success<*> -> {
                     if (participationTextView != null) {
                         participationTextView.text = resource.data?.size.toString()
                     }
+                    // Gone progress bar
+                    loadingProgressBar.visibility = View.GONE
                 }
                 is Resource.Error<*> -> {
                     if (participationTextView != null) {
@@ -119,6 +133,32 @@ class UserProfileFragment : Fragment() {
         }
     }
 
+    private fun refreshFragment( swipeRefreshLayout: SwipeRefreshLayout) {
+        swipeRefreshLayout.isRefreshing = true
+
+        viewModel.getUserParticipationVM()
+        viewModel.getUserDetailVM()
+        viewModel.updateElapsedTime()
+
+        viewModel.userParticipation.observe(viewLifecycleOwner, Observer { resource ->
+            when (resource) {
+                is Resource.Loading<*> -> {
+                    // loading indicator will be kept
+                }
+                is Resource.Success<*> -> {
+                    // Stop the loading indicator once the data has been loaded
+                    swipeRefreshLayout.isRefreshing = false
+                }
+                is Resource.Error<*> -> {
+                    // Stop the loading indicator in case of error
+                    swipeRefreshLayout.isRefreshing = false
+                    // Manage the error state (e.g., show an error message)
+                    Toast.makeText(requireContext(), getString(R.string.swipe_down_error), Toast.LENGTH_SHORT).show()
+                }
+            }
+        })
+    }
+
     private fun handleTracking(elapsedTimeSeconds: Long) {
 
         val formattedTime = when {
@@ -126,15 +166,15 @@ class UserProfileFragment : Fragment() {
                 val hours = elapsedTimeSeconds / 3600
                 val minutes = (elapsedTimeSeconds % 3600) / 60
                 if (minutes <10 && hours <10){
-                    "0$hours:0$minutes horas"
+                    "0$hours:0$minutes " + getString(R.string.profile_time_horas)
                 }else if (minutes <10){
-                    "$hours:0$minutes horas"
+                    "$hours:0$minutes " + getString(R.string.profile_time_horas)
                 }
                 else if (hours <10){
-                    "0$hours:$minutes horas"
+                    "0$hours:$minutes " + getString(R.string.profile_time_horas)
                 }
                 else{
-                    "$hours:$minutes horas"
+                    "$hours:$minutes " + getString(R.string.profile_time_horas)
                 }
             }
             elapsedTimeSeconds > 59 -> {
@@ -142,24 +182,24 @@ class UserProfileFragment : Fragment() {
                 val seconds = elapsedTimeSeconds % 60
 
                 if (seconds <10 && minutes <10){
-                    "0$minutes:0$seconds minutos"
+                    "0$minutes:0$seconds " + getString(R.string.profile_time_minutos)
                 }else if (seconds <10){
-                    "$minutes:0$seconds minutos"
+                    "$minutes:0$seconds " + getString(R.string.profile_time_minutos)
                 }
                 else if (minutes <10){
-                    "0$minutes:$seconds minutos"
+                    "0$minutes:$seconds " + getString(R.string.profile_time_minutos)
                 }
                 else{
-                    "$minutes:$seconds minutos"
+                    "$minutes:$seconds " + getString(R.string.profile_time_minutos)
                 }
             }
             else -> {
                 val seconds = elapsedTimeSeconds
                 if (seconds <10){
-                    "00:0$seconds segundos"
+                    "00:0$seconds " + getString(R.string.profile_time_segundos)
                 }
                 else{
-                    "00:$seconds segundos"
+                    "00:$seconds " + getString(R.string.profile_time_segundos)
                 }
             }
 

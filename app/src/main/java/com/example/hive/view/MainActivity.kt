@@ -147,7 +147,6 @@ class MainActivity : AppCompatActivity() {
                     true
                 }
                 R.id.ic_profile -> {
-                    sessionManager.saveElapsedTime(elapsedTimeSeconds)
                     replaceFragment(UserProfileFragment())
                     true
                 }
@@ -163,30 +162,50 @@ class MainActivity : AppCompatActivity() {
     }
 
     //TIME TRACKER STATUS
-    override fun onStop(){
-        super.onStop()
 
-        //Stop the timer if it is running
+    //time tracker reset cases
+    private fun restartTimer() {
+        if (!isTracking) {
+            startTimeMillis = System.currentTimeMillis()
+            isTracking = true
+        }
+    }
+
+    override fun onResume(){
+        super.onResume()
+        //Restart the timer if it is not already running
+        restartTimer()
+    }
+    override fun onRestart() {
+        super.onRestart()
+        //Restart the timer if it is not already running
+        restartTimer()
+    }
+
+    // time tracker stop cases
+    private fun stopTimer() {
         if (isTracking) {
             val endTimeMillis = System.currentTimeMillis()
             elapsedTimeSeconds += (endTimeMillis-startTimeMillis)/1000
             isTracking = false
         }
+
         sessionManager.saveElapsedTime(elapsedTimeSeconds)
     }
 
-    override fun onRestart() {
-        super.onRestart()
-
-        //Restart the timer if the app is restarted
-        startTimeMillis = System.currentTimeMillis()
-        isTracking = true
-        sessionManager.saveElapsedTime(elapsedTimeSeconds)
+    override fun onPause(){
+        super.onPause()
+        //Stop the timer if it is running
+        stopTimer()
+    }
+    override fun onStop(){
+        super.onStop()
+        //Stop the timer if it is running
+        stopTimer()
     }
 
     override fun onDestroy() {
         super.onDestroy()
-
         //Save the elapsed time in the session manager
         sessionManager.saveElapsedTime(elapsedTimeSeconds)
         sessionManager.saveDatabase(false)
@@ -278,8 +297,8 @@ class MainActivity : AppCompatActivity() {
 
         val notificationBuilder = NotificationCompat.Builder(this, channelId)
             .setSmallIcon(R.drawable.ic_star)
-            .setContentTitle("Bienvenido a Hive!")
-            .setContentText("La mejor app de eventos")
+            .setContentTitle(getString(R.string.main_welcome))
+            .setContentText(getString(R.string.main_description))
             .setPriority(NotificationCompat.PRIORITY_DEFAULT)
             .setAutoCancel(true)
 

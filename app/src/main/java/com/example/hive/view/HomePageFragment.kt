@@ -1,6 +1,7 @@
 package com.example.hive.view
 
 import android.app.Dialog
+import android.content.Context
 import android.content.Intent
 import android.graphics.Bitmap
 import android.os.Bundle
@@ -8,11 +9,14 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.*
+import androidx.appcompat.app.AppCompatActivity
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProvider
+import androidx.lifecycle.lifecycleScope
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
+import androidx.swiperefreshlayout.widget.SwipeRefreshLayout
 import com.example.hive.R
 import com.example.hive.model.adapters.EventsAdapter
 import com.example.hive.model.adapters.SessionManager
@@ -29,6 +33,7 @@ import com.google.zxing.integration.android.IntentIntegrator
 import com.google.zxing.qrcode.QRCodeWriter
 import com.google.zxing.qrcode.decoder.ErrorCorrectionLevel
 import com.squareup.picasso.Picasso
+import kotlinx.coroutines.launch
 import java.text.SimpleDateFormat
 import java.util.*
 
@@ -54,6 +59,13 @@ class HomePageFragment : Fragment() {
     ): View? {
         // Inflate the layout for this fragment
         val view = inflater.inflate(R.layout.fragment_home_page, container, false)
+
+        // Refresh fragment
+        val swipeRefreshLayout: SwipeRefreshLayout = view.findViewById(R.id.swipeRefreshLayout)
+
+        swipeRefreshLayout.setOnRefreshListener {
+            refreshFragment(swipeRefreshLayout)
+        }
 
         val userSession = SessionManager(requireContext())
         user = userSession.getUserSession()
@@ -233,7 +245,7 @@ class HomePageFragment : Fragment() {
         val integrator = IntentIntegrator.forSupportFragment(this) // Cambiar a forSupportFragment si usas AndroidX
         integrator.setDesiredBarcodeFormats(IntentIntegrator.QR_CODE)
         integrator.setBeepEnabled(false)
-        integrator.setPrompt("Unete a un Evento")
+        integrator.setPrompt(requireContext().getString(R.string.event_promotion))
         integrator.initiateScan()
     }
 
@@ -242,7 +254,7 @@ class HomePageFragment : Fragment() {
         val result = IntentIntegrator.parseActivityResult(requestCode, resultCode, data)
         if (result != null) {
                 if (result.contents == null) {
-                    Toast.makeText(requireContext(), "Cancelled", Toast.LENGTH_LONG).show()
+                    Toast.makeText(requireContext(), requireContext().getString(R.string.evento_cancelado), Toast.LENGTH_LONG).show()
                 } else {
                     val viewModelFactoryDetail =
                         context?.let { EventDetailViewModelProviderFactory(result.contents, it) }
@@ -271,9 +283,9 @@ class HomePageFragment : Fragment() {
 
                                 val eventEstadoTextView = detailDialog.findViewById<TextView>(R.id.estado)
                                 if (resource.data?.state == true) {
-                                    eventEstadoTextView.text = "Activo"
+                                    eventEstadoTextView.text = requireContext().getString(R.string.event_state_activo)
                                 } else {
-                                    eventEstadoTextView.text = "Inactivo"
+                                    eventEstadoTextView.text = requireContext().getString(R.string.event_state_inactivo)
                                 }
 
                                 val eventIDTextView = detailDialog.findViewById<TextView>(R.id.eventID)
@@ -289,7 +301,7 @@ class HomePageFragment : Fragment() {
                                 eventDateTextView.text = resource.data?.date
 
                                 val eventDuracionTextView = detailDialog.findViewById<TextView>(R.id.duracion)
-                                eventDuracionTextView.text = resource.data?.duration.toString()+" minutos"
+                                eventDuracionTextView.text = resource.data?.duration.toString()+" "+ requireContext().getString(R.string.event_duration_minutos)
 
                                 val eventDescriptionTextView = detailDialog.findViewById<TextView>(R.id.descripcion)
                                 eventDescriptionTextView.text = resource.data?.description
@@ -298,7 +310,7 @@ class HomePageFragment : Fragment() {
                                 eventLugarTextView.text = resource.data?.place
 
                                 val eventParticipantTextView = detailDialog.findViewById<TextView>(R.id.personas)
-                                val stringParticipant = "${resource.data?.participants?.size} / ${resource.data?.num_participants} personas"
+                                val stringParticipant = "${resource.data?.participants?.size} / ${resource.data?.num_participants} "+ requireContext().getString(R.string.event_participants_personas)
                                 eventParticipantTextView.text = stringParticipant
 
                                 val eventLinksInteresesTextView = detailDialog.findViewById<TextView>(R.id.linksInteres)
@@ -332,15 +344,15 @@ class HomePageFragment : Fragment() {
                                 val joinEventButton = detailDialog.findViewById<Button>(R.id.submitButton)
 
                                 if (eventParticipants?.contains(user.userId) == true) {
-                                    joinEventButton.text = "No asistir"
+                                    joinEventButton.text = requireContext().getString(R.string.event_detail_no_asistir)
                                 } else {
-                                    joinEventButton.text = "Unirse"
+                                    joinEventButton.text = requireContext().getString(R.string.event_detail_unirse)
                                 }
                                     joinEventButton.setOnClickListener {
                                     val eventIDTextView = detailDialog.findViewById<TextView>(R.id.eventID)
                                     val eventID = eventIDTextView.text.toString()
                                     val userID = user.userId
-                                    if (userID != null && joinEventButton.text.toString() == "Unirse") {
+                                    if (userID != null && joinEventButton.text.toString() == requireContext().getString(R.string.event_detail_unirse)) {
                                         viewModelAddParticipant.addParticipatEventVM(eventID, userID)
                                         viewModelAddParticipant.addParticipatEvent.observe(this, Observer { resource ->
                                             when (resource) {
@@ -355,10 +367,10 @@ class HomePageFragment : Fragment() {
                                                     }
 
                                                     // change joinEventButton text to "salir"
-                                                    joinEventButton.text = "No asistir"
+                                                    joinEventButton.text = requireContext().getString(R.string.event_detail_no_asistir)
 
                                                     // update the number of participants
-                                                    val stringParticipant = "${resource.data?.participants!!.size} / ${resource.data?.num_participants} personas"
+                                                    val stringParticipant = "${resource.data?.participants!!.size} / ${resource.data?.num_participants} "+requireContext().getString(R.string.event_participants_personas)
                                                     eventParticipantTextView.text = stringParticipant
                                                 }
                                                 is Resource.Error<*> -> {
@@ -367,7 +379,7 @@ class HomePageFragment : Fragment() {
                                             }
                                         })
                                     }
-                                    if (userID != null && joinEventButton.text.toString() == "No asistir") {
+                                    if (userID != null && joinEventButton.text.toString() == requireContext().getString(R.string.event_detail_no_asistir)) {
                                         viewModelAddParticipant.deleteParticipatEventVM(eventID, userID)
                                         // Remove the ID from the event.participants
                                         viewModelAddParticipant.deleteParticipatEvent.observe(this, Observer { resource ->
@@ -381,10 +393,10 @@ class HomePageFragment : Fragment() {
                                                         )!!
                                                     }
                                                     // change joinEventButton text to "unirse"
-                                                    joinEventButton.text = "Unirse"
+                                                    joinEventButton.text = requireContext().getString(R.string.event_detail_unirse)
 
                                                     // update the number of participants
-                                                    val stringParticipant = "${resource.data?.participants?.size} / ${resource.data?.num_participants} personas"
+                                                    val stringParticipant = "${resource.data?.participants?.size} / ${resource.data?.num_participants} "+requireContext().getString(R.string.event_participants_personas)
                                                     eventParticipantTextView.text = stringParticipant
 
                                                 }
@@ -434,6 +446,30 @@ class HomePageFragment : Fragment() {
             e.printStackTrace()
         }
         return null
+    }
+
+    private fun refreshFragment( swipeRefreshLayout: SwipeRefreshLayout ) {
+        swipeRefreshLayout.isRefreshing = true
+
+        viewModelEvent.getEventsVM()
+
+        viewModelEvent.eventsPage.observe(viewLifecycleOwner, Observer { resource ->
+            when (resource) {
+                is Resource.Loading<*> -> {
+                    // loading indicator will be kept
+                }
+                is Resource.Success<*> -> {
+                    // Stop the loading indicator once the data has been loaded
+                    swipeRefreshLayout.isRefreshing = false
+                }
+                is Resource.Error<*> -> {
+                    // Stop the loading indicator in case of error
+                    swipeRefreshLayout.isRefreshing = false
+                    // Manage the error state (e.g., show an error message)
+                    Toast.makeText(requireContext(), getString(R.string.swipe_down_error), Toast.LENGTH_SHORT).show()
+                }
+            }
+        })
     }
 
 }

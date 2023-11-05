@@ -63,7 +63,7 @@ class SignUpFragment : Fragment() {
 
             if (password != confirmPassword) {
                 // Show toast message
-                Toast.makeText(requireContext(), "La contraseña debe ser igual a su confirmación", Toast.LENGTH_SHORT).show()
+                Toast.makeText(requireContext(), getString(R.string.sign_up_error_password_match), Toast.LENGTH_SHORT).show()
             }
 
             // Create a RegisterRequest object
@@ -71,7 +71,7 @@ class SignUpFragment : Fragment() {
                 RegisterRequest(username, name, selectedCareer, birthdateStr, email, password)
             } catch (e: Exception) {
                 // Show toast message
-                Toast.makeText(requireContext(), "Error al registrar usuario", Toast.LENGTH_SHORT).show()
+                Toast.makeText(requireContext(), getString(R.string.sign_up_fail), Toast.LENGTH_SHORT).show()
                 null
             }
 
@@ -88,12 +88,12 @@ class SignUpFragment : Fragment() {
                 } catch (e: Exception) {
                     // Show toast message
                     println(e.stackTrace)
-                    Toast.makeText(requireContext(), "Error al registrar usuario", Toast.LENGTH_SHORT).show()
+                    Toast.makeText(requireContext(), getString(R.string.sign_up_fail), Toast.LENGTH_SHORT).show()
                 }
             }
             else {
                 // Show toast message
-                Toast.makeText(requireContext(), "Error al registrar usuario", Toast.LENGTH_SHORT).show()
+                Toast.makeText(requireContext(), getString(R.string.sign_up_fail), Toast.LENGTH_SHORT).show()
             }
         }
 
@@ -102,7 +102,7 @@ class SignUpFragment : Fragment() {
             when (resource) {
                 is Resource.Success -> {
                     // Registration was successful, go to the login page and print the response
-                    Toast.makeText(requireContext(), "Usuario registrado exitosamente", Toast.LENGTH_SHORT).show()
+                    Toast.makeText(requireContext(), getString(R.string.sign_up_fail), Toast.LENGTH_SHORT).show()
                     val transaction = requireActivity().supportFragmentManager.beginTransaction()
                     transaction.replace(R.id.fragment_container, LoginFragment())
                     transaction.commit()
@@ -111,11 +111,11 @@ class SignUpFragment : Fragment() {
 
                     if (resource.message == "Bad Request") {
                         // Show toast message
-                        Toast.makeText(requireContext(), "El usuario ya existe", Toast.LENGTH_SHORT).show()
+                        Toast.makeText(requireContext(), getString(R.string.sign_up_user_exists), Toast.LENGTH_SHORT).show()
                     }
                     else {
                         // Show toast message
-                        Toast.makeText(requireContext(), "Error al registrar usuario", Toast.LENGTH_SHORT).show()
+                        Toast.makeText(requireContext(), getString(R.string.sign_up_fail), Toast.LENGTH_SHORT).show()
                     }
                 }
                 is Resource.Loading -> {
