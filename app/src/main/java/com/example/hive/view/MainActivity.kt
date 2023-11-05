@@ -8,18 +8,30 @@ import androidx.appcompat.app.AppCompatActivity
 import android.app.NotificationChannel
 import android.app.NotificationManager
 import android.os.Build
+import android.util.Log
 import androidx.core.app.NotificationCompat
 import androidx.core.app.NotificationManagerCompat
 import android.view.Menu
+import android.view.View
+import android.widget.Toast
 import androidx.core.app.ActivityCompat
+import androidx.core.content.ContentProviderCompat.requireContext
 import androidx.core.content.ContextCompat
 import androidx.fragment.app.Fragment
 import com.example.hive.R
 import com.example.hive.databinding.ActivityMainBinding
 import com.example.hive.model.adapters.SessionManager
+import com.example.hive.util.Resource
+import com.example.hive.viewmodel.EventListViewModel
+import com.example.hive.viewmodel.EventsViewModelProviderFactory
 import com.google.android.gms.location.FusedLocationProviderClient
 import com.google.android.gms.location.LocationServices
 import com.google.android.gms.maps.model.LatLng
+import java.text.SimpleDateFormat
+import java.util.*
+import androidx.lifecycle.Observer
+import com.example.hive.model.network.responses.EventResponse
+import com.example.hive.model.room.entities.Event
 
 
 class MainActivity : AppCompatActivity() {
@@ -28,6 +40,7 @@ class MainActivity : AppCompatActivity() {
     private lateinit var sessionManager: SessionManager
     private lateinit var fusedLocationClient: FusedLocationProviderClient
     private var hasLocationStarted = false
+    private lateinit var viewModelEvent : EventListViewModel
 
     //time tracker
     private var startTimeMillis: Long = 0
@@ -140,7 +153,6 @@ class MainActivity : AppCompatActivity() {
                 else -> false
             }
         }
-
     }
 
     override fun onCreateOptionsMenu(menu: Menu): Boolean {
@@ -196,6 +208,7 @@ class MainActivity : AppCompatActivity() {
         super.onDestroy()
         //Save the elapsed time in the session manager
         sessionManager.saveElapsedTime(elapsedTimeSeconds)
+        sessionManager.saveDatabase(false)
     }
 
     private fun replaceFragment(fragment: Fragment) {

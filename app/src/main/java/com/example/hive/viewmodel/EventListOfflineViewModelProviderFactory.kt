@@ -3,10 +3,10 @@ package com.example.hive.viewmodel
 import android.content.Context
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
-import com.example.hive.model.repository.EventRepository
+import com.example.hive.model.models.UserSession
 
-class EventCreationViewModelProviderFactory (private val context: Context): ViewModelProvider.Factory {
+class EventListOfflineViewModelProviderFactory(private val context: Context) : ViewModelProvider.Factory {
     override fun <T : ViewModel> create(modelClass: Class<T>): T {
-        return EventCreationViewModel(context) as T
+        return EventListOfflineViewModel(context) as T
     }
 }

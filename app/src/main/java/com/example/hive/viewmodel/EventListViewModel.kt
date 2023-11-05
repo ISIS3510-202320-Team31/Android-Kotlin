@@ -1,19 +1,19 @@
 package com.example.hive.viewmodel
 
-import androidx.lifecycle.MutableLiveData
-import androidx.lifecycle.ViewModel
-import androidx.lifecycle.viewModelScope
+import android.content.Context
+import androidx.lifecycle.*
 import com.example.hive.model.models.UserSession
 import com.example.hive.model.network.responses.EventResponse
 import com.example.hive.model.repository.EventRepository
+import com.example.hive.model.room.entities.Event
 import com.example.hive.util.Resource
 import kotlinx.coroutines.launch
 import retrofit2.Response
 
-class EventListViewModel(private val userSession: UserSession) : ViewModel() {
+class EventListViewModel(private val userSession: UserSession, private val context: Context) : ViewModel() {
 
     val eventsPage: MutableLiveData<Resource<List<EventResponse>>> = MutableLiveData()
-    val repository = EventRepository()
+    val repository = EventRepository(context)
 
     init {
         getEventsVM()

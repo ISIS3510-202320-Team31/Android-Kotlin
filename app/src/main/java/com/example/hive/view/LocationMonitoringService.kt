@@ -35,7 +35,6 @@ class LocationMonitoringService : Service() {
 
     private val locationListener = LocationListener { location ->
         val userLatLng = LatLng(location.latitude, location.longitude)
-        println("User location: $userLatLng")
         val isInsidePolygon = isPointInPolygon(userLatLng, polygonPoints)
         if (isInsidePolygon) {
             val notification = createNotification()

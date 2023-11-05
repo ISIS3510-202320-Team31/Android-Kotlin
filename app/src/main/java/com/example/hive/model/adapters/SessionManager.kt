@@ -6,6 +6,7 @@ import com.example.hive.model.models.UserSession
 
 class SessionManager(context: Context) {
     private val sharedPreferences: SharedPreferences = context.getSharedPreferences("user_session", Context.MODE_PRIVATE)
+    private val sharedPreferencesDatabase = context.getSharedPreferences("database", Context.MODE_PRIVATE)
     private val sharedPreferencesNotification: SharedPreferences = context.getSharedPreferences("notification", Context.MODE_PRIVATE)
     private val editor: SharedPreferences.Editor = sharedPreferences.edit()
 
@@ -19,6 +20,16 @@ class SessionManager(context: Context) {
         val editorNotification: SharedPreferences.Editor = sharedPreferencesNotification.edit()
         editorNotification.putBoolean("notification", notification)
         editorNotification.apply()
+    }
+
+    fun saveDatabase(database: Boolean) {
+        val editorDatabase: SharedPreferences.Editor = sharedPreferencesDatabase.edit()
+        editorDatabase.putBoolean("database", database)
+        editorDatabase.apply()
+    }
+
+    fun getDatabase(): Boolean {
+        return sharedPreferencesDatabase.getBoolean("database", false)
     }
 
     fun getNotification(): Boolean {
