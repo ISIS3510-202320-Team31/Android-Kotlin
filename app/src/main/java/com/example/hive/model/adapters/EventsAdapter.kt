@@ -3,6 +3,7 @@ package com.example.hive.model.adapters
 import android.app.Dialog
 import android.content.Context
 import android.graphics.Bitmap
+import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -21,6 +22,7 @@ import com.example.hive.util.ConnectionLiveData
 import com.example.hive.util.Resource
 import com.example.hive.viewmodel.AddParticipatEventViewModel
 import com.example.hive.viewmodel.EventDetailViewModel
+import com.google.firebase.analytics.FirebaseAnalytics
 import com.google.zxing.BarcodeFormat
 import com.google.zxing.EncodeHintType
 import com.google.zxing.qrcode.QRCodeWriter
@@ -84,6 +86,13 @@ class EventsAdapter(private val viewModelAddParticipant: AddParticipatEventViewM
             connectionLiveData.observe(lifecycleOwner, Observer { isConnected ->
                 if (isConnected) {
                     // If the user is connected to the internet, show the event detail
+                    // Track a custom event when a list item is clicked
+                    val bundle = Bundle()
+                    bundle.putString(FirebaseAnalytics.Param.ITEM_ID, "item_${event.id}") // Use a unique item ID
+                    bundle.putString(FirebaseAnalytics.Param.ITEM_NAME, "List Item ${event.name}") // Item name
+                    bundle.putString(FirebaseAnalytics.Param.CONTENT_TYPE, "CardView Item (HomePage)")
+
+                    FirebaseAnalytics.getInstance(context).logEvent(FirebaseAnalytics.Event.SELECT_CONTENT, bundle)
 
                     eventDetailViewModel = EventDetailViewModel(event.id, context)
 
