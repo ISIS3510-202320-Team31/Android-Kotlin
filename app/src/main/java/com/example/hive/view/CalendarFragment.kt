@@ -24,6 +24,7 @@ class CalendarFragment : Fragment() {
 
         val btnActivities = view.findViewById<android.widget.Button>(R.id.btnActivities)
         val btnHistorical = view.findViewById<android.widget.Button>(R.id.btnHistorical)
+        val btnCreados = view.findViewById<android.widget.Button>(R.id.btnCreados)
 
         //Show ActivitiesFragment by default
         showFragment(CalendarActivitiesFragment())
@@ -34,12 +35,22 @@ class CalendarFragment : Fragment() {
             btnActivities.setBackgroundColor(Color.parseColor("#2196F3"))
             //Color DARK GRAY
             btnHistorical.setBackgroundColor(Color.parseColor("#A2AEBB"))
+            //Color DARK GRAY
+            btnCreados.setBackgroundColor(Color.parseColor("#A2AEBB"))
         }
 
         btnHistorical.setOnClickListener {
             showFragment(CalendarHistoricalFragment())
             btnActivities.setBackgroundColor(Color.parseColor("#A2AEBB"))
             btnHistorical.setBackgroundColor(Color.parseColor("#2196F3"))
+            btnCreados.setBackgroundColor(Color.parseColor("#A2AEBB"))
+        }
+
+        btnCreados.setOnClickListener {
+            showFragment(CalendarCreadosFragment())
+            btnActivities.setBackgroundColor(Color.parseColor("#A2AEBB"))
+            btnHistorical.setBackgroundColor(Color.parseColor("#A2AEBB"))
+            btnCreados.setBackgroundColor(Color.parseColor("#2196F3"))
         }
 
         return view

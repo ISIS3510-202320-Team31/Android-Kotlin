@@ -25,8 +25,8 @@ import com.google.zxing.qrcode.QRCodeWriter
 import com.google.zxing.qrcode.decoder.ErrorCorrectionLevel
 import com.squareup.picasso.Picasso
 
-class CalendarHistoricalAdapter(private val lifecycleOwner: LifecycleOwner,
-                                private val context: Context): RecyclerView.Adapter<CalendarHistoricalAdapter.MListHolder>(){
+class CalendarCreadosAdapter(private val lifecycleOwner: LifecycleOwner,
+                                private val context: Context): RecyclerView.Adapter<CalendarCreadosAdapter.MListHolder>(){
 
     inner class MListHolder(itemView: View) : RecyclerView.ViewHolder(itemView)
 
