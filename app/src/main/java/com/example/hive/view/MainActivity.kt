@@ -32,6 +32,7 @@ import java.util.*
 import androidx.lifecycle.Observer
 import com.example.hive.model.network.responses.EventResponse
 import com.example.hive.model.room.entities.Event
+import com.google.firebase.analytics.FirebaseAnalytics
 
 
 class MainActivity : AppCompatActivity() {
@@ -66,6 +67,7 @@ class MainActivity : AppCompatActivity() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+        FirebaseAnalytics.getInstance(this)
 
         binding = ActivityMainBinding.inflate(layoutInflater)
         setContentView(binding.root)
