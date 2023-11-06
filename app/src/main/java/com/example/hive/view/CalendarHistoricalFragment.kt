@@ -106,7 +106,7 @@ class CalendarHistoricalFragment : Fragment() {
                     val formatter = SimpleDateFormat("yyyy-MM-dd")
                     val date = formatter.parse(event.date)
                     eventDate.time = date
-                    eventDate.get(Calendar.DAY_OF_YEAR) >= today.get(Calendar.DAY_OF_YEAR)
+                    eventDate.get(Calendar.DAY_OF_YEAR) < today.get(Calendar.DAY_OF_YEAR)
                 }
 
                 // Cast manually the list of events to the list of EventResponse
@@ -181,7 +181,7 @@ class CalendarHistoricalFragment : Fragment() {
                                     val formatter = SimpleDateFormat("yyyy-MM-dd")
                                     val date = formatter.parse(event.date)
                                     eventDate.time = date
-                                    eventDate.get(Calendar.DAY_OF_YEAR) >= today.get(Calendar.DAY_OF_YEAR)
+                                    eventDate.get(Calendar.DAY_OF_YEAR) < today.get(Calendar.DAY_OF_YEAR)
                                 }
                                 calendarHistoricalAdapter.submitList(filteredList)
                             }

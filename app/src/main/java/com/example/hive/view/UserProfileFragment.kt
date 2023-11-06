@@ -11,11 +11,18 @@ import android.widget.TextView
 import android.widget.Toast
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.Observer
+import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
 import androidx.swiperefreshlayout.widget.SwipeRefreshLayout
 import com.example.hive.R
 import com.example.hive.model.adapters.SessionManager
+import com.example.hive.model.models.UserSession
+import com.example.hive.model.network.responses.UserCacheResponse
+import com.example.hive.model.network.responses.UserResponse
+import com.example.hive.util.ConnectionLiveData
 import com.example.hive.util.Resource
+import com.example.hive.viewmodel.UserProfileOfflineViewModel
+import com.example.hive.viewmodel.UserProfileOfflineViewModelProviderFactory
 import com.example.hive.viewmodel.UserProfileViewModel
 import com.example.hive.viewmodel.UserProfileViewModelProviderFactory
 
@@ -29,63 +36,115 @@ class UserProfileFragment : Fragment() {
     private lateinit var sessionManager: SessionManager
     private lateinit var elapsedTimeTextView: TextView
 
+    private lateinit var viewModelUserProfileOffline: UserProfileOfflineViewModel
+    private lateinit var user: UserSession
+    private lateinit var connectionLiveData: ConnectionLiveData
+
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View? {
-        return inflater.inflate(R.layout.fragment_user_profile, container, false)
+        val view =  inflater.inflate(R.layout.fragment_user_profile, container, false)
+
+        val userSession = SessionManager(requireContext())
+        user = userSession.getUserSession()
+
+        val viewModelFactoryOffline = context?.let{
+            UserProfileOfflineViewModelProviderFactory(
+                it
+            )
+        }
+
+        viewModelUserProfileOffline =
+            viewModelFactoryOffline?.let{
+                ViewModelProvider(this,
+                    it
+                ).get(UserProfileOfflineViewModel::class.java)
+            }!!
+
+        viewModelUserProfileOffline.allUsers?.observe(viewLifecycleOwner, Observer { resource ->
+            val list = mutableListOf<UserCacheResponse>()
+            resource.let {
+                println("resource: $it")
+                for (user in it){
+                    val userToAdd = UserCacheResponse(
+                        user.id,
+                        user.name?:"",
+                        user.email?:"",
+                        user.participation?:0,
+                    )
+                    list.add(userToAdd)
+                }
+            }
+        })
+        return view
     }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
-        sessionManager = SessionManager(requireContext())
-        val viewModelFactory = sessionManager?.let{ UserProfileViewModelProviderFactory(it) }
+        viewModel = ViewModelProvider(this).get(UserProfileViewModel::class.java)
 
-        elapsedTimeTextView = view?.findViewById<TextView>(R.id.timeSpent)!!
+        connectionLiveData = ConnectionLiveData(requireContext())
+        connectionLiveData.observe(viewLifecycleOwner, Observer { isConnected ->
+            if (isConnected){
+                val viewModelFactory = sessionManager?.let{ UserProfileViewModelProviderFactory(it) }
+                viewModel = ViewModelProvider(this, viewModelFactory!!).get(UserProfileViewModel::class.java)
 
-        viewModel = ViewModelProvider(this, viewModelFactory!!).get(UserProfileViewModel::class.java)
-
-        //Observer for time usage
-        viewModel.elapsedTimeLiveData.observe(viewLifecycleOwner, Observer{ elapsedTime ->
-            handleTracking(elapsedTime)
-        })
-
-        // Progress bar
-        val loadingProgressBar = view.findViewById<ProgressBar>(R.id.loadingProgressBarProfile)
-        // Swipe refresh layout
-        val swipeRefreshLayout = view.findViewById<SwipeRefreshLayout>(R.id.swipeRefreshLayoutProfile)
-        swipeRefreshLayout.setOnRefreshListener {
-            refreshFragment(swipeRefreshLayout)
-        }
-        //Update user participation
-        viewModel.userParticipation.observe(viewLifecycleOwner, Observer { resource ->
-            val participationTextView = view?.findViewById<TextView>(R.id.eventsJoined)
-
-            when (resource){
-                is Resource.Loading<*> -> {
-                    if (participationTextView != null) {
-                        participationTextView.text = "..."
-                    }
-                    // Show progress bar
-                    loadingProgressBar.visibility = View.VISIBLE
+                // Progress bar
+                val loadingProgressBar = view.findViewById<ProgressBar>(R.id.loadingProgressBarProfile)
+                // Swipe refresh layout
+                val swipeRefreshLayout = view.findViewById<SwipeRefreshLayout>(R.id.swipeRefreshLayoutProfile)
+                swipeRefreshLayout.setOnRefreshListener {
+                    refreshFragment(swipeRefreshLayout)
                 }
-                is Resource.Success<*> -> {
-                    if (participationTextView != null) {
-                        participationTextView.text = resource.data?.size.toString()
+
+                viewModel.userParticipation.observe(viewLifecycleOwner, Observer { resource ->
+                    val participationTextView = view.findViewById<TextView>(R.id.eventsJoined)
+
+                    when (resource){
+                        is Resource.Loading<*> -> {
+                            if (participationTextView != null) {
+                                participationTextView.text = "..."
+                            }
+                            // Show progress bar
+                            loadingProgressBar.visibility = View.VISIBLE
+                        }
+                        is Resource.Success<*> -> {
+                            //Comprobar si la información guardada en el room es igual a la que se obtiene de la api
+                            if (resource.data? != user.participation){
+                                //update user
+                                val userToUpdate = UserSession(
+                                    user.id,
+                                    user.name,
+                                    user.email,
+                                    resource.data?.size
+                                )
+                                viewModelUserProfileOffline.updateUser(userToUpdate)
+                        }
+                            if (participationTextView != null) {
+                                participationTextView.text = resource.data?.size.toString()
+                            }
+                            // Gone progress bar
+                            loadingProgressBar.visibility = View.GONE
+                        }
+                        is Resource.Error<*> -> {
+                            if (participationTextView != null) {
+                                participationTextView.text = ""
+                            }
+                        }
                     }
-                    // Gone progress bar
-                    loadingProgressBar.visibility = View.GONE
-                }
-                is Resource.Error<*> -> {
-                    if (participationTextView != null) {
-                        participationTextView.text = ""
-                    }
-                }
+
+            } else {
+
             }
-
-
         })
+
+
+
+
+
+
 
         //update user detail
         viewModel.userDetail.observe(viewLifecycleOwner, Observer { resource ->
@@ -119,8 +178,6 @@ class UserProfileFragment : Fragment() {
                 }
             }
         })
-
-        viewModel.updateElapsedTime()
 
         val buttonSignOut = view?.findViewById<Button>(R.id.signOutButton)
 
@@ -160,7 +217,6 @@ class UserProfileFragment : Fragment() {
     }
 
     private fun handleTracking(elapsedTimeSeconds: Long) {
-
         val formattedTime = when {
             elapsedTimeSeconds > 3599 -> {
                 val hours = elapsedTimeSeconds / 3600
@@ -202,10 +258,44 @@ class UserProfileFragment : Fragment() {
                     "00:$seconds " + getString(R.string.profile_time_segundos)
                 }
             }
-
-        }
-
         elapsedTimeTextView.text = formattedTime
+        }
+        }
     }
-
+    private fun refreshFragment( swipeRefreshLayout: SwipeRefreshLayout ) {
+        swipeRefreshLayout.isRefreshing = true
+        connectionLiveData.observe(viewLifecycleOwner, Observer { isAvailable ->
+            if (isAvailable) {
+                viewModelEvent.getEventsVM()
+                viewModelEvent.eventsPage.observe(viewLifecycleOwner, Observer { resource ->
+                    when (resource) {
+                        is Resource.Loading<*> -> {
+                            // loading indicator will be kept
+                        }
+                        is Resource.Success<*> -> {
+                            // Stop the loading indicator once the data has been loaded
+                            swipeRefreshLayout.isRefreshing = false
+                        }
+                        is Resource.Error<*> -> {
+                            // Stop the loading indicator in case of error
+                            swipeRefreshLayout.isRefreshing = false
+                            // Manage the error state (e.g., show an error message)
+                            Toast.makeText(
+                                requireContext(),
+                                getString(R.string.swipe_down_error),
+                                Toast.LENGTH_SHORT
+                            ).show()
+                        }
+                    }
+                })
+            } else {
+                swipeRefreshLayout.isRefreshing = false
+                Toast.makeText(
+                    requireContext(),
+                    getString(R.string.no_internet),
+                    Toast.LENGTH_SHORT
+                ).show()
+            }
+        })
+    }
 }

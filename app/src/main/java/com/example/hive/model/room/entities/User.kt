@@ -9,5 +9,5 @@ data class User(
     @PrimaryKey val id: String,
     @ColumnInfo(name = "name") val name: String?,
     @ColumnInfo(name = "email") val email: String?,
-    @ColumnInfo(name = "participation") val participation: String?,
+    @ColumnInfo(name = "participation") val participation: Int?,
 )
