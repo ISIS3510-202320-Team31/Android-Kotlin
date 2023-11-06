@@ -13,25 +13,20 @@ import androidx.recyclerview.widget.AsyncListDiffer
 import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.RecyclerView
 import com.example.hive.R
+import com.example.hive.model.network.responses.EventDetailResponse
 import com.example.hive.model.network.responses.EventResponse
+import com.example.hive.util.ConnectionLiveData
 import com.example.hive.util.Resource
 import com.example.hive.viewmodel.AddParticipatEventViewModel
+import com.example.hive.viewmodel.EventDetailViewModel
 import com.google.zxing.BarcodeFormat
 import com.google.zxing.EncodeHintType
 import com.google.zxing.qrcode.QRCodeWriter
 import com.google.zxing.qrcode.decoder.ErrorCorrectionLevel
 import com.squareup.picasso.Picasso
 
-//Importar strings de strings.xml
-import com.example.hive.R.string.*
-import com.example.hive.model.network.responses.EventDetailResponse
-import com.example.hive.util.ConnectionLiveData
-import com.example.hive.viewmodel.EventDetailViewModel
-
-class CalendarActivitiesAdapter(private val viewModelAddParticipant: AddParticipatEventViewModel,
-                                private val lifecycleOwner: LifecycleOwner,
-                                private val sessionManager: SessionManager,
-                                private val context: Context): RecyclerView.Adapter<CalendarActivitiesAdapter.MListHolder>(){
+class CalendarCreadosAdapter(private val lifecycleOwner: LifecycleOwner,
+                                private val context: Context): RecyclerView.Adapter<CalendarCreadosAdapter.MListHolder>(){
 
     inner class MListHolder(itemView: View) : RecyclerView.ViewHolder(itemView)
 
@@ -79,7 +74,6 @@ class CalendarActivitiesAdapter(private val viewModelAddParticipant: AddParticip
             this.findViewById<android.widget.TextView>(R.id.fecha).text = newDate
         }
 
-        // Check if there is internet connection
         connectionLiveData = ConnectionLiveData(context)
         val detailDialog = Dialog(holder.itemView.context)
         detailDialog.setContentView(R.layout.fragment_no_internet_connection)
@@ -93,18 +87,18 @@ class CalendarActivitiesAdapter(private val viewModelAddParticipant: AddParticip
 
                     eventDetailViewModel.getEventByIdVM(event.id)
 
-                    detailDialog.setContentView(R.layout.fragment_event_detail)
+                    detailDialog.setContentView(R.layout.fragment_event_detail_historical)
 
                     val dialogLinearLayout =
-                        detailDialog.findViewById<LinearLayout>(R.id.layoutCard)
+                        detailDialog.findViewById<LinearLayout>(R.id.layoutCardHistorical)
                     val dialogProgressBar =
-                        detailDialog.findViewById<ProgressBar>(R.id.loadingProgressBar)
+                        detailDialog.findViewById<ProgressBar>(R.id.loadingProgressCalendarHist)
 
                     dialogLinearLayout.visibility = View.GONE
                     dialogProgressBar.visibility = View.VISIBLE
 
-                    val eventNameTextView = detailDialog.findViewById<TextView>(R.id.title)
-                    val eventEstadoTextView = detailDialog.findViewById<TextView>(R.id.estado)
+                    val eventNameTextView = detailDialog.findViewById<TextView>(R.id.title_historical)
+                    val eventEstadoTextView = detailDialog.findViewById<TextView>(R.id.estado_historical)
                     if (event.state) {
                         eventEstadoTextView.text =
                             holder.itemView.context.getString(R.string.event_state_activo)
@@ -113,24 +107,23 @@ class CalendarActivitiesAdapter(private val viewModelAddParticipant: AddParticip
                             holder.itemView.context.getString(R.string.event_state_inactivo)
                     }
 
-                    val eventIDTextView = detailDialog.findViewById<TextView>(R.id.eventID)
-                    val eventCategoryTextView = detailDialog.findViewById<TextView>(R.id.categoria)
-                    val eventCreatorTextView = detailDialog.findViewById<TextView>(R.id.creador)
-                    val eventDateTextView = detailDialog.findViewById<TextView>(R.id.fecha)
-                    val eventDuracionTextView = detailDialog.findViewById<TextView>(R.id.duracion)
+                    val eventIDTextView = detailDialog.findViewById<TextView>(R.id.eventID_historical)
+                    val eventCategoryTextView = detailDialog.findViewById<TextView>(R.id.categoria_historical)
+                    val eventCreatorTextView = detailDialog.findViewById<TextView>(R.id.creador_historical)
+                    val eventDateTextView = detailDialog.findViewById<TextView>(R.id.fecha_historical)
+                    val eventDuracionTextView = detailDialog.findViewById<TextView>(R.id.duracion_historical)
                     eventDuracionTextView.text =
                         event.duration.toString() + " " + holder.itemView.context.getString(R.string.event_duration_minutos)
 
                     val eventDescriptionTextView =
-                        detailDialog.findViewById<TextView>(R.id.descripcion)
-                    val eventLugarTextView = detailDialog.findViewById<TextView>(R.id.lugar)
+                        detailDialog.findViewById<TextView>(R.id.descripcion_historical)
+                    val eventLugarTextView = detailDialog.findViewById<TextView>(R.id.lugar_historical)
                     val eventParticipantTextView =
-                        detailDialog.findViewById<TextView>(R.id.personas)
-                    val eventQRImageView = detailDialog.findViewById<ImageView>(R.id.qr)
-                    val joinEventButton = detailDialog.findViewById<Button>(R.id.submitButton)
+                        detailDialog.findViewById<TextView>(R.id.personas_historical)
+                    val eventQRImageView = detailDialog.findViewById<ImageView>(R.id.qr_historical)
                     val eventLinksInteresesTextView =
-                        detailDialog.findViewById<TextView>(R.id.linksInteres)
-                    val eventImageView = detailDialog.findViewById<ImageView>(R.id.imagen)
+                        detailDialog.findViewById<TextView>(R.id.linksInteres_historical)
+                    val eventImageView = detailDialog.findViewById<ImageView>(R.id.imagen_historical)
 
                     eventDetailViewModel.eventById.observe(lifecycleOwner, Observer { resource ->
                         when (resource) {
@@ -138,9 +131,9 @@ class CalendarActivitiesAdapter(private val viewModelAddParticipant: AddParticip
                                 // Show progress bar
                                 // Hide all components except progress bar
                                 val dialogLinearLayout =
-                                    detailDialog.findViewById<LinearLayout>(R.id.layoutCard)
+                                    detailDialog.findViewById<LinearLayout>(R.id.layoutCardHistorical)
                                 val dialogProgressBar =
-                                    detailDialog.findViewById<ProgressBar>(R.id.loadingProgressBar)
+                                    detailDialog.findViewById<ProgressBar>(R.id.loadingProgressCalendarHist)
 
                                 dialogLinearLayout.visibility = View.GONE
                                 dialogProgressBar.visibility = View.VISIBLE
@@ -151,9 +144,9 @@ class CalendarActivitiesAdapter(private val viewModelAddParticipant: AddParticip
                                 // Hide progress bar
                                 // Show all components except progress bar
                                 val dialogLinearLayout =
-                                    detailDialog.findViewById<LinearLayout>(R.id.layoutCard)
+                                    detailDialog.findViewById<LinearLayout>(R.id.layoutCardHistorical)
                                 val dialogProgressBar =
-                                    detailDialog.findViewById<ProgressBar>(R.id.loadingProgressBar)
+                                    detailDialog.findViewById<ProgressBar>(R.id.loadingProgressCalendarHist)
 
                                 dialogProgressBar.visibility = View.GONE
                                 dialogLinearLayout.visibility = View.VISIBLE
@@ -200,15 +193,6 @@ class CalendarActivitiesAdapter(private val viewModelAddParticipant: AddParticip
                                     eventQRImageView.setImageBitmap(it)
                                 }
 
-                                val userSession = sessionManager.getUserSession()
-
-                                // Check if userSession.id is in event.participants
-                                if (eventDetailResponse.participants.contains(userSession.userId)) {
-                                    // If userSession.id is in event.participants, change joinEventButton text to "salir"
-                                    joinEventButton.text =
-                                        holder.itemView.context.getString(R.string.event_detail_no_asistir)
-                                }
-
                                 if (eventDetailResponse.links.isNotEmpty()) {
                                     // If there are links, set the text to the links
                                     eventLinksInteresesTextView.text =
@@ -230,95 +214,6 @@ class CalendarActivitiesAdapter(private val viewModelAddParticipant: AddParticip
                                     }
                                 }
 
-                                joinEventButton.setOnClickListener {
-                                    val eventIDTextView =
-                                        detailDialog.findViewById<TextView>(R.id.eventID)
-                                    val eventID = eventIDTextView.text.toString()
-                                    val userID = userSession.userId
-                                    if (userID != null && joinEventButton.text.toString() == holder.itemView.context.getString(
-                                            R.string.event_detail_unirse
-                                        )
-                                    ) {
-                                        viewModelAddParticipant.addParticipatEventVM(
-                                            eventID,
-                                            userID
-                                        )
-                                        viewModelAddParticipant.addParticipatEvent.observe(
-                                            lifecycleOwner,
-                                            Observer { resource ->
-                                                when (resource) {
-                                                    is Resource.Loading<*> -> {
-                                                    }
-                                                    is Resource.Success<*> -> {
-
-                                                        if (!eventDetailResponse.participants.contains(
-                                                                userID
-                                                            )
-                                                        ) {
-                                                            eventDetailResponse.participants += userID
-                                                        }
-
-                                                        // change joinEventButton text to "salir"
-                                                        joinEventButton.text =
-                                                            holder.itemView.context.getString(R.string.event_detail_no_asistir)
-
-                                                        // update the number of participants
-                                                        val stringParticipant =
-                                                            "${eventDetailResponse.participants.size} / ${eventDetailResponse.num_participants} " + holder.itemView.context.getString(
-                                                                R.string.event_participants_personas
-                                                            )
-                                                        eventParticipantTextView.text =
-                                                            stringParticipant
-                                                    }
-                                                    is Resource.Error<*> -> {
-
-                                                    }
-                                                }
-                                            })
-                                    }
-                                    if (userID != null && joinEventButton.text.toString() == holder.itemView.context.getString(
-                                            R.string.event_detail_no_asistir
-                                        )
-                                    ) {
-                                        viewModelAddParticipant.deleteParticipatEventVM(
-                                            eventID,
-                                            userID
-                                        )
-                                        // Remove the ID from the event.participants
-                                        viewModelAddParticipant.deleteParticipatEvent.observe(
-                                            lifecycleOwner,
-                                            Observer { resource ->
-                                                when (resource) {
-                                                    is Resource.Loading<*> -> {
-                                                    }
-                                                    is Resource.Success<*> -> {
-                                                        if (eventDetailResponse.participants.contains(
-                                                                userID
-                                                            )
-                                                        ) {
-                                                            eventDetailResponse.participants -= userID
-                                                        }
-                                                        // change joinEventButton text to "unirse"
-                                                        joinEventButton.text =
-                                                            holder.itemView.context.getString(R.string.event_detail_unirse)
-
-                                                        // update the number of participants
-                                                        val stringParticipant =
-                                                            "${eventDetailResponse.participants.size} / ${eventDetailResponse.num_participants} " + holder.itemView.context.getString(
-                                                                R.string.event_participants_personas
-                                                            )
-                                                        eventParticipantTextView.text =
-                                                            stringParticipant
-
-                                                    }
-                                                    is Resource.Error<*> -> {
-
-                                                    }
-                                                }
-                                            })
-                                    }
-                                }
-
                             }
                             is Resource.Error<*> -> {
                                 // Handle error state (e.g., show an error message)
@@ -334,7 +229,6 @@ class CalendarActivitiesAdapter(private val viewModelAddParticipant: AddParticip
             detailDialog.show()
         }
     }
-
     private fun generateQRCode(eventId: String, width: Int, height: Int): Bitmap? {
         try {
             val hints = HashMap<EncodeHintType, Any>()

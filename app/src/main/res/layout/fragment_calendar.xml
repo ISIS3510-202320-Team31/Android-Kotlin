@@ -31,9 +31,10 @@
         <Button
             android:id="@+id/btnActivities"
             android:layout_width="0dp"
-            android:layout_height="wrap_content"
+            android:layout_height="match_parent"
             android:layout_weight="1"
             android:text="Actividades"
+            android:textSize="11dp"
             android:gravity="center"
             android:backgroundTint="@color/main_palette_blue"
         />
@@ -41,12 +42,23 @@
         <Button
             android:id="@+id/btnHistorical"
             android:layout_width="0dp"
-            android:layout_height="wrap_content"
+            android:layout_height="match_parent"
             android:layout_weight="1"
             android:text="Historial"
+            android:textSize="11dp"
             android:gravity="center"
             android:backgroundTint="@color/main_palette_gray"
         />
+        <Button
+            android:id="@+id/btnCreados"
+            android:layout_width="0dp"
+            android:layout_height="match_parent"
+            android:layout_weight="1"
+            android:text="Mis eventos"
+            android:textSize="11dp"
+            android:gravity="center"
+            android:backgroundTint="@color/main_palette_gray"
+            />
     </LinearLayout>
 
     <FrameLayout

@@ -8,11 +8,6 @@ import androidx.room.PrimaryKey
 data class User(
     @PrimaryKey val id: String,
     @ColumnInfo(name = "name") val name: String?,
-    @ColumnInfo(name = "icon") val icon: String?,
-    @ColumnInfo(name = "login") val login: String?,
     @ColumnInfo(name = "email") val email: String?,
-    @ColumnInfo(name = "verificated") val verificated: Boolean?,
-    @ColumnInfo(name = "role") val role: String?,
-    @ColumnInfo(name = "career") val career: String?,
-    @ColumnInfo(name = "birthdate") val birthdate: String?,
+    @ColumnInfo(name = "participation") val participation: String?,
 )
