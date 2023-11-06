@@ -30,7 +30,8 @@ class CalendarListViewModel(private val user_id: String, private val future: Str
             val response = repository.getEventsByDateAndUserR(user_id,future)
             eventsPage.postValue(handleResponse(response))
         } catch (e: Exception) {
-            Toast.makeText(context, context.getString(R.string.error_internet), Toast.LENGTH_LONG).show()
+            //Toast.makeText(context, context.getString(R.string.error_internet), Toast.LENGTH_LONG).show()
+            e.printStackTrace()
         }
 
     }
@@ -41,7 +42,7 @@ class CalendarListViewModel(private val user_id: String, private val future: Str
             val response = repository.getEventsCreatedByR(user_id)
             eventsPageCreated.postValue(handleResponse(response))
         } catch (e: Exception) {
-            Toast.makeText(context, context.getString(R.string.error_internet), Toast.LENGTH_LONG).show()
+            e.printStackTrace()
         }
     }
 

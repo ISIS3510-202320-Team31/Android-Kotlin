@@ -24,7 +24,8 @@ class AddParticipatEventViewModel(context: Context) : ViewModel()  {
             val peticion = repository.addParticipatEventR(userID, eventID)
             addParticipatEvent.postValue(handleAddParticipatEventResponse(peticion))
         } catch (e: Exception) {
-            Toast.makeText(context, context.getString(R.string.error_internet), Toast.LENGTH_LONG).show()
+            //Toast.makeText(context, context.getString(R.string.error_internet), Toast.LENGTH_LONG).show()
+            e.printStackTrace()
         }
     }
 
@@ -35,7 +36,8 @@ class AddParticipatEventViewModel(context: Context) : ViewModel()  {
             deleteParticipatEvent.postValue(handleAddParticipatEventResponse(peticion))
         }
         catch (e: Exception) {
-            Toast.makeText(context, context.getString(R.string.error_internet), Toast.LENGTH_LONG).show()
+            //Toast.makeText(context, context.getString(R.string.error_internet), Toast.LENGTH_LONG).show()
+            e.printStackTrace()
         }
     }
 
