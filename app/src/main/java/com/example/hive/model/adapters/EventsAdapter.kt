@@ -90,7 +90,7 @@ class EventsAdapter(private val viewModelAddParticipant: AddParticipatEventViewM
                     val bundle = Bundle()
                     bundle.putString(FirebaseAnalytics.Param.ITEM_ID, "item_${event.id}") // Use a unique item ID
                     bundle.putString(FirebaseAnalytics.Param.ITEM_NAME, "List Item ${event.name}") // Item name
-                    bundle.putString(FirebaseAnalytics.Param.CONTENT_TYPE, "CardView Item (HomePage)")
+                    bundle.putString(FirebaseAnalytics.Param.CONTENT_TYPE, "CardView Item ${event.name}")
 
                     FirebaseAnalytics.getInstance(context).logEvent(FirebaseAnalytics.Event.SELECT_CONTENT, bundle)
 
