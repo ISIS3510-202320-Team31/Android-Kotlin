@@ -246,12 +246,12 @@ class HomePageFragment : Fragment() {
             connectionLiveData.observe(viewLifecycleOwner, Observer { isConnected ->
                 if (isConnected) {
                     initScanner()
+                    connectionLiveData.removeObservers(viewLifecycleOwner)
                 }
                 else {
                     Toast.makeText(requireContext(), getString(R.string.error_internet), Toast.LENGTH_SHORT).show()
                     scanQRButton.visibility = View.GONE
                 }
-
             })
         }
     }
