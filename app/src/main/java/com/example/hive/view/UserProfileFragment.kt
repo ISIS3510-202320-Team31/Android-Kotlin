@@ -267,6 +267,7 @@ class UserProfileFragment : Fragment() {
                 val buttonSignOut = view?.findViewById<Button>(R.id.signOutButton)
 
                 buttonSignOut?.setOnClickListener {
+                    sessionManager = SessionManager(requireContext())
                     sessionManager.clearSession()
                     viewModelUserProfileOffline.removeUserDatabase()
                     viewModelEventListOffline.removeEventDatabase()

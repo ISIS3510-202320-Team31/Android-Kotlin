@@ -157,6 +157,7 @@ class HomePageFragment : Fragment() {
             if (isConnected) {
                 // Refresh fragment
                 swipeRefreshLayout.isEnabled = true
+                Toast.makeText(requireContext(), getString(R.string.internet), Toast.LENGTH_SHORT).show()
 
                 swipeRefreshLayout.setOnRefreshListener {
                     refreshFragment(swipeRefreshLayout)
@@ -241,7 +242,18 @@ class HomePageFragment : Fragment() {
         }
 
         val scanQRButton = requireView().findViewById<View>(R.id.scanQRButton)
-        scanQRButton.setOnClickListener { initScanner()}
+        scanQRButton.setOnClickListener {
+            connectionLiveData.observe(viewLifecycleOwner, Observer { isConnected ->
+                if (isConnected) {
+                    initScanner()
+                }
+                else {
+                    Toast.makeText(requireContext(), getString(R.string.error_internet), Toast.LENGTH_SHORT).show()
+                    scanQRButton.visibility = View.GONE
+                }
+
+            })
+        }
     }
 
     private fun initScanner() {

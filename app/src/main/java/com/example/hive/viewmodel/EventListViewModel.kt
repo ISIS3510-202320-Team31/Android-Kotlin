@@ -29,7 +29,8 @@ class EventListViewModel(private val userSession: UserSession, private val conte
             eventsPage.postValue(response?.let { handleResponse(it) })
         }
         catch (e: Exception) {
-            Toast.makeText(context, context.getString(R.string.error_internet), Toast.LENGTH_LONG).show()
+            //Toast.makeText(context, context.getString(R.string.error_internet), Toast.LENGTH_LONG).show()
+            e.printStackTrace()
         }
     }
 

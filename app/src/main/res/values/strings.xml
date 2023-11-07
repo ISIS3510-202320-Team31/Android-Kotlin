@@ -54,6 +54,7 @@
     <string name="main_welcome">¡Bienvenido a Hive!</string>
     <string name="main_description">La mejor app de eventos</string>
     <string name="no_internet">No hay conexión a internet</string>
+    <string name="internet">Conectado correctamente!</string>
     <string name="error_internet">"No hay conexión a internet, revise su conexión e intente nuevamente"</string>
 
     <!-- STRINGS SIGN UP -->
