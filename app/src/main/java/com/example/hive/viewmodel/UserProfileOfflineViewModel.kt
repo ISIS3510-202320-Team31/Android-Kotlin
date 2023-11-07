@@ -12,6 +12,10 @@ class UserProfileOfflineViewModel(private val context: Context): ViewModel() {
     val repository = UserRepository(context)
     val allUsers: LiveData<List<User>>? = repository.allUsers?.asLiveData()
 
+     fun findUserById(id: String) = viewModelScope.launch {
+        repository.findUserById(id)?.asLiveData()
+     }
+
 
     fun removeUserDatabase() = viewModelScope.launch {
         repository.deleteAllUsers()
@@ -22,4 +26,6 @@ class UserProfileOfflineViewModel(private val context: Context): ViewModel() {
         println(user)
         repository.insertUser(user)
     }
+
+
 }

@@ -10,6 +10,7 @@ import android.widget.ProgressBar
 import android.widget.TextView
 import android.widget.Toast
 import androidx.fragment.app.Fragment
+import androidx.lifecycle.LiveData
 import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
@@ -18,13 +19,18 @@ import com.example.hive.R
 import com.example.hive.model.adapters.SessionManager
 import com.example.hive.model.models.UserSession
 import com.example.hive.model.network.responses.UserCacheResponse
+import com.example.hive.model.network.responses.UserParticipationResponse
 import com.example.hive.model.network.responses.UserResponse
+import com.example.hive.model.room.entities.User
 import com.example.hive.util.ConnectionLiveData
 import com.example.hive.util.Resource
-import com.example.hive.viewmodel.UserProfileOfflineViewModel
-import com.example.hive.viewmodel.UserProfileOfflineViewModelProviderFactory
-import com.example.hive.viewmodel.UserProfileViewModel
-import com.example.hive.viewmodel.UserProfileViewModelProviderFactory
+import com.example.hive.viewmodel.*
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.Job
+import kotlinx.coroutines.launch
+import okhttp3.internal.wait
+import kotlin.properties.Delegates
 
 class UserProfileFragment : Fragment() {
 
@@ -39,6 +45,8 @@ class UserProfileFragment : Fragment() {
     private lateinit var viewModelUserProfileOffline: UserProfileOfflineViewModel
     private lateinit var user: UserSession
     private lateinit var connectionLiveData: ConnectionLiveData
+
+    private var userParticipation: String = "0"
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
@@ -84,49 +92,33 @@ class UserProfileFragment : Fragment() {
         super.onViewCreated(view, savedInstanceState)
 
         viewModel = ViewModelProvider(this).get(UserProfileViewModel::class.java)
-
+        val loadingProgressBar = view?.findViewById<ProgressBar>(R.id.loadingProgressBarProfile)
         connectionLiveData = ConnectionLiveData(requireContext())
+        val swipeRefreshLayout: SwipeRefreshLayout = view?.findViewById(R.id.swipeRefreshLayoutProfile)!!
         connectionLiveData.observe(viewLifecycleOwner, Observer { isConnected ->
             if (isConnected){
-                val viewModelFactory = sessionManager?.let{ UserProfileViewModelProviderFactory(it) }
-                viewModel = ViewModelProvider(this, viewModelFactory!!).get(UserProfileViewModel::class.java)
+                swipeRefreshLayout.isEnabled = true
 
-                // Progress bar
-                val loadingProgressBar = view.findViewById<ProgressBar>(R.id.loadingProgressBarProfile)
-                // Swipe refresh layout
-                val swipeRefreshLayout = view.findViewById<SwipeRefreshLayout>(R.id.swipeRefreshLayoutProfile)
                 swipeRefreshLayout.setOnRefreshListener {
                     refreshFragment(swipeRefreshLayout)
                 }
 
-                viewModel.userParticipation.observe(viewLifecycleOwner, Observer { resource ->
-                    val participationTextView = view.findViewById<TextView>(R.id.eventsJoined)
+                val viewModelFactory = sessionManager?.let{ UserProfileViewModelProviderFactory(it,requireContext()) }
+                viewModel = ViewModelProvider(this, viewModelFactory!!).get(UserProfileViewModel::class.java)
 
+                //Update user participation
+                viewModel.userParticipation.observe(viewLifecycleOwner, Observer { resource ->
+                    val participationTextView = view?.findViewById<TextView>(R.id.eventsJoined)
                     when (resource){
                         is Resource.Loading<*> -> {
                             if (participationTextView != null) {
                                 participationTextView.text = "..."
                             }
-                            // Show progress bar
-                            loadingProgressBar.visibility = View.VISIBLE
                         }
                         is Resource.Success<*> -> {
-                            //Comprobar si la información guardada en el room es igual a la que se obtiene de la api
-                            if (resource.data? != user.participation){
-                                //update user
-                                val userToUpdate = UserSession(
-                                    user.id,
-                                    user.name,
-                                    user.email,
-                                    resource.data?.size
-                                )
-                                viewModelUserProfileOffline.updateUser(userToUpdate)
-                        }
                             if (participationTextView != null) {
-                                participationTextView.text = resource.data?.size.toString()
+                                userParticipation = resource.data?.size.toString()!!
                             }
-                            // Gone progress bar
-                            loadingProgressBar.visibility = View.GONE
                         }
                         is Resource.Error<*> -> {
                             if (participationTextView != null) {
@@ -134,89 +126,103 @@ class UserProfileFragment : Fragment() {
                             }
                         }
                     }
+                })
 
+                //update user detail
+                viewModel.userDetail.observe(viewLifecycleOwner, Observer { resource ->
+                    val nameTextView = view?.findViewById<TextView>(R.id.userName)
+                    val emailTextView = view?.findViewById<TextView>(R.id.email)
+                    val participationTextView = view?.findViewById<TextView>(R.id.eventsJoined)
+                    when (resource){
+                        is Resource.Loading<*> -> {
+                            if (nameTextView != null) {
+                                nameTextView.text = "..."
+                            }
+                            if (emailTextView != null) {
+                                emailTextView.text = "..."
+                            }
+                        }
+                        is Resource.Success<*> -> {
+                            val userCacheJob: Job? =
+                                user.userId?.let {
+                                    viewModelUserProfileOffline.findUserById(
+                                        it
+                                    )
+                                }
+                            CoroutineScope(Dispatchers.Main).launch {
+                                userCacheJob?.let {
+                                    val userCache = it.wait() as UserCacheResponse
+
+                                    if (userCache.name != resource.data?.name || userCache.email != resource.data?.email || userCache.participation != userParticipation.toInt()){
+                                        viewModelUserProfileOffline.removeUserDatabase()
+                                        val user = user.userId?.let { it1 ->
+                                            User(
+                                                it1,
+                                                resource.data?.name,
+                                                resource.data?.email,
+                                                userParticipation.toInt()
+                                            )
+                                        }
+                                        if (user != null) {
+                                            viewModelUserProfileOffline.insertOneToDatabase(user)
+                                        }
+
+                                        if (nameTextView != null) {
+                                            nameTextView.text = resource.data?.name
+                                        }
+                                        if (emailTextView != null) {
+                                            emailTextView.text = resource.data?.email
+                                        }
+                                        if (participationTextView != null) {
+                                            participationTextView.text = userParticipation
+                                        }
+
+                                    } else  {
+                                        if (nameTextView != null) {
+                                            nameTextView.text = userCache.name
+                                        }
+                                        if (emailTextView != null) {
+                                            emailTextView.text = userCache.email
+                                        }
+                                        if (participationTextView != null) {
+                                            participationTextView.text = userCache.participation.toString()
+                                        }
+                                    }
+                                }
+                            }
+
+
+                        }
+                        is Resource.Error<*> -> {
+                            if (nameTextView != null) {
+                                nameTextView.text = ""
+                            }
+                            if (emailTextView != null) {
+                                emailTextView.text = ""
+                            }
+                        }
+                    }
+                })
+
+                val buttonSignOut = view?.findViewById<Button>(R.id.signOutButton)
+
+                buttonSignOut?.setOnClickListener {
+                    sessionManager.clearSession()
+                    val intent = Intent(requireContext(), LoginActivity::class.java)
+                    intent.flags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TASK // Clear the back stack
+                    startActivity(intent)
+                    activity?.finish()
+                }
             } else {
-
+                swipeRefreshLayout.isEnabled = false
+                Toast.makeText(requireContext(), getString(R.string.no_internet), Toast.LENGTH_SHORT).show()
             }
         })
 
-
-
-
-
-
-
-        //update user detail
-        viewModel.userDetail.observe(viewLifecycleOwner, Observer { resource ->
-            val nameTextView = view?.findViewById<TextView>(R.id.userName)
-            val emailTextView = view?.findViewById<TextView>(R.id.email)
-
-            when (resource){
-                is Resource.Loading<*> -> {
-                    if (nameTextView != null) {
-                        nameTextView.text = "..."
-                    }
-                    if (emailTextView != null) {
-                        emailTextView.text = "..."
-                    }
-                }
-                is Resource.Success<*> -> {
-                    if (nameTextView != null) {
-                        nameTextView.text = resource.data?.name
-                    }
-                    if (emailTextView != null) {
-                        emailTextView.text = resource.data?.email
-                    }
-                }
-                is Resource.Error<*> -> {
-                    if (nameTextView != null) {
-                        nameTextView.text = ""
-                    }
-                    if (emailTextView != null) {
-                        emailTextView.text = ""
-                    }
-                }
-            }
-        })
-
-        val buttonSignOut = view?.findViewById<Button>(R.id.signOutButton)
-
-        buttonSignOut?.setOnClickListener {
-            sessionManager.clearSession()
-            val intent = Intent(requireContext(), LoginActivity::class.java)
-            intent.flags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TASK // Clear the back stack
-            startActivity(intent)
-            activity?.finish()
-        }
-    }
-
-    private fun refreshFragment( swipeRefreshLayout: SwipeRefreshLayout) {
-        swipeRefreshLayout.isRefreshing = true
-
-        viewModel.getUserParticipationVM()
-        viewModel.getUserDetailVM()
-        viewModel.updateElapsedTime()
-
-        viewModel.userParticipation.observe(viewLifecycleOwner, Observer { resource ->
-            when (resource) {
-                is Resource.Loading<*> -> {
-                    // loading indicator will be kept
-                }
-                is Resource.Success<*> -> {
-                    // Stop the loading indicator once the data has been loaded
-                    swipeRefreshLayout.isRefreshing = false
-                }
-                is Resource.Error<*> -> {
-                    // Stop the loading indicator in case of error
-                    swipeRefreshLayout.isRefreshing = false
-                    // Manage the error state (e.g., show an error message)
-                    Toast.makeText(requireContext(), getString(R.string.swipe_down_error), Toast.LENGTH_SHORT).show()
-                }
-            }
-        })
     }
 
     private fun handleTracking(elapsedTimeSeconds: Long) {
+
         val formattedTime = when {
             elapsedTimeSeconds > 3599 -> {
                 val hours = elapsedTimeSeconds / 3600
@@ -258,16 +264,20 @@ class UserProfileFragment : Fragment() {
                     "00:$seconds " + getString(R.string.profile_time_segundos)
                 }
             }
+
+        }
         elapsedTimeTextView.text = formattedTime
-        }
-        }
     }
+
     private fun refreshFragment( swipeRefreshLayout: SwipeRefreshLayout ) {
         swipeRefreshLayout.isRefreshing = true
         connectionLiveData.observe(viewLifecycleOwner, Observer { isAvailable ->
             if (isAvailable) {
-                viewModelEvent.getEventsVM()
-                viewModelEvent.eventsPage.observe(viewLifecycleOwner, Observer { resource ->
+                viewModel.getUserParticipationVM()
+                viewModel.getUserDetailVM()
+                viewModel.updateElapsedTime()
+
+                viewModel.userParticipation.observe(viewLifecycleOwner, Observer { resource ->
                     when (resource) {
                         is Resource.Loading<*> -> {
                             // loading indicator will be kept
@@ -280,22 +290,15 @@ class UserProfileFragment : Fragment() {
                             // Stop the loading indicator in case of error
                             swipeRefreshLayout.isRefreshing = false
                             // Manage the error state (e.g., show an error message)
-                            Toast.makeText(
-                                requireContext(),
-                                getString(R.string.swipe_down_error),
-                                Toast.LENGTH_SHORT
-                            ).show()
+                            Toast.makeText(requireContext(), getString(R.string.swipe_down_error), Toast.LENGTH_SHORT).show()
                         }
                     }
                 })
             } else {
                 swipeRefreshLayout.isRefreshing = false
-                Toast.makeText(
-                    requireContext(),
-                    getString(R.string.no_internet),
-                    Toast.LENGTH_SHORT
-                ).show()
+                Toast.makeText(requireContext(), getString(R.string.no_internet), Toast.LENGTH_SHORT).show()
             }
         })
     }
+
 }

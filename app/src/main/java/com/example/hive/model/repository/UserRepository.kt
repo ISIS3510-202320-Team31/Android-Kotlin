@@ -26,6 +26,10 @@ class UserRepository(context: Context) {
     @WorkerThread
     suspend fun  deleteAllUsers() = userDao?.deleteAll()
 
+    @Suppress("RedundantSuspendModifier")
+    @WorkerThread
+    suspend fun findUserById(id: String): Flow<User>? = userDao?.findById(id)
+
 
     suspend fun registerR(registerRequest: RegisterRequest) = RetroFitInstance.api.registerUser(registerRequest)
     suspend fun loginR(loginRequest: LoginRequest) = RetroFitInstance.api.loginUser(loginRequest)

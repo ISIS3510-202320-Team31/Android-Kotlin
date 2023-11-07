@@ -34,7 +34,7 @@ class LoginFragment : Fragment() {
         val view = inflater.inflate(R.layout.fragment_login, container, false)
 
         val session = SessionManager(requireContext())
-        val viewModelFactory = LoginViewModelProviderFactory(session)
+        val viewModelFactory = LoginViewModelProviderFactory(session, requireContext())
 
         viewModel = ViewModelProvider(this, viewModelFactory).get(LoginViewModel::class.java)
 

@@ -25,7 +25,7 @@ class SignUpFragment : Fragment() {
         savedInstanceState: Bundle?
     ): View? {
 
-        viewModelFactory = SignUpViewModelProviderFactory()
+        viewModelFactory = SignUpViewModelProviderFactory(requireContext())
         viewModel = ViewModelProvider(this, viewModelFactory).get(SignUpViewModel::class.java)
         return inflater.inflate(R.layout.fragment_sign_up, container, false)
     }
