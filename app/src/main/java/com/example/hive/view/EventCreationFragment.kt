@@ -39,7 +39,7 @@ class EventCreationFragment : Fragment() {
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View? {
-        viewModelFactory = EventCreationViewModelProviderFactory()
+        viewModelFactory = context?.let { EventCreationViewModelProviderFactory(it) }!!
         viewModel = ViewModelProvider(this, viewModelFactory).get(EventCreationViewModel::class.java)
         return inflater.inflate(R.layout.fragment_event_creation, container, false)
     }

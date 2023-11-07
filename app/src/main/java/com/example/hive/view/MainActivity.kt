@@ -8,18 +8,31 @@ import androidx.appcompat.app.AppCompatActivity
 import android.app.NotificationChannel
 import android.app.NotificationManager
 import android.os.Build
+import android.util.Log
 import androidx.core.app.NotificationCompat
 import androidx.core.app.NotificationManagerCompat
 import android.view.Menu
+import android.view.View
+import android.widget.Toast
 import androidx.core.app.ActivityCompat
+import androidx.core.content.ContentProviderCompat.requireContext
 import androidx.core.content.ContextCompat
 import androidx.fragment.app.Fragment
 import com.example.hive.R
 import com.example.hive.databinding.ActivityMainBinding
 import com.example.hive.model.adapters.SessionManager
+import com.example.hive.util.Resource
+import com.example.hive.viewmodel.EventListViewModel
+import com.example.hive.viewmodel.EventsViewModelProviderFactory
 import com.google.android.gms.location.FusedLocationProviderClient
 import com.google.android.gms.location.LocationServices
 import com.google.android.gms.maps.model.LatLng
+import java.text.SimpleDateFormat
+import java.util.*
+import androidx.lifecycle.Observer
+import com.example.hive.model.network.responses.EventResponse
+import com.example.hive.model.room.entities.Event
+import com.google.firebase.analytics.FirebaseAnalytics
 
 
 class MainActivity : AppCompatActivity() {
@@ -28,6 +41,7 @@ class MainActivity : AppCompatActivity() {
     private lateinit var sessionManager: SessionManager
     private lateinit var fusedLocationClient: FusedLocationProviderClient
     private var hasLocationStarted = false
+    private lateinit var viewModelEvent : EventListViewModel
 
     //time tracker
     private var startTimeMillis: Long = 0
@@ -53,6 +67,7 @@ class MainActivity : AppCompatActivity() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+        FirebaseAnalytics.getInstance(this)
 
         binding = ActivityMainBinding.inflate(layoutInflater)
         setContentView(binding.root)
@@ -134,14 +149,12 @@ class MainActivity : AppCompatActivity() {
                     true
                 }
                 R.id.ic_profile -> {
-                    sessionManager.saveElapsedTime(elapsedTimeSeconds)
                     replaceFragment(UserProfileFragment())
                     true
                 }
                 else -> false
             }
         }
-
     }
 
     override fun onCreateOptionsMenu(menu: Menu): Boolean {
@@ -151,32 +164,53 @@ class MainActivity : AppCompatActivity() {
     }
 
     //TIME TRACKER STATUS
-    override fun onStop(){
-        super.onStop()
 
-        //Stop the timer if it is running
+    //time tracker reset cases
+    private fun restartTimer() {
+        if (!isTracking) {
+            startTimeMillis = System.currentTimeMillis()
+            isTracking = true
+        }
+    }
+
+    override fun onResume(){
+        super.onResume()
+        //Restart the timer if it is not already running
+        restartTimer()
+    }
+    override fun onRestart() {
+        super.onRestart()
+        //Restart the timer if it is not already running
+        restartTimer()
+    }
+
+    // time tracker stop cases
+    private fun stopTimer() {
         if (isTracking) {
             val endTimeMillis = System.currentTimeMillis()
             elapsedTimeSeconds += (endTimeMillis-startTimeMillis)/1000
             isTracking = false
         }
+
         sessionManager.saveElapsedTime(elapsedTimeSeconds)
     }
 
-    override fun onRestart() {
-        super.onRestart()
-
-        //Restart the timer if the app is restarted
-        startTimeMillis = System.currentTimeMillis()
-        isTracking = true
-        sessionManager.saveElapsedTime(elapsedTimeSeconds)
+    override fun onPause(){
+        super.onPause()
+        //Stop the timer if it is running
+        stopTimer()
+    }
+    override fun onStop(){
+        super.onStop()
+        //Stop the timer if it is running
+        stopTimer()
     }
 
     override fun onDestroy() {
         super.onDestroy()
-
         //Save the elapsed time in the session manager
         sessionManager.saveElapsedTime(elapsedTimeSeconds)
+        sessionManager.saveDatabase(false)
     }
 
     private fun replaceFragment(fragment: Fragment) {

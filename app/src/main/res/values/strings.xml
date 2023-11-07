@@ -53,6 +53,8 @@
     <!-- STRINGS MAIN -->
     <string name="main_welcome">¡Bienvenido a Hive!</string>
     <string name="main_description">La mejor app de eventos</string>
+    <string name="no_internet">No hay conexión a internet</string>
+    <string name="error_internet">"No hay conexión a internet, revise su conexión e intente nuevamente"</string>
 
     <!-- STRINGS SIGN UP -->
     <string name="sign_up_error_name">Por favor ingrese su nombre</string>
@@ -79,4 +81,7 @@
     <string name="profile_cerrar_sesion">CERRAR SESIÓN</string>
     <string name="profile_events_number">Eventos a los que perteneces</string>
 
+    <!-- STRINGS SWIPE DOWN -->
+    <string name="swipe_down_success">Datos actualizados correctamente</string>
+    <string name="swipe_down_error">Error al actualizar los datos</string>
 </resources>

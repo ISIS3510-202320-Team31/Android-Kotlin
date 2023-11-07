@@ -1,31 +1,32 @@
 package com.example.hive.model.adapters
 
 import android.app.Dialog
+import android.content.Context
 import android.graphics.Bitmap
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import android.widget.Button
-import android.widget.ImageView
-import android.widget.TextView
+import android.widget.*
 import androidx.lifecycle.LifecycleOwner
 import androidx.lifecycle.Observer
 import androidx.recyclerview.widget.AsyncListDiffer
 import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.RecyclerView
 import com.example.hive.R
+import com.example.hive.model.network.responses.EventDetailResponse
 import com.example.hive.model.network.responses.EventResponse
+import com.example.hive.util.ConnectionLiveData
 import com.example.hive.util.Resource
 import com.example.hive.viewmodel.AddParticipatEventViewModel
+import com.example.hive.viewmodel.EventDetailViewModel
 import com.google.zxing.BarcodeFormat
 import com.google.zxing.EncodeHintType
 import com.google.zxing.qrcode.QRCodeWriter
 import com.google.zxing.qrcode.decoder.ErrorCorrectionLevel
 import com.squareup.picasso.Picasso
 
-class CalendarHistoricalAdapter(private val viewModelAddParticipant: AddParticipatEventViewModel,
-                                private val lifecycleOwner: LifecycleOwner,
-                                private val sessionManager: SessionManager)  : RecyclerView.Adapter<CalendarHistoricalAdapter.MListHolder>(){
+class CalendarHistoricalAdapter(private val lifecycleOwner: LifecycleOwner,
+                                private val context: Context): RecyclerView.Adapter<CalendarHistoricalAdapter.MListHolder>(){
 
     inner class MListHolder(itemView: View) : RecyclerView.ViewHolder(itemView)
 
@@ -38,6 +39,9 @@ class CalendarHistoricalAdapter(private val viewModelAddParticipant: AddParticip
             return oldItem == newItem
         }
     }
+
+    private lateinit var eventDetailViewModel: EventDetailViewModel
+    private lateinit var connectionLiveData: ConnectionLiveData
 
     val differ = AsyncListDiffer(this, differCallback)
 
@@ -70,82 +74,161 @@ class CalendarHistoricalAdapter(private val viewModelAddParticipant: AddParticip
             this.findViewById<android.widget.TextView>(R.id.fecha).text = newDate
         }
 
+        connectionLiveData = ConnectionLiveData(context)
+        val detailDialog = Dialog(holder.itemView.context)
+        detailDialog.setContentView(R.layout.fragment_no_internet_connection)
+
         cardView.setOnClickListener {
-            val detailDialog = Dialog(holder.itemView.context)
-            detailDialog.setContentView(R.layout.fragment_event_detail_historical)
+            connectionLiveData.observe(lifecycleOwner, Observer { isConnected ->
+                if (isConnected) {
+                    // If the user is connected to the internet, show the event detail
 
-            val eventNameTextView = detailDialog.findViewById<TextView>(R.id.title_historical)
-            eventNameTextView.text = event.name
+                    eventDetailViewModel = EventDetailViewModel(event.id, context)
 
-            val eventEstadoTextView = detailDialog.findViewById<TextView>(R.id.estado_historical)
-            if (event.state) {
-                eventEstadoTextView.text = holder.itemView.context.getString(R.string.event_state_activo)
-            } else {
-                eventEstadoTextView.text = holder.itemView.context.getString(R.string.event_state_inactivo)
-            }
+                    eventDetailViewModel.getEventByIdVM(event.id)
 
-            val eventIDTextView = detailDialog.findViewById<TextView>(R.id.eventID_historical)
-            eventIDTextView.text = event.id
+                    detailDialog.setContentView(R.layout.fragment_event_detail_historical)
 
-            val eventCategoryTextView = detailDialog.findViewById<TextView>(R.id.categoria_historical)
-            eventCategoryTextView.text = event.category
+                    val dialogLinearLayout =
+                        detailDialog.findViewById<LinearLayout>(R.id.layoutCardHistorical)
+                    val dialogProgressBar =
+                        detailDialog.findViewById<ProgressBar>(R.id.loadingProgressCalendarHist)
 
-            val eventCreatorTextView = detailDialog.findViewById<TextView>(R.id.creador_historical)
-            eventCreatorTextView.text = event.creator
+                    dialogLinearLayout.visibility = View.GONE
+                    dialogProgressBar.visibility = View.VISIBLE
 
-            val eventDateTextView = detailDialog.findViewById<TextView>(R.id.fecha_historical)
-            eventDateTextView.text = newDate
+                    val eventNameTextView = detailDialog.findViewById<TextView>(R.id.title_historical)
+                    val eventEstadoTextView = detailDialog.findViewById<TextView>(R.id.estado_historical)
+                    if (event.state) {
+                        eventEstadoTextView.text =
+                            holder.itemView.context.getString(R.string.event_state_activo)
+                    } else {
+                        eventEstadoTextView.text =
+                            holder.itemView.context.getString(R.string.event_state_inactivo)
+                    }
 
-            val eventDuracionTextView = detailDialog.findViewById<TextView>(R.id.duracion_historical)
-            eventDuracionTextView.text = event.duration.toString() +" "+ holder.itemView.context.getString(R.string.event_duration_minutos)
+                    val eventIDTextView = detailDialog.findViewById<TextView>(R.id.eventID_historical)
+                    val eventCategoryTextView = detailDialog.findViewById<TextView>(R.id.categoria_historical)
+                    val eventCreatorTextView = detailDialog.findViewById<TextView>(R.id.creador_historical)
+                    val eventDateTextView = detailDialog.findViewById<TextView>(R.id.fecha_historical)
+                    val eventDuracionTextView = detailDialog.findViewById<TextView>(R.id.duracion_historical)
+                    eventDuracionTextView.text =
+                        event.duration.toString() + " " + holder.itemView.context.getString(R.string.event_duration_minutos)
 
-            val eventDescriptionTextView = detailDialog.findViewById<TextView>(R.id.descripcion_historical)
-            eventDescriptionTextView.text = event.description
+                    val eventDescriptionTextView =
+                        detailDialog.findViewById<TextView>(R.id.descripcion_historical)
+                    val eventLugarTextView = detailDialog.findViewById<TextView>(R.id.lugar_historical)
+                    val eventParticipantTextView =
+                        detailDialog.findViewById<TextView>(R.id.personas_historical)
+                    val eventQRImageView = detailDialog.findViewById<ImageView>(R.id.qr_historical)
+                    val eventLinksInteresesTextView =
+                        detailDialog.findViewById<TextView>(R.id.linksInteres_historical)
+                    val eventImageView = detailDialog.findViewById<ImageView>(R.id.imagen_historical)
 
-            val eventLugarTextView = detailDialog.findViewById<TextView>(R.id.lugar_historical)
-            eventLugarTextView.text = event.place
+                    eventDetailViewModel.eventById.observe(lifecycleOwner, Observer { resource ->
+                        when (resource) {
+                            is Resource.Loading<*> -> {
+                                // Show progress bar
+                                // Hide all components except progress bar
+                                val dialogLinearLayout =
+                                    detailDialog.findViewById<LinearLayout>(R.id.layoutCardHistorical)
+                                val dialogProgressBar =
+                                    detailDialog.findViewById<ProgressBar>(R.id.loadingProgressCalendarHist)
 
-            val eventParticipantTextView = detailDialog.findViewById<TextView>(R.id.personas_historical)
-            val stringParticipant = "${event.participants.size} / ${event.num_participants} " + holder.itemView.context.getString(R.string.event_participants_personas)
-            eventParticipantTextView.text = stringParticipant
+                                dialogLinearLayout.visibility = View.GONE
+                                dialogProgressBar.visibility = View.VISIBLE
+                            }
 
-            val userSession = sessionManager.getUserSession()
+                            is Resource.Success<*> -> {
 
-            val eventLinksInteresesTextView = detailDialog.findViewById<TextView>(R.id.linksInteres_historical)
+                                // Hide progress bar
+                                // Show all components except progress bar
+                                val dialogLinearLayout =
+                                    detailDialog.findViewById<LinearLayout>(R.id.layoutCardHistorical)
+                                val dialogProgressBar =
+                                    detailDialog.findViewById<ProgressBar>(R.id.loadingProgressCalendarHist)
 
-            if (event.links.isNotEmpty()) {
-                // If there are links, set the text to the links
-                eventLinksInteresesTextView.text = event.links.joinToString("\n")
-            } else {
-                // If there are no links, set an empty text
-                eventLinksInteresesTextView.text = ""
-            }
+                                dialogProgressBar.visibility = View.GONE
+                                dialogLinearLayout.visibility = View.VISIBLE
 
-            val eventImageView = detailDialog.findViewById<ImageView>(R.id.imagen_historical)
-            val url = event.image
-            if (url != null || url != "") {
+                                val eventDetailResponse = resource.data as EventDetailResponse
 
-                //In case it is not a loadable image just leave the eventImageView empty using a try catch
-                try {
-                    Picasso.get().load(url).into(eventImageView)
-                } catch (e: Exception) {
-                    eventImageView.setImageResource(R.drawable.ic_baseline_calendar_day)
+                                eventNameTextView.text = eventDetailResponse.name
+
+                                if (eventDetailResponse.state) {
+                                    eventEstadoTextView.text =
+                                        holder.itemView.context.getString(R.string.event_state_activo)
+                                } else {
+                                    eventEstadoTextView.text =
+                                        holder.itemView.context.getString(R.string.event_state_inactivo)
+                                }
+
+                                eventIDTextView.text = eventDetailResponse.id
+
+                                eventCategoryTextView.text = eventDetailResponse.category
+
+                                eventCreatorTextView.text = eventDetailResponse.creator
+
+                                eventDateTextView.text = newDate
+
+                                eventDuracionTextView.text =
+                                    eventDetailResponse.duration.toString() + " " + holder.itemView.context.getString(
+                                        R.string.event_duration_minutos
+                                    )
+
+                                eventDescriptionTextView.text = eventDetailResponse.description
+
+                                eventLugarTextView.text = eventDetailResponse.place
+
+                                val stringParticipant =
+                                    "${eventDetailResponse.participants.size} / ${eventDetailResponse.num_participants} " + holder.itemView.context.getString(
+                                        R.string.event_participants_personas
+                                    )
+                                eventParticipantTextView.text = stringParticipant
+
+                                val eventId = eventDetailResponse.id
+                                val qrCodeBitmap = generateQRCode(eventId, 300, 300)
+
+                                qrCodeBitmap?.let {
+                                    eventQRImageView.setImageBitmap(it)
+                                }
+
+                                if (eventDetailResponse.links.isNotEmpty()) {
+                                    // If there are links, set the text to the links
+                                    eventLinksInteresesTextView.text =
+                                        eventDetailResponse.links.joinToString("\n")
+                                } else {
+                                    // If there are no links, set an empty text
+                                    eventLinksInteresesTextView.text = ""
+                                }
+
+                                val url = eventDetailResponse.image
+
+                                if (url != null || url != "") {
+
+                                    //In case it is not a loadable image just leave the eventImageView empty using a try catch
+                                    try {
+                                        Picasso.get().load(url).into(eventImageView)
+                                    } catch (e: Exception) {
+                                        eventImageView.setImageResource(R.drawable.ic_baseline_calendar_day)
+                                    }
+                                }
+
+                            }
+                            is Resource.Error<*> -> {
+                                // Handle error state (e.g., show an error message)
+                                detailDialog.setContentView(R.layout.fragment_no_internet_connection)
+                            }
+                        }
+                    })
+                } else {
+                    detailDialog.setContentView(R.layout.fragment_no_internet_connection)
                 }
-            }
-
-            val eventQRImageView = detailDialog.findViewById<ImageView>(R.id.qr_historical)
-            val eventId = event.id
-            val qrCodeBitmap = generateQRCode(eventId, 300, 300)
-
-            qrCodeBitmap?.let {
-                eventQRImageView.setImageBitmap(it)
-            }
-
+            })
             // Show the detail dialog
             detailDialog.show()
         }
     }
-
     private fun generateQRCode(eventId: String, width: Int, height: Int): Bitmap? {
         try {
             val hints = HashMap<EncodeHintType, Any>()

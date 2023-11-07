@@ -25,8 +25,17 @@ class EventDetailFragment : Fragment() {
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?,
                               savedInstanceState: Bundle?): View? {
-        val viewModelAddParticipatEventFactory = AddParticipatEventViewModelProviderFactory()
-        viewModelAddParticipant = ViewModelProvider(this, viewModelAddParticipatEventFactory).get(AddParticipatEventViewModel::class.java)
+        val viewModelAddParticipatEventFactory = context?.let {
+            AddParticipatEventViewModelProviderFactory(
+                it
+            )
+        }
+        viewModelAddParticipant =
+            viewModelAddParticipatEventFactory?.let {
+                ViewModelProvider(this,
+                    it
+                ).get(AddParticipatEventViewModel::class.java)
+            }!!
         return inflater.inflate(R.layout.fragment_event_detail, container, false)
     }
 

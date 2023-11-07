@@ -148,8 +148,6 @@ class SignUpActivity : AppCompatActivity() {
         viewModel.registerPage.observe(this, Observer { resource ->
             when (resource) {
                 is Resource.Success -> {
-                    // Registration was successful, go to the login page and print the response
-                    println(resource.data)
                     // Start login activity
                     val intent = Intent(this, LoginActivity::class.java)
                     startActivity(intent)

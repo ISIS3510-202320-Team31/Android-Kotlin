@@ -14,12 +14,14 @@ import androidx.lifecycle.ViewModelProvider
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.example.hive.R
+import com.example.hive.model.adapters.CalendarCreadosAdapter
 import com.example.hive.model.adapters.CalendarHistoricalAdapter
 import com.example.hive.model.adapters.SessionManager
 import com.example.hive.model.models.UserSession
 import com.example.hive.model.network.responses.EventResponse
 import com.example.hive.model.room.entities.EventActivities
 import com.example.hive.model.room.entities.EventHistorical
+import com.example.hive.model.room.entities.EventUser
 import com.example.hive.util.ConnectionLiveData
 import com.example.hive.util.Resource
 import com.example.hive.viewmodel.*
@@ -32,15 +34,15 @@ import com.squareup.picasso.Picasso
 import java.text.SimpleDateFormat
 import java.util.*
 
-class CalendarHistoricalFragment : Fragment() {
+class CalendarCreadosFragment : Fragment() {
     companion object {
-        fun newInstance() = CalendarActivitiesFragment()
+        fun newInstance() = CalendarCreadosFragment()
     }
 
     private lateinit var sessionManager: SessionManager
     private lateinit var viewModel: CalendarViewModel
     private lateinit var viewModelCalendar: CalendarListViewModel
-    private lateinit var calendarHistoricalAdapter: CalendarHistoricalAdapter
+    private lateinit var calendarCreadosAdapter: CalendarCreadosAdapter
     private lateinit var viewModelAddParticipant: AddParticipatEventViewModel
     private lateinit var viewModelEventListOffline : EventListOfflineViewModel
     private lateinit var viewModelEventDetail: EventDetailViewModel
@@ -69,11 +71,11 @@ class CalendarHistoricalFragment : Fragment() {
 
         //Set up RecyclerView
         val recyclerView = view.findViewById<RecyclerView>(R.id.recyclerCalendarlist)
-        calendarHistoricalAdapter = context?.let{
-            CalendarHistoricalAdapter(this, it)
+        calendarCreadosAdapter = context?.let{
+            CalendarCreadosAdapter(this, it)
         }!!
         recyclerView.layoutManager = LinearLayoutManager(requireContext())
-        recyclerView.adapter = calendarHistoricalAdapter
+        recyclerView.adapter = calendarCreadosAdapter
 
         //Set up ViewModel
         val viewModelFactoryOffline = context?.let{
@@ -92,7 +94,7 @@ class CalendarHistoricalFragment : Fragment() {
         val loadingProgressBar = view.findViewById<ProgressBar>(R.id.loadingProgressCalendar)
 
         //Observe LiveData from ViewModel
-        viewModelEventListOffline.allEventHistorical?.observe(viewLifecycleOwner, Observer { resource ->
+        viewModelEventListOffline.allEventCreados?.observe(viewLifecycleOwner, Observer { resource ->
             loadingProgressBar.visibility = View.GONE
             val list = mutableListOf<EventResponse>()
             resource.let {
@@ -106,7 +108,7 @@ class CalendarHistoricalFragment : Fragment() {
                     val formatter = SimpleDateFormat("yyyy-MM-dd")
                     val date = formatter.parse(event.date)
                     eventDate.time = date
-                    eventDate.get(Calendar.DAY_OF_YEAR) < today.get(Calendar.DAY_OF_YEAR)
+                    (eventDate.get(Calendar.DAY_OF_YEAR) <= today.get(Calendar.DAY_OF_YEAR) || eventDate.get(Calendar.YEAR) > today.get(Calendar.YEAR))
                 }
 
                 // Cast manually the list of events to the list of EventResponse
@@ -130,7 +132,7 @@ class CalendarHistoricalFragment : Fragment() {
                     list.add(eventToAdd)
                 }
 
-                calendarHistoricalAdapter.submitList(list)
+                calendarCreadosAdapter.submitList(list)
             }
         })
         return view
@@ -159,7 +161,7 @@ class CalendarHistoricalFragment : Fragment() {
                     ).get(CalendarListViewModel::class.java)
                 }!!
 
-                viewModelCalendar.eventsPage.observe(viewLifecycleOwner, Observer { resource ->
+                viewModelCalendar.eventsPageCreated.observe(viewLifecycleOwner, Observer { resource ->
                     when (resource) {
                         is Resource.Loading<*> -> {
                             // Show progress bar
@@ -181,16 +183,19 @@ class CalendarHistoricalFragment : Fragment() {
                                     val formatter = SimpleDateFormat("yyyy-MM-dd")
                                     val date = formatter.parse(event.date)
                                     eventDate.time = date
-                                    eventDate.get(Calendar.DAY_OF_YEAR) >= today.get(Calendar.DAY_OF_YEAR)
+
+                                    //Make the condition be if the event is any day after or before today
+                                    (eventDate.get(Calendar.DAY_OF_YEAR) <= today.get(Calendar.DAY_OF_YEAR) || eventDate.get(Calendar.YEAR) > today.get(Calendar.YEAR))
+
                                 }
-                                calendarHistoricalAdapter.submitList(filteredList)
+                                calendarCreadosAdapter.submitList(filteredList)
                             }
 
-                            viewModelEventListOffline.removeEventHistoricalDatabase()
+                            viewModelEventListOffline.removeEventCreadosDatabase()
 
                             // Loop over the filtered list and create an EventEntity for each event
                             resource.data?.forEach { event ->
-                                val eventToAdd = EventHistorical(
+                                val eventToAdd = EventUser(
                                     event.id,
                                     event.image ?: "",
                                     event.name ?: "",
@@ -206,7 +211,7 @@ class CalendarHistoricalFragment : Fragment() {
                                     event.participants ?: emptyList(),
                                     event.links ?: emptyList()
                                 )
-                                viewModelEventListOffline.insertOneToDatabaseHistorical(eventToAdd)
+                                viewModelEventListOffline.insertOneToDatabaseCreados(eventToAdd)
                             }
                         }
                         is Resource.Error<*> -> {

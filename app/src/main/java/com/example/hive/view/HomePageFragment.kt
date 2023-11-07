@@ -1,6 +1,7 @@
 package com.example.hive.view
 
 import android.app.Dialog
+import android.content.Context
 import android.content.Intent
 import android.graphics.Bitmap
 import android.os.Bundle
@@ -8,16 +9,22 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.*
+import androidx.appcompat.app.AppCompatActivity
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProvider
+import androidx.lifecycle.lifecycleScope
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
+import androidx.swiperefreshlayout.widget.SwipeRefreshLayout
 import com.example.hive.R
 import com.example.hive.model.adapters.EventsAdapter
 import com.example.hive.model.adapters.SessionManager
 import com.example.hive.model.models.UserSession
+import com.example.hive.model.network.responses.EventResponse
 import com.example.hive.model.repository.EventRepository
+import com.example.hive.model.room.entities.Event
+import com.example.hive.util.ConnectionLiveData
 import com.example.hive.util.Resource
 import com.example.hive.viewmodel.*
 import com.google.zxing.BarcodeFormat
@@ -26,6 +33,7 @@ import com.google.zxing.integration.android.IntentIntegrator
 import com.google.zxing.qrcode.QRCodeWriter
 import com.google.zxing.qrcode.decoder.ErrorCorrectionLevel
 import com.squareup.picasso.Picasso
+import kotlinx.coroutines.launch
 import java.text.SimpleDateFormat
 import java.util.*
 
@@ -40,7 +48,9 @@ class HomePageFragment : Fragment() {
     private lateinit var eventsAdapter: EventsAdapter
     private lateinit var viewModelEventDetail: EventDetailViewModel
     private lateinit var viewModelAddParticipant: AddParticipatEventViewModel
+    private lateinit var viewModelEventListOffline: EventListOfflineViewModel
     private lateinit var user : UserSession
+    private lateinit var connectionLiveData: ConnectionLiveData
 
 
     override fun onCreateView(
@@ -49,62 +59,179 @@ class HomePageFragment : Fragment() {
     ): View? {
         // Inflate the layout for this fragment
         val view = inflater.inflate(R.layout.fragment_home_page, container, false)
+        val swipeRefreshLayout: SwipeRefreshLayout = view?.findViewById(R.id.swipeRefreshLayout)!!
+        swipeRefreshLayout.isRefreshing = false;
+        swipeRefreshLayout.isEnabled = false;
 
         val userSession = SessionManager(requireContext())
         user = userSession.getUserSession()
-        val viewModelFactory = EventsViewModelProviderFactory(user)
-        viewModelEvent = ViewModelProvider(this, viewModelFactory).get(EventListViewModel::class.java)
 
-        val viewModelAddParticipatEventFactory = AddParticipatEventViewModelProviderFactory()
-        viewModelAddParticipant = ViewModelProvider(this, viewModelAddParticipatEventFactory).get(AddParticipatEventViewModel::class.java)
+        val viewModelAddParticipatEventFactory = context?.let {
+            AddParticipatEventViewModelProviderFactory(
+                it
+            )
+        }
+        viewModelAddParticipant =
+            viewModelAddParticipatEventFactory?.let {
+                ViewModelProvider(this,
+                    it
+                ).get(AddParticipatEventViewModel::class.java)
+            }!!
 
         // Set up RecyclerView
         val recyclerView = view.findViewById<RecyclerView>(R.id.recyclerView)
-        eventsAdapter = EventsAdapter(viewModelAddParticipant, this, userSession)
+        eventsAdapter = context?.let {
+            EventsAdapter(viewModelAddParticipant, this, userSession,
+                it
+            )
+        }!!
         recyclerView.layoutManager = LinearLayoutManager(requireContext())
         recyclerView.adapter = eventsAdapter
 
+        // Set up ViewModel
+        val viewModelFactoryOffline = context?.let {
+            EventListOfflineViewModelProviderFactory(
+                it
+            )
+        }
+
+        viewModelEventListOffline =
+            viewModelFactoryOffline?.let {
+                ViewModelProvider(this,
+                    it
+                ).get(EventListOfflineViewModel::class.java)
+            }!!
+
         val loadingProgressBar = view.findViewById<ProgressBar>(R.id.loadingProgressBar)
 
-        // Observe LiveData from ViewModel
-        viewModelEvent.eventsPage.observe(viewLifecycleOwner, Observer { resource ->
-            when (resource) {
-                is Resource.Loading<*> -> {
-                    // Show progress bar
-                    loadingProgressBar.visibility = View.VISIBLE
-                }
-                is Resource.Success<*> -> {
-                    loadingProgressBar.visibility = View.GONE
-                    // Update the RecyclerView with the list of events
-                    resource.data?.let {
+        viewModelEventListOffline.allEvents?.observe(viewLifecycleOwner, Observer { resource ->
+                loadingProgressBar.visibility = View.GONE
+                val list = mutableListOf<EventResponse>()
+                resource.let {
+                    println("Resource: $it")
+                    // Filter the list for only the ones with date of today and after
+                    val today = Calendar.getInstance()
+                    val filteredList = it.filter { event ->
+                        val eventDate = Calendar.getInstance()
 
-                        // Filter the list for only the ones with date of today and after
-                        val today = Calendar.getInstance()
-                        val filteredList = it.filter { event ->
-                            val eventDate = Calendar.getInstance()
+                        //Transform the date from the event from string to Date
+                        val formatter = SimpleDateFormat("yyyy-MM-dd")
+                        val date = formatter.parse(event.date)
+                        eventDate.time = date
+                        eventDate.get(Calendar.DAY_OF_YEAR) >= today.get(Calendar.DAY_OF_YEAR)
+                    }
 
-                            //Transform the date from the event from string to Date
-                            val formatter = SimpleDateFormat("yyyy-MM-dd")
-                            val date = formatter.parse(event.date)
-                            eventDate.time = date
-                            eventDate.get(Calendar.DAY_OF_YEAR) >= today.get(Calendar.DAY_OF_YEAR)
-                        }
+                    // Cast manually the list of events to the list of EventResponse
+                    for (event in filteredList) {
+                        val eventToAdd = EventResponse(
+                            event.id,
+                            event.image?:"",
+                            event.name?:"",
+                            event.description?:"",
+                            event.date?:"",
+                            event.place?:"",
+                            event.num_participants?:0,
+                            event.category?:"",
+                            event.state?:false,
+                            event.duration?:0,
+                            event.creator_id?:"",
+                            event.creator?:"",
+                            event.participants?: emptyList(),
+                            event.links?: emptyList()
+                        )
+                        list.add(eventToAdd)
+                    }
 
-                        eventsAdapter.submitList(filteredList) }
-                }
-                is Resource.Error<*> -> {
-                    // Handle error state (e.g., show an error message)
-                    Toast.makeText(requireContext(), resource.message, Toast.LENGTH_SHORT).show()
-                }
-            }
-        })
-
+                    eventsAdapter.submitList(list) }
+                })
         return view
     }
 
     override fun onActivityCreated(savedInstanceState: Bundle?) {
         super.onActivityCreated(savedInstanceState)
         viewModel = ViewModelProvider(this).get(HomePageViewModel::class.java)
+        val loadingProgressBar = view?.findViewById<ProgressBar>(R.id.loadingProgressBar)
+        connectionLiveData = ConnectionLiveData(requireContext())
+        val swipeRefreshLayout: SwipeRefreshLayout = view?.findViewById(R.id.swipeRefreshLayout)!!
+        connectionLiveData.observe(viewLifecycleOwner, Observer { isConnected ->
+            if (isConnected) {
+                // Refresh fragment
+                swipeRefreshLayout.isEnabled = true
+
+                swipeRefreshLayout.setOnRefreshListener {
+                    refreshFragment(swipeRefreshLayout)
+                }
+                val viewModelFactory = context?.let { EventsViewModelProviderFactory(user, it) }
+                viewModelEvent = viewModelFactory?.let {
+                    ViewModelProvider(this,
+                        it
+                    ).get(EventListViewModel::class.java)
+                }!!
+
+                viewModelEvent.eventsPage.observe(viewLifecycleOwner, Observer { resource ->
+                    when (resource) {
+                        is Resource.Loading<*> -> {
+                            // Show progress bar
+                            if (loadingProgressBar != null) {
+                                loadingProgressBar.visibility = View.VISIBLE
+                            }
+                        }
+                        is Resource.Success<*> -> {
+                            if (loadingProgressBar != null) {
+                                loadingProgressBar.visibility = View.GONE
+                            }
+                            // Update the RecyclerView with the list of events
+                            resource.data?.let {
+                                // Filter the list for only the ones with date of today and after
+                                val today = Calendar.getInstance()
+                                val filteredList = it.filter { event ->
+                                    val eventDate = Calendar.getInstance()
+                                    //Transform the date from the event from string to Date
+                                    val formatter = SimpleDateFormat("yyyy-MM-dd")
+                                    val date = formatter.parse(event.date)
+                                    eventDate.time = date
+                                    eventDate.get(Calendar.DAY_OF_YEAR) >= today.get(Calendar.DAY_OF_YEAR)
+                                }
+
+                                eventsAdapter.submitList(filteredList) }
+
+                            viewModelEventListOffline.removeEventDatabase()
+
+                            // Loop over the filtered list and create an EventEntity for each event
+                            resource.data?.forEach { event ->
+                                val eventToAdd = Event(
+                                    event.id,
+                                    event.image?:"",
+                                    event.name?:"",
+                                    event.description?:"",
+                                    event.date?:"",
+                                    event.place?:"",
+                                    event.num_participants?:0,
+                                    event.category?:"",
+                                    event.state?:false,
+                                    event.duration?:0,
+                                    event.creator_id?:"",
+                                    event.creator?:"",
+                                    event.participants?: emptyList(),
+                                    event.links?: emptyList()
+                                )
+                                viewModelEventListOffline.insertOneToDatabase(eventToAdd)
+                            }
+                        }
+                        is Resource.Error<*> -> {
+                            // Handle error state (e.g., show an error message)
+                            Toast.makeText(requireContext(), resource.message, Toast.LENGTH_SHORT).show()
+                        }
+                    }
+                })
+
+            } else {
+                swipeRefreshLayout.isEnabled = false
+                Toast.makeText(requireContext(), getString(R.string.no_internet), Toast.LENGTH_SHORT).show()
+            }
+        })
+
+
 
         val cardView = requireView().findViewById<View>(R.id.recyclerView)
         cardView.setOnClickListener {
@@ -132,8 +259,13 @@ class HomePageFragment : Fragment() {
                 if (result.contents == null) {
                     Toast.makeText(requireContext(), requireContext().getString(R.string.evento_cancelado), Toast.LENGTH_LONG).show()
                 } else {
-                    val viewModelFactoryDetail = EventDetailViewModelProviderFactory(result.contents)
-                    viewModelEventDetail = ViewModelProvider(this, viewModelFactoryDetail).get(EventDetailViewModel::class.java)
+                    val viewModelFactoryDetail =
+                        context?.let { EventDetailViewModelProviderFactory(result.contents, it) }
+                    viewModelEventDetail = viewModelFactoryDetail?.let {
+                        ViewModelProvider(this,
+                            it
+                        ).get(EventDetailViewModel::class.java)
+                    }!!
 
                     viewModelEventDetail.eventById.observe(viewLifecycleOwner, Observer { resource ->
                         when (resource) {
@@ -277,11 +409,7 @@ class HomePageFragment : Fragment() {
                                             }
                                         })
                                     }
-
-
                                 }
-
-
 
                                 detailDialog.show()
                             }
@@ -317,6 +445,35 @@ class HomePageFragment : Fragment() {
             e.printStackTrace()
         }
         return null
+    }
+
+    private fun refreshFragment( swipeRefreshLayout: SwipeRefreshLayout ) {
+        swipeRefreshLayout.isRefreshing = true
+        connectionLiveData.observe(viewLifecycleOwner, Observer { isAvailable ->
+            if (isAvailable) {
+                viewModelEvent.getEventsVM()
+                viewModelEvent.eventsPage.observe(viewLifecycleOwner, Observer { resource ->
+                    when (resource) {
+                        is Resource.Loading<*> -> {
+                            // loading indicator will be kept
+                        }
+                        is Resource.Success<*> -> {
+                            // Stop the loading indicator once the data has been loaded
+                            swipeRefreshLayout.isRefreshing = false
+                        }
+                        is Resource.Error<*> -> {
+                            // Stop the loading indicator in case of error
+                            swipeRefreshLayout.isRefreshing = false
+                            // Manage the error state (e.g., show an error message)
+                            Toast.makeText(requireContext(), getString(R.string.swipe_down_error), Toast.LENGTH_SHORT).show()
+                        }
+                    }
+                })
+            } else {
+                swipeRefreshLayout.isRefreshing = false
+                Toast.makeText(requireContext(), getString(R.string.no_internet), Toast.LENGTH_SHORT).show()
+            }
+        })
     }
 
 }

@@ -2,11 +2,37 @@ package com.example.hive.model.adapters
 
 import android.content.Context
 import android.content.SharedPreferences
+import androidx.security.crypto.EncryptedSharedPreferences
+import androidx.security.crypto.MasterKeys
 import com.example.hive.model.models.UserSession
 
 class SessionManager(context: Context) {
-    private val sharedPreferences: SharedPreferences = context.getSharedPreferences("user_session", Context.MODE_PRIVATE)
-    private val sharedPreferencesNotification: SharedPreferences = context.getSharedPreferences("notification", Context.MODE_PRIVATE)
+    private val masterKeyAlias = MasterKeys.getOrCreate(MasterKeys.AES256_GCM_SPEC)
+
+    private val sharedPreferences: SharedPreferences = EncryptedSharedPreferences.create(
+        "user_session",
+        masterKeyAlias,
+        context,
+        EncryptedSharedPreferences.PrefKeyEncryptionScheme.AES256_SIV,
+        EncryptedSharedPreferences.PrefValueEncryptionScheme.AES256_GCM
+    )
+
+    private val sharedPreferencesDatabase = EncryptedSharedPreferences.create(
+        "database",
+        masterKeyAlias,
+        context,
+        EncryptedSharedPreferences.PrefKeyEncryptionScheme.AES256_SIV,
+        EncryptedSharedPreferences.PrefValueEncryptionScheme.AES256_GCM
+    )
+
+    private val sharedPreferencesNotification: SharedPreferences = EncryptedSharedPreferences.create(
+        "notification",
+        masterKeyAlias,
+        context,
+        EncryptedSharedPreferences.PrefKeyEncryptionScheme.AES256_SIV,
+        EncryptedSharedPreferences.PrefValueEncryptionScheme.AES256_GCM
+    )
+
     private val editor: SharedPreferences.Editor = sharedPreferences.edit()
 
     fun saveUserSession(session: UserSession) {
@@ -21,6 +47,16 @@ class SessionManager(context: Context) {
         editorNotification.apply()
     }
 
+    fun saveDatabase(database: Boolean) {
+        val editorDatabase: SharedPreferences.Editor = sharedPreferencesDatabase.edit()
+        editorDatabase.putBoolean("database", database)
+        editorDatabase.apply()
+    }
+
+    fun getDatabase(): Boolean {
+        return sharedPreferencesDatabase.getBoolean("database", false)
+    }
+
     fun getNotification(): Boolean {
         return sharedPreferencesNotification.getBoolean("notification", false)
     }
@@ -31,7 +67,7 @@ class SessionManager(context: Context) {
         return UserSession(authToken, userId)
     }
 
-    //Time tracker functions
+    // Time tracker functions
     fun saveElapsedTime(elapsedTimeSeconds: Long) {
         editor.putLong("time_tracker", elapsedTimeSeconds)
         editor.apply()
