@@ -1,5 +1,6 @@
 package com.example.hive.viewmodel
 
+import android.content.Context
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
@@ -12,7 +13,7 @@ import com.example.hive.util.Resource
 import kotlinx.coroutines.launch
 import retrofit2.Response
 
-class UserProfileViewModel(private val sessionManager: SessionManager) : ViewModel() {
+class UserProfileViewModel(private val sessionManager: SessionManager, private val context: Context) : ViewModel() {
 
     //User Participation
     val userParticipation: MutableLiveData<Resource<UserParticipationResponse>> = MutableLiveData()
@@ -24,7 +25,7 @@ class UserProfileViewModel(private val sessionManager: SessionManager) : ViewMod
     private val _elapsedTimeLiveData = MutableLiveData<Long>()
     val elapsedTimeLiveData: LiveData<Long> = _elapsedTimeLiveData
 
-    val repository = UserRepository()
+    val repository = UserRepository(context)
 
     init{
         getUserDetailVM()

@@ -1,4 +1,5 @@
 package com.example.hive.viewmodel
+import android.content.Context
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
@@ -9,10 +10,10 @@ import com.example.hive.util.Resource
 import kotlinx.coroutines.launch
 import retrofit2.Response
 
-class SignUpViewModel() : ViewModel() {
+class SignUpViewModel(private val context: Context) : ViewModel() {
 
     val registerPage: MutableLiveData<Resource<UserResponse>> = MutableLiveData()
-    val repository = UserRepository()
+    val repository = UserRepository(context)
 
     fun registerVM(request: RegisterRequest) = viewModelScope.launch {
         registerPage.postValue(Resource.Loading())

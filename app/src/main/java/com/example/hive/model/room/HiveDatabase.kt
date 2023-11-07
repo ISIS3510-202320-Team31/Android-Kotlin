@@ -4,11 +4,20 @@ import android.content.Context
 import androidx.room.Database
 import androidx.room.RoomDatabase
 import androidx.room.TypeConverters
+import com.example.hive.model.room.daos.EventActivitiesDao
+import com.example.hive.model.room.daos.EventDao
+import com.example.hive.model.room.daos.EventHistoricalDao
+import com.example.hive.model.room.daos.UserDao
+import com.example.hive.model.room.entities.Event
+import com.example.hive.model.room.entities.EventActivities
+import com.example.hive.model.room.entities.EventHistorical
+import com.example.hive.model.room.entities.User
+import com.example.hive.util.Converters
 import com.example.hive.model.room.daos.*
 import com.example.hive.model.room.entities.*
-import com.example.hive.util.Converters
 
-@Database(entities = arrayOf(User::class, Event::class, EventActivities::class, EventHistorical::class, EventUser::class), version = 5, exportSchema = false)
+
+@Database(entities = arrayOf(User::class, Event::class, EventActivities::class, EventHistorical::class, EventUser::class), version = 7, exportSchema = false)
 @TypeConverters(Converters::class)
 abstract class HiveDatabase : RoomDatabase() {
     abstract fun userDao(): UserDao

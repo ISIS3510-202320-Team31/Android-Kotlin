@@ -32,7 +32,7 @@ class LoginActivity : AppCompatActivity() {
         setContentView(R.layout.fragment_login)
 
         val session = SessionManager(this)
-        val viewModelFactory = LoginViewModelProviderFactory(session)
+        val viewModelFactory = LoginViewModelProviderFactory(session, this)
 
         viewModel = ViewModelProvider(this, viewModelFactory).get(LoginViewModel::class.java)
 
