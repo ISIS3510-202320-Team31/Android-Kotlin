@@ -36,10 +36,10 @@ class UserProfileFragment : Fragment() {
     private lateinit var viewModel: UserProfileViewModel
     private lateinit var sessionManager: SessionManager
     private lateinit var elapsedTimeTextView: TextView
-
     private lateinit var viewModelUserProfileOffline: UserProfileOfflineViewModel
     private lateinit var user: UserSession
     private lateinit var connectionLiveData: ConnectionLiveData
+    private lateinit var viewModelEventListOffline: EventListOfflineViewModel
 
     private var userParticipation: String = "0"
     private lateinit var userCache: UserCacheResponse
@@ -64,6 +64,20 @@ class UserProfileFragment : Fragment() {
                 ViewModelProvider(this,
                     it
                 ).get(UserProfileOfflineViewModel::class.java)
+            }!!
+
+        // ViewModel offline for events
+        val viewModelFactoryOfflineEvents = context?.let{
+            EventListOfflineViewModelProviderFactory(
+                it
+            )
+        }
+
+        viewModelEventListOffline =
+            viewModelFactoryOfflineEvents?.let{
+                ViewModelProvider(this,
+                    it
+                ).get(EventListOfflineViewModel::class.java)
             }!!
 
         viewModelUserProfileOffline.allUsers?.observe(viewLifecycleOwner, Observer { resource ->
@@ -254,6 +268,8 @@ class UserProfileFragment : Fragment() {
 
                 buttonSignOut?.setOnClickListener {
                     sessionManager.clearSession()
+                    viewModelUserProfileOffline.removeUserDatabase()
+                    viewModelEventListOffline.removeEventDatabase()
                     val intent = Intent(requireContext(), LoginActivity::class.java)
                     intent.flags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TASK // Clear the back stack
                     startActivity(intent)
