@@ -8,7 +8,7 @@ import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProvider
 import com.example.hive.R
 import com.example.hive.model.network.requests.RegisterRequest
-import com.example.hive.model.repository.UserRepository
+import com.example.hive.util.FormProgressCache
 import com.example.hive.util.Resource
 import com.example.hive.viewmodel.SignUpViewModel
 import com.example.hive.viewmodel.SignUpViewModelProviderFactory
@@ -17,7 +17,18 @@ class SignUpActivity : AppCompatActivity() {
 
     private lateinit var viewModel: SignUpViewModel
     private lateinit var viewModelFactory: SignUpViewModelProviderFactory
-    private lateinit var userRepository: UserRepository
+
+    companion object {
+        val formProgressCache = FormProgressCache<String, formDataSingUp>(3)
+    }
+
+    data class formDataSingUp(val name: String,
+                        val username: String,
+                        val email: String,
+                        val password: String,
+                        val confirmPassword: String,
+                        val selectedCareer: String,
+                        val birthdate: String)
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -168,5 +179,82 @@ class SignUpActivity : AppCompatActivity() {
             val intent = Intent(this, LoginActivity::class.java)
             startActivity(intent)
         }
+    }
+
+    override fun onPause() {
+        super.onPause()
+
+        if (resourceHasSucceeded()) {
+            EventCreationFragment.formProgressCache.remove("formDataSingUp")
+            println("Borrado")
+            println(EventCreationFragment.formProgressCache.get("formDataSingUp"))
+        }
+        else {
+
+            val name = findViewById<EditText>(R.id.editTextName)?.text.toString()
+            val username = findViewById<EditText>(R.id.editTextUsername)?.text.toString()
+            val email = findViewById<EditText>(R.id.editTextEmail)?.text.toString()
+            val password = findViewById<EditText>(R.id.editTextPassword)?.text.toString()
+            val confirmPassword = findViewById<EditText>(R.id.editTextVerifyPassword)?.text.toString()
+            val selectedCareer = findViewById<Spinner>(R.id.spinnerCareer)?.selectedItem.toString()
+            val birthdate = findViewById<DatePicker>(R.id.datePickerBirthdate)
+
+            val year = birthdate?.year
+            val month = birthdate?.month?.plus(1)
+            val dayOfMonth = birthdate?.dayOfMonth
+            var birthdateStr = ""
+
+            if (month != null) {
+                if (month>9) {
+                    var monthStr = month.toString()
+                    birthdateStr = "$year-$monthStr-$dayOfMonth"
+                }
+                else {
+                    var monthStr = "0$month"
+                    birthdateStr = "$year-$monthStr-$dayOfMonth"
+                }
+            }
+
+            val formDataSingUp = formDataSingUp(name, username, email, password, confirmPassword, selectedCareer, birthdateStr)
+            formProgressCache.put("formDataSingUp", formDataSingUp)
+            println ("Pause")
+            println (formProgressCache.get("formDataSingUp"))
+        }
+    }
+
+    override fun onResume() {
+        super.onResume()
+
+        val formData = formProgressCache.get("formDataSingUp")
+        println("Resume")
+        println(formData)
+
+        findViewById<EditText>(R.id.editTextName)?.setText(formData?.name ?: "")
+        findViewById<EditText>(R.id.editTextUsername)?.setText(formData?.username ?: "")
+        findViewById<EditText>(R.id.editTextEmail)?.setText(formData?.email ?: "")
+        findViewById<EditText>(R.id.editTextPassword)?.setText(formData?.password ?: "")
+        findViewById<EditText>(R.id.editTextVerifyPassword)?.setText(formData?.confirmPassword ?: "")
+        val selectedCareerSpinner = findViewById<Spinner>(R.id.spinnerCareer)
+        if (formData != null) {
+            val careerAdapter = selectedCareerSpinner?.adapter as ArrayAdapter<String>
+            val careerIndex = careerAdapter.getPosition(formData.selectedCareer)
+            selectedCareerSpinner.setSelection(careerIndex)
+        }
+        if (formData != null) {
+            val birthdateParts = formData.birthdate.split("-")
+            if (birthdateParts.size == 3) {
+                val year = birthdateParts[0].toInt()
+                val month = birthdateParts[1].toInt() - 1
+                val day = birthdateParts[2].toInt()
+                val datePicker = findViewById<DatePicker>(R.id.datePickerBirthdate)
+                datePicker?.init(year, month, day, null)
+            }
+        }
+
+    }
+
+    private fun resourceHasSucceeded(): Boolean {
+        val resource = viewModel.registerPage.value
+        return resource is Resource.Success
     }
 }
