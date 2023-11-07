@@ -42,6 +42,7 @@ class UserProfileFragment : Fragment() {
     private lateinit var connectionLiveData: ConnectionLiveData
 
     private var userParticipation: String = "0"
+    private lateinit var userCache: UserCacheResponse
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
@@ -78,6 +79,31 @@ class UserProfileFragment : Fragment() {
                     )
                     list.add(userToAdd)
                 }
+                try {
+                    userCache = list[0]
+
+                    val nameTextView = view?.findViewById<TextView>(R.id.userName)
+                    val emailTextView = view?.findViewById<TextView>(R.id.email)
+                    val participationTextView = view?.findViewById<TextView>(R.id.eventsJoined)
+
+                    if (nameTextView != null) {
+                        nameTextView.text = userCache.name
+                    }
+                    if (emailTextView != null) {
+                        emailTextView.text = userCache.email
+                    }
+                    if (participationTextView != null) {
+                        participationTextView.text = userCache.participation
+                    }
+
+                }catch (e: Exception){
+                    println("Exception: $e")
+                    userCache = UserCacheResponse(
+                        "",
+                    "",
+                    "",
+                    "0")
+                }
             }
         })
         return view
@@ -86,10 +112,14 @@ class UserProfileFragment : Fragment() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
-        viewModel = ViewModelProvider(this).get(UserProfileViewModel::class.java)
         val loadingProgressBar = view?.findViewById<ProgressBar>(R.id.loadingProgressBarProfile)
         connectionLiveData = ConnectionLiveData(requireContext())
         val swipeRefreshLayout: SwipeRefreshLayout = view?.findViewById(R.id.swipeRefreshLayoutProfile)!!
+        swipeRefreshLayout.isEnabled = false
+        swipeRefreshLayout.isRefreshing = false
+
+        elapsedTimeTextView = view?.findViewById<TextView>(R.id.timeSpent)!!
+
         connectionLiveData.observe(viewLifecycleOwner, Observer { isConnected ->
             if (isConnected){
                 swipeRefreshLayout.isEnabled = true
@@ -97,39 +127,24 @@ class UserProfileFragment : Fragment() {
                 swipeRefreshLayout.setOnRefreshListener {
                     refreshFragment(swipeRefreshLayout)
                 }
-
+                sessionManager = SessionManager(requireContext())
                 val viewModelFactory = sessionManager?.let{ UserProfileViewModelProviderFactory(it,requireContext()) }
                 viewModel = ViewModelProvider(this, viewModelFactory!!).get(UserProfileViewModel::class.java)
 
-                //Update user participation
-                viewModel.userParticipation.observe(viewLifecycleOwner, Observer { resource ->
-                    val participationTextView = view?.findViewById<TextView>(R.id.eventsJoined)
-                    when (resource){
-                        is Resource.Loading<*> -> {
-                            if (participationTextView != null) {
-                                participationTextView.text = "..."
-                            }
-                        }
-                        is Resource.Success<*> -> {
-                            if (participationTextView != null) {
-                                userParticipation = resource.data?.size.toString()!!
-                            }
-                        }
-                        is Resource.Error<*> -> {
-                            if (participationTextView != null) {
-                                participationTextView.text = ""
-                            }
-                        }
-                    }
+                //Observer for time usage
+                viewModel.elapsedTimeLiveData.observe(viewLifecycleOwner, Observer{ elapsedTime ->
+                    handleTracking(elapsedTime)
                 })
 
+
                 //update user detail
-                viewModel.userDetail.observe(viewLifecycleOwner, Observer { resource ->
+                viewModel.userDetail.observe(viewLifecycleOwner, Observer { resourceUserDetail ->
                     val nameTextView = view?.findViewById<TextView>(R.id.userName)
                     val emailTextView = view?.findViewById<TextView>(R.id.email)
                     val participationTextView = view?.findViewById<TextView>(R.id.eventsJoined)
-                    when (resource){
+                    when (resourceUserDetail){
                         is Resource.Loading<*> -> {
+                            println(resourceUserDetail)
                             if (nameTextView != null) {
                                 nameTextView.text = "..."
                             }
@@ -138,42 +153,91 @@ class UserProfileFragment : Fragment() {
                             }
                         }
                         is Resource.Success<*> -> {
+                            viewModel.userParticipation.observe(viewLifecycleOwner, Observer { resource ->
+                                val participationTextView = view?.findViewById<TextView>(R.id.eventsJoined)
+                                when (resource){
+                                    is Resource.Loading<*> -> {
+                                        if (loadingProgressBar != null) {
+                                            loadingProgressBar.visibility = View.VISIBLE
+                                        }
+                                        if (participationTextView != null) {
+                                            participationTextView.text = "..."
+                                        }
+                                    }
+                                    is Resource.Success<*> -> {
 
-                            if (userCache.name != resource.data?.name || userCache.email != resource.data?.email || userCache.participation != userParticipation){
-                                viewModelUserProfileOffline.removeUserDatabase()
-                                val user = user.userId?.let { it1 ->
-                                    User(
-                                        it1,
-                                        resource.data?.name,
-                                        resource.data?.email,
-                                        userParticipation
-                                    )
-                                }
-                                if (user != null) {
-                                    viewModelUserProfileOffline.insertOneToDatabase(user)
-                                }
+                                        if (loadingProgressBar != null) {
+                                            loadingProgressBar.visibility = View.GONE
+                                        }
+                                        if (participationTextView != null) {
+                                            participationTextView.text = resource.data?.size.toString()
+                                            userParticipation = resource.data?.size.toString()
+                                        }
 
-                                if (nameTextView != null) {
-                                    nameTextView.text = resource.data?.name
-                                }
-                                if (emailTextView != null) {
-                                    emailTextView.text = resource.data?.email
-                                }
-                                if (participationTextView != null) {
-                                    participationTextView.text = userParticipation
-                                }
+                                        viewModelUserProfileOffline.removeUserDatabase()
+                                        val userWeb = user.userId?.let { it1 ->
+                                            User(
+                                                it1,
+                                                resourceUserDetail.data?.name,
+                                                resourceUserDetail.data?.email,
+                                                userParticipation
+                                            )
+                                        }
+                                        if (userWeb != null) {
+                                            if (userWeb.id != "") {
+                                                viewModelUserProfileOffline.insertOneToDatabase(userWeb!!)
+                                            }
+                                        }
 
-                            } else  {
-                                if (nameTextView != null) {
-                                    nameTextView.text = userCache.name
+
+                                        if (userCache.name != resourceUserDetail.data?.name || userCache.email != resourceUserDetail.data?.email || userCache.participation != userParticipation){
+                                            viewModelUserProfileOffline.removeUserDatabase()
+                                            val user = user.userId?.let { it1 ->
+                                                User(
+                                                    it1,
+                                                    resourceUserDetail.data?.name,
+                                                    resourceUserDetail.data?.email,
+                                                    userParticipation
+                                                )
+                                            }
+                                            if (user != null) {
+                                                viewModelUserProfileOffline.insertOneToDatabase(user)
+                                            }
+
+                                            if (nameTextView != null) {
+                                                nameTextView.text = resourceUserDetail.data?.name
+                                            }
+                                            if (emailTextView != null) {
+                                                emailTextView.text = resourceUserDetail.data?.email
+                                            }
+                                            if (participationTextView != null) {
+                                                participationTextView.text = userParticipation
+                                            }
+
+                                        } else  {
+                                            if (nameTextView != null) {
+                                                nameTextView.text = userCache.name
+                                            }
+                                            if (emailTextView != null) {
+                                                emailTextView.text = userCache.email
+                                            }
+                                            if (participationTextView != null) {
+                                                participationTextView.text = userCache.participation
+                                            }
+                                        }
+                                    }
+                                    is Resource.Error<*> -> {
+                                        if (loadingProgressBar != null) {
+                                            loadingProgressBar.visibility = View.GONE
+                                        }
+                                        if (participationTextView != null) {
+                                            participationTextView.text = ""
+                                        }
+                                    }
                                 }
-                                if (emailTextView != null) {
-                                    emailTextView.text = userCache.email
-                                }
-                                if (participationTextView != null) {
-                                    participationTextView.text = userCache.participation.toString()
-                                }
-                            }
+                            })
+
+
                         }
                         is Resource.Error<*> -> {
                             if (nameTextView != null) {

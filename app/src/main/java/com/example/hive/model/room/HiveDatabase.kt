@@ -17,7 +17,7 @@ import com.example.hive.model.room.daos.*
 import com.example.hive.model.room.entities.*
 
 
-@Database(entities = arrayOf(User::class, Event::class, EventActivities::class, EventHistorical::class, EventUser::class), version = 6, exportSchema = false)
+@Database(entities = arrayOf(User::class, Event::class, EventActivities::class, EventHistorical::class, EventUser::class), version = 7, exportSchema = false)
 @TypeConverters(Converters::class)
 abstract class HiveDatabase : RoomDatabase() {
     abstract fun userDao(): UserDao
