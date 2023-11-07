@@ -1,6 +1,7 @@
 package com.example.hive.view
 
 import android.os.Bundle
+import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -15,8 +16,6 @@ import com.example.hive.util.FormProgressCache
 import com.example.hive.util.Resource
 import com.example.hive.viewmodel.EventCreationViewModel
 import com.example.hive.viewmodel.EventCreationViewModelProviderFactory
-import java.sql.Date
-import java.text.SimpleDateFormat
 
 class EventCreationFragment : Fragment() {
 
@@ -54,11 +53,24 @@ class EventCreationFragment : Fragment() {
 
             val name = view?.findViewById<EditText>(R.id.inputBox)?.text.toString()
             val place = view?.findViewById<EditText>(R.id.inputBoxLugar)?.text.toString()
-            val calendarDate = view?.findViewById<CalendarView>(R.id.calendarView)
-            val dateMillis = calendarDate?.date ?: 0
-            val date = Date(dateMillis)
-            val sdf = SimpleDateFormat("yyyy-MM-dd")
-            val formattedDate = sdf.format(date)
+            val calendarDate = view?.findViewById<DatePicker>(R.id.datePicker)
+            val year = calendarDate?.year
+            val month = calendarDate?.month?.plus(1)
+            val dayOfMonth = calendarDate?.dayOfMonth
+            var formattedDate = ""
+
+            if (month != null) {
+                if (month>9) {
+                    var monthStr = month.toString()
+                    formattedDate = "$year-$monthStr-$dayOfMonth"
+                }
+                else {
+                    var monthStr = "0$month"
+                    formattedDate = "$year-$monthStr-$dayOfMonth"
+                }
+            }
+            Log.d("date", "FECHA")
+            Log.d("date", formattedDate)
             val description = view?.findViewById<EditText>(R.id.textBoxDescription)?.text.toString()
             val num_participants = view?.findViewById<EditText>(R.id.inputBoxParticipant)?.text.toString()
             val category = view?.findViewById<Spinner>(R.id.spinner1)?.selectedItem.toString()
@@ -168,11 +180,22 @@ class EventCreationFragment : Fragment() {
 
             val name = view?.findViewById<EditText>(R.id.inputBox)?.text.toString()
             val place = view?.findViewById<EditText>(R.id.inputBoxLugar)?.text.toString()
-            val calendarDate = view?.findViewById<CalendarView>(R.id.calendarView)
-            val dateMillis = calendarDate?.date ?: 0
-            val date = Date(dateMillis)
-            val sdf = SimpleDateFormat("yyyy-MM-dd")
-            val formattedDate = sdf.format(date)
+            val calendarDate = view?.findViewById<DatePicker>(R.id.datePicker)
+            val year = calendarDate?.year
+            val month = calendarDate?.month?.plus(1)
+            val dayOfMonth = calendarDate?.dayOfMonth
+            var formattedDate = ""
+
+            if (month != null) {
+                if (month>9) {
+                    var monthStr = month.toString()
+                    formattedDate = "$year-$monthStr-$dayOfMonth"
+                }
+                else {
+                    var monthStr = "0$month"
+                    formattedDate = "$year-$monthStr-$dayOfMonth"
+                }
+            }
             val description = view?.findViewById<EditText>(R.id.textBoxDescription)?.text.toString()
             val num_participants = view?.findViewById<EditText>(R.id.inputBoxParticipant)?.text.toString()
             val category = view?.findViewById<Spinner>(R.id.spinner1)?.selectedItem.toString()
@@ -197,11 +220,17 @@ class EventCreationFragment : Fragment() {
         view?.findViewById<EditText>(R.id.inputBox)?.setText(formData?.name ?: "")
         view?.findViewById<EditText>(R.id.inputBoxLugar)?.setText(formData?.place ?: "")
 
-        val calendarDate = view?.findViewById<CalendarView>(R.id.calendarView)
         if (formData != null) {
-            val date = SimpleDateFormat("yyyy-MM-dd").parse(formData.formattedDate)
-            calendarDate?.date = date.time
+            val dateParts = formData.formattedDate.split("-")
+            if (dateParts.size == 3) {
+                val year = dateParts[0].toInt()
+                val month = dateParts[1].toInt() - 1
+                val day = dateParts[2].toInt()
+                val datePicker = view?.findViewById<DatePicker>(R.id.datePicker)
+                datePicker?.init(year, month, day, null)
+            }
         }
+
 
         view?.findViewById<EditText>(R.id.textBoxDescription)?.setText(formData?.description ?: "")
         view?.findViewById<EditText>(R.id.inputBoxParticipant)?.setText(formData?.num_participants ?: "")
