@@ -13,5 +13,5 @@ data class UserCacheResponse(
     var email: String,
 
     @SerializedName("participation")
-    var participation: Int,
+    var participation: String,
 )

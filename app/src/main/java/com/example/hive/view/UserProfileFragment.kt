@@ -10,17 +10,13 @@ import android.widget.ProgressBar
 import android.widget.TextView
 import android.widget.Toast
 import androidx.fragment.app.Fragment
-import androidx.lifecycle.LiveData
 import androidx.lifecycle.Observer
-import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
 import androidx.swiperefreshlayout.widget.SwipeRefreshLayout
 import com.example.hive.R
 import com.example.hive.model.adapters.SessionManager
 import com.example.hive.model.models.UserSession
 import com.example.hive.model.network.responses.UserCacheResponse
-import com.example.hive.model.network.responses.UserParticipationResponse
-import com.example.hive.model.network.responses.UserResponse
 import com.example.hive.model.room.entities.User
 import com.example.hive.util.ConnectionLiveData
 import com.example.hive.util.Resource
@@ -30,7 +26,6 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.launch
 import okhttp3.internal.wait
-import kotlin.properties.Delegates
 
 class UserProfileFragment : Fragment() {
 
@@ -79,7 +74,7 @@ class UserProfileFragment : Fragment() {
                         user.id,
                         user.name?:"",
                         user.email?:"",
-                        user.participation?:0,
+                        user.participation?:"0",
                     )
                     list.add(userToAdd)
                 }
@@ -143,55 +138,42 @@ class UserProfileFragment : Fragment() {
                             }
                         }
                         is Resource.Success<*> -> {
-                            val userCacheJob: Job? =
-                                user.userId?.let {
-                                    viewModelUserProfileOffline.findUserById(
-                                        it
+
+                            if (userCache.name != resource.data?.name || userCache.email != resource.data?.email || userCache.participation != userParticipation){
+                                viewModelUserProfileOffline.removeUserDatabase()
+                                val user = user.userId?.let { it1 ->
+                                    User(
+                                        it1,
+                                        resource.data?.name,
+                                        resource.data?.email,
+                                        userParticipation
                                     )
                                 }
-                            CoroutineScope(Dispatchers.Main).launch {
-                                userCacheJob?.let {
-                                    val userCache = it.wait() as UserCacheResponse
+                                if (user != null) {
+                                    viewModelUserProfileOffline.insertOneToDatabase(user)
+                                }
 
-                                    if (userCache.name != resource.data?.name || userCache.email != resource.data?.email || userCache.participation != userParticipation.toInt()){
-                                        viewModelUserProfileOffline.removeUserDatabase()
-                                        val user = user.userId?.let { it1 ->
-                                            User(
-                                                it1,
-                                                resource.data?.name,
-                                                resource.data?.email,
-                                                userParticipation.toInt()
-                                            )
-                                        }
-                                        if (user != null) {
-                                            viewModelUserProfileOffline.insertOneToDatabase(user)
-                                        }
+                                if (nameTextView != null) {
+                                    nameTextView.text = resource.data?.name
+                                }
+                                if (emailTextView != null) {
+                                    emailTextView.text = resource.data?.email
+                                }
+                                if (participationTextView != null) {
+                                    participationTextView.text = userParticipation
+                                }
 
-                                        if (nameTextView != null) {
-                                            nameTextView.text = resource.data?.name
-                                        }
-                                        if (emailTextView != null) {
-                                            emailTextView.text = resource.data?.email
-                                        }
-                                        if (participationTextView != null) {
-                                            participationTextView.text = userParticipation
-                                        }
-
-                                    } else  {
-                                        if (nameTextView != null) {
-                                            nameTextView.text = userCache.name
-                                        }
-                                        if (emailTextView != null) {
-                                            emailTextView.text = userCache.email
-                                        }
-                                        if (participationTextView != null) {
-                                            participationTextView.text = userCache.participation.toString()
-                                        }
-                                    }
+                            } else  {
+                                if (nameTextView != null) {
+                                    nameTextView.text = userCache.name
+                                }
+                                if (emailTextView != null) {
+                                    emailTextView.text = userCache.email
+                                }
+                                if (participationTextView != null) {
+                                    participationTextView.text = userCache.participation.toString()
                                 }
                             }
-
-
                         }
                         is Resource.Error<*> -> {
                             if (nameTextView != null) {
