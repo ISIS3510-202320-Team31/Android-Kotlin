@@ -11,6 +11,7 @@ import androidx.lifecycle.ViewModelProvider
 import com.example.hive.R
 import com.example.hive.model.adapters.SessionManager
 import com.example.hive.model.network.requests.LoginRequest
+import com.example.hive.util.FormProgressCache
 import com.example.hive.util.Resource
 import com.example.hive.viewmodel.LoginViewModel
 import com.example.hive.viewmodel.LoginViewModelProviderFactory
@@ -18,6 +19,13 @@ import com.example.hive.viewmodel.LoginViewModelProviderFactory
 class LoginActivity : AppCompatActivity() {
 
     private lateinit var viewModel: LoginViewModel
+
+    companion object {
+        val formProgressCache = FormProgressCache<String, formDataLogIn>(3)
+    }
+
+    data class formDataLogIn(val username: String,
+                              val password: String)
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -77,5 +85,41 @@ class LoginActivity : AppCompatActivity() {
             val intent = Intent(this, SignUpActivity::class.java)
             startActivity(intent)
         }
+    }
+
+    override fun onPause() {
+        super.onPause()
+
+        if (resourceHasSucceeded()) {
+            EventCreationFragment.formProgressCache.remove("formDataSingUp")
+            println("Borrado")
+            println(EventCreationFragment.formProgressCache.get("formDataSingUp"))
+        }
+        else {
+
+            val username = findViewById<EditText>(R.id.editTextEmail)?.text.toString()
+            val password = findViewById<EditText>(R.id.editTextPassword)?.text.toString()
+
+            val formDataLogIn = formDataLogIn( username, password)
+            formProgressCache.put("formDataLogIn", formDataLogIn)
+            println ("Pause")
+            println (formProgressCache.get("formDataLogIn"))
+        }
+    }
+
+    override fun onResume() {
+        super.onResume()
+
+        val formData = formProgressCache.get("formDataLogIn")
+        println("Resume")
+        println(formData)
+
+        findViewById<EditText>(R.id.editTextEmail)?.setText(formData?.username ?: "")
+        findViewById<EditText>(R.id.editTextPassword)?.setText(formData?.password ?: "")
+    }
+
+    private fun resourceHasSucceeded(): Boolean {
+        val resource = viewModel._loginResult.value
+        return resource is Resource.Success
     }
 }
