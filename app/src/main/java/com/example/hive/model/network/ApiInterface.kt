@@ -48,4 +48,7 @@ interface ApiInterface {
 
     @GET("/users/{userId}/")
     suspend fun getUserById(@Path("userId") userId: String): Response<UserResponse>
+
+    @GET("/events/users/{userId}/createdby/")
+    suspend fun getEventsCreatedBy(@Path("userId") userId: String): Response<List<EventResponse>>
 }
