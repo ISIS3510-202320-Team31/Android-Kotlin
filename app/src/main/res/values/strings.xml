@@ -85,4 +85,8 @@
     <!-- STRINGS SWIPE DOWN -->
     <string name="swipe_down_success">Datos actualizados correctamente</string>
     <string name="swipe_down_error">Error al actualizar los datos</string>
+
+    <!-- STRINGS NUMBER OF EVENTS -->
+    <string name="number_of_events">Número de eventos:</string>
+
 </resources>

@@ -7,6 +7,7 @@ import android.os.Bundle
 import androidx.appcompat.app.AppCompatActivity
 import android.app.NotificationChannel
 import android.app.NotificationManager
+import android.content.pm.ActivityInfo
 import android.os.Build
 import android.util.Log
 import androidx.core.app.NotificationCompat
@@ -67,6 +68,10 @@ class MainActivity : AppCompatActivity() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+
+        //Block the screen rotation
+        requestedOrientation = ActivityInfo.SCREEN_ORIENTATION_PORTRAIT
+
         FirebaseAnalytics.getInstance(this)
 
         binding = ActivityMainBinding.inflate(layoutInflater)

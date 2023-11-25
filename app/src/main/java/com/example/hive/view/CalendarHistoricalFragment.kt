@@ -46,6 +46,7 @@ class CalendarHistoricalFragment : Fragment() {
     private lateinit var viewModelEventDetail: EventDetailViewModel
     private lateinit var connectionLiveData: ConnectionLiveData
     private lateinit var user: UserSession
+    private var numberOfEvents: Int = 0
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
@@ -131,6 +132,14 @@ class CalendarHistoricalFragment : Fragment() {
                 }
 
                 calendarHistoricalAdapter.submitList(list)
+
+                // Update the number of events
+                numberOfEvents = list.size
+
+                // Show the number of events
+                val numberOfEventsTextView =
+                    view.findViewById<TextView>(R.id.numberOfEventsTextView)
+                numberOfEventsTextView.text = getString(R.string.number_of_events) +" "+ numberOfEvents.toString()
             }
         })
         return view
