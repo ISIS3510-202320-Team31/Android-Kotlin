@@ -1,38 +1,27 @@
 package com.example.hive.view
 
-import android.content.Intent
 import android.Manifest
-import android.content.pm.PackageManager
-import android.os.Bundle
-import androidx.appcompat.app.AppCompatActivity
 import android.app.NotificationChannel
 import android.app.NotificationManager
+import android.content.Intent
 import android.content.pm.ActivityInfo
+import android.content.pm.PackageManager
 import android.os.Build
-import android.util.Log
+import android.os.Bundle
+import android.view.Menu
+import androidx.appcompat.app.AppCompatActivity
+import androidx.core.app.ActivityCompat
 import androidx.core.app.NotificationCompat
 import androidx.core.app.NotificationManagerCompat
-import android.view.Menu
-import android.view.View
-import android.widget.Toast
-import androidx.core.app.ActivityCompat
-import androidx.core.content.ContentProviderCompat.requireContext
 import androidx.core.content.ContextCompat
 import androidx.fragment.app.Fragment
 import com.example.hive.R
 import com.example.hive.databinding.ActivityMainBinding
 import com.example.hive.model.adapters.SessionManager
-import com.example.hive.util.Resource
 import com.example.hive.viewmodel.EventListViewModel
-import com.example.hive.viewmodel.EventsViewModelProviderFactory
 import com.google.android.gms.location.FusedLocationProviderClient
 import com.google.android.gms.location.LocationServices
 import com.google.android.gms.maps.model.LatLng
-import java.text.SimpleDateFormat
-import java.util.*
-import androidx.lifecycle.Observer
-import com.example.hive.model.network.responses.EventResponse
-import com.example.hive.model.room.entities.Event
 import com.google.firebase.analytics.FirebaseAnalytics
 
 
