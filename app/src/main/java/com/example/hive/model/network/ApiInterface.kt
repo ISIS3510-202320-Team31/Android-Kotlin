@@ -51,4 +51,8 @@ interface ApiInterface {
     //Category
     @GET("users/{userId}/stats")
     suspend fun getCategories(@Path("userId") userId: String): Response<List<CategoryResponse>>
+
+    //Top Partners
+    @GET("users/{userId}/partners")
+    suspend fun getTopPartners(@Path("userId") userId: String): Response<TopPartnersResponse>
 }

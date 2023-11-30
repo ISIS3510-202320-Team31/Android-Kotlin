@@ -7,6 +7,7 @@ import androidx.lifecycle.asLiveData
 import androidx.lifecycle.viewModelScope
 import com.example.hive.model.repository.UserRepository
 import com.example.hive.model.room.entities.CategoryChart
+import com.example.hive.model.room.entities.TopPartners
 import com.example.hive.model.room.entities.User
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
@@ -16,7 +17,6 @@ class UserProfileOfflineViewModel(private val context: Context): ViewModel() {
     val repository = UserRepository(context)
     val allUsers: LiveData<List<User>>? = repository.allUsers?.asLiveData()
     val allCategories: LiveData<List<CategoryChart>>? = repository.allCategories?.asLiveData()
-
     suspend fun getUserById(id: String): LiveData<User>? = repository.findUserById(id)?.asLiveData()
 
     //CATEGORY
@@ -38,6 +38,15 @@ class UserProfileOfflineViewModel(private val context: Context): ViewModel() {
         println("Inserting user to database")
         println(user)
         repository.insertUser(user)
+    }
+
+    //TOP PARTNERS
+    fun insertTopPartner(topPartner: TopPartners) = viewModelScope.launch(Dispatchers.IO) {
+        repository.insertTopPartner(topPartner)
+    }
+
+    fun removeTopPartnersDatabase() = viewModelScope.launch(Dispatchers.IO) {
+        repository.deleteAllTopPartners()
     }
 
 

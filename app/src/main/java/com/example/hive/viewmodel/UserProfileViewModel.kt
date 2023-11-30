@@ -7,6 +7,7 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.hive.model.adapters.SessionManager
 import com.example.hive.model.network.responses.CategoryResponse
+import com.example.hive.model.network.responses.TopPartnersResponse
 import com.example.hive.model.network.responses.UserParticipationResponse
 import com.example.hive.model.network.responses.UserResponse
 import com.example.hive.model.repository.UserRepository
@@ -25,6 +26,9 @@ class UserProfileViewModel(private val sessionManager: SessionManager, private v
     //Category Chart
     val categoryChart: MutableLiveData<Resource<List<CategoryResponse>>> = MutableLiveData()
 
+    //Top Partners
+    private val topPartners: MutableLiveData<Resource<TopPartnersResponse>> = MutableLiveData()
+
     //LiveData for time usage
     private val _elapsedTimeLiveData = MutableLiveData<Long>()
     val elapsedTimeLiveData: LiveData<Long> = _elapsedTimeLiveData
@@ -35,10 +39,17 @@ class UserProfileViewModel(private val sessionManager: SessionManager, private v
         getUserDetailVM()
         getUserParticipationVM()
         getCategoryChartVM()
+        getTopPartnersVM()
         _elapsedTimeLiveData.value = sessionManager.getElapsedTime()
     }
 
-    fun getCategoryChartVM() = viewModelScope.launch {
+    private fun getTopPartnersVM() = viewModelScope.launch {
+        topPartners.postValue(Resource.Loading())
+        val response = sessionManager.getUserSession().userId?.let { repository.getTopPartnersR(it) }
+        topPartners.postValue(response?.let { handleResponseTopPartners(it) })
+    }
+
+    private fun getCategoryChartVM() = viewModelScope.launch {
         try {
             categoryChart.postValue(Resource.Loading())
             val response = sessionManager.getUserSession().userId?.let { repository.getCategoriesR(it) }
@@ -64,6 +75,15 @@ class UserProfileViewModel(private val sessionManager: SessionManager, private v
 
     fun updateElapsedTime(){
         _elapsedTimeLiveData.value = sessionManager.getElapsedTime()
+    }
+
+    private fun handleResponseTopPartners(response: Response<TopPartnersResponse>): Resource<TopPartnersResponse> {
+        if (response.isSuccessful) {
+            response.body()?.let { resultResponse ->
+                return Resource.Success(resultResponse)
+            }
+        }
+        return Resource.Error(response.message())
     }
 
     private fun handleResponseCategoryChart(response: Response<List<CategoryResponse>>): Resource<List<CategoryResponse>> {

@@ -1,0 +1,11 @@
+package com.example.hive.model.network.responses
+
+import com.google.gson.annotations.SerializedName
+
+data class TopPartnersResponse(
+    @SerializedName("id")
+    var id: String,
+
+    @SerializedName("top")
+    var top: List<String>,
+)

@@ -9,7 +9,7 @@ import com.example.hive.model.room.entities.*
 import com.example.hive.util.Converters
 
 
-@Database(entities = arrayOf(User::class, Event::class, EventActivities::class, EventHistorical::class, EventUser::class, CategoryChart::class, ), version = 9, exportSchema = false)
+@Database(entities = arrayOf(User::class, Event::class, EventActivities::class, EventHistorical::class, EventUser::class, CategoryChart::class, TopPartners::class, ), version = 9, exportSchema = false)
 @TypeConverters(Converters::class)
 abstract class HiveDatabase : RoomDatabase() {
     abstract fun userDao(): UserDao
@@ -18,6 +18,7 @@ abstract class HiveDatabase : RoomDatabase() {
     abstract fun eventHistoricalDao(): EventHistoricalDao
     abstract fun eventUserDao(): EventUserDao
     abstract fun categoryChartDao(): CategoryChartDao
+    abstract fun topPartnersDao(): TopPartnersDao
 
     companion object {
         private const val Database_NAME = "hive.db"
