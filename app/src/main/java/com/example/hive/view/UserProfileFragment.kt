@@ -3,6 +3,7 @@ package com.example.hive.view
 import android.content.Intent
 import android.os.Bundle
 import android.view.LayoutInflater
+import android.view.MotionEvent
 import android.view.View
 import android.view.ViewGroup
 import android.widget.Button
@@ -40,6 +41,7 @@ class UserProfileFragment : Fragment() {
     private lateinit var user: UserSession
     private lateinit var connectionLiveData: ConnectionLiveData
     private lateinit var viewModelEventListOffline: EventListOfflineViewModel
+    private lateinit var beeView: BeeView
 
     private var userParticipation: String = "0"
     private lateinit var userCache: UserCacheResponse
@@ -125,6 +127,25 @@ class UserProfileFragment : Fragment() {
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
+
+        beeView = view.findViewById(R.id.beeView)
+
+        // Inside onViewCreated, update the touch event handling
+        beeView.setOnTouchListener { _, event ->
+            when (event.action) {
+                MotionEvent.ACTION_DOWN -> {
+                    // Get the touch coordinates
+                    val x = event.x
+                    val y = event.y
+
+
+                    // Update the UI on the main thread using Coroutines
+                    beeView.setBeePosition(x, y)
+                    return@setOnTouchListener true
+                }
+            }
+            return@setOnTouchListener false
+        }
 
         val loadingProgressBar = view?.findViewById<ProgressBar>(R.id.loadingProgressBarProfile)
         connectionLiveData = ConnectionLiveData(requireContext())
