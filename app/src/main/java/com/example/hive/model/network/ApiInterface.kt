@@ -5,11 +5,7 @@ import com.example.hive.model.network.requests.LoginRequest
 import com.example.hive.model.network.requests.RegisterRequest
 import com.example.hive.model.network.responses.*
 import retrofit2.Response
-import retrofit2.http.DELETE
-import retrofit2.http.Body
-import retrofit2.http.GET
-import retrofit2.http.POST
-import retrofit2.http.Path
+import retrofit2.http.*
 
 interface ApiInterface {
 
@@ -51,4 +47,8 @@ interface ApiInterface {
 
     @GET("/events/users/{userId}/createdby/")
     suspend fun getEventsCreatedBy(@Path("userId") userId: String): Response<List<EventResponse>>
+
+    //Category
+    @GET("users/{userId}/stats")
+    suspend fun getCategories(@Path("userId") userId: String): Response<List<CategoryResponse>>
 }
