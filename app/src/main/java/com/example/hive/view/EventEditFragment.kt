@@ -297,7 +297,23 @@ class EventEditFragment(
             val categorySpinner = view?.findViewById<Spinner>(R.id.spinner1)
             if (formData != null) {
                 val categoryAdapter = categorySpinner?.adapter as ArrayAdapter<String>
-                val categoryIndex = categoryAdapter.getPosition(formData.category)
+                var category = formData.category
+                if (category == "ACADEMIC") {
+                    category = "Académico"
+                }
+                else if (category == "SPORTS") {
+                    category = "Deportivo"
+                }
+                else if (category == "CULTURAL") {
+                    category = "Cultural"
+                }
+                else if (category == "ENTERTAINMENT") {
+                    category = "Entretenimiento"
+                }
+                else if (category == "OTHER") {
+                    category = "Otros"
+                }
+                val categoryIndex = categoryAdapter.getPosition(category)
                 categorySpinner.setSelection(categoryIndex)
             }
 
@@ -313,7 +329,23 @@ class EventEditFragment(
             val categorySpinner = view?.findViewById<Spinner>(R.id.spinner1)
             if (eventCategoryTextView != null) {
                 val categoryAdapter = categorySpinner?.adapter as ArrayAdapter<String>
-                val categoryIndex = categoryAdapter.getPosition(eventCategoryTextView.text.toString())
+                var category = eventCategoryTextView.text.toString()
+                if (category == "ACADEMIC") {
+                    category = "Académico"
+                }
+                else if (category == "SPORTS") {
+                    category = "Deportivo"
+                }
+                else if (category == "CULTURAL") {
+                    category = "Cultural"
+                }
+                else if (category == "ENTERTAINMENT") {
+                    category = "Entretenimiento"
+                }
+                else if (category == "OTHER") {
+                    category = "Otros"
+                }
+                val categoryIndex = categoryAdapter.getPosition(category)
                 categorySpinner.setSelection(categoryIndex)
             }
             if (eventDateTextView != null) {

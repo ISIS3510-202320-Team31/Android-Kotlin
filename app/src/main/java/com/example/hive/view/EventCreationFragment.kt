@@ -2,7 +2,6 @@ package com.example.hive.view
 
 import android.graphics.Color
 import android.os.Bundle
-import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -78,8 +77,6 @@ class EventCreationFragment : Fragment() {
                             formattedDate = "$year-$monthStr-$dayOfMonth"
                         }
                     }
-                    Log.d("date", "FECHA")
-                    Log.d("date", formattedDate)
                     val description = view?.findViewById<EditText>(R.id.textBoxDescription)?.text.toString()
                     val num_participants = view?.findViewById<EditText>(R.id.inputBoxParticipant)?.text.toString()
                     var category = view?.findViewById<Spinner>(R.id.spinner1)?.selectedItem.toString()
@@ -172,6 +169,7 @@ class EventCreationFragment : Fragment() {
         viewModel.eventCreationPage.observe(viewLifecycleOwner, Observer { resource ->
             when (resource) {
                 is Resource.Success -> {
+                    println("EVENTOOOOO")
                     println(resource.data)
                     Toast.makeText(requireContext(), requireContext().getString(R.string.evento_registrado), Toast.LENGTH_SHORT).show()
                     val transaction = requireActivity().supportFragmentManager.beginTransaction()
@@ -266,7 +264,23 @@ class EventCreationFragment : Fragment() {
         val categorySpinner = view?.findViewById<Spinner>(R.id.spinner1)
         if (formData != null) {
             val categoryAdapter = categorySpinner?.adapter as ArrayAdapter<String>
-            val categoryIndex = categoryAdapter.getPosition(formData.category)
+            var category = formData.category
+            if (category == "ACADEMIC") {
+                category = "Académico"
+            }
+            else if (category == "SPORTS") {
+                category = "Deportivo"
+            }
+            else if (category == "CULTURAL") {
+                category = "Cultural"
+            }
+            else if (category == "ENTERTAINMENT") {
+                category = "Entretenimiento"
+            }
+            else if (category == "OTHER") {
+                category = "Otros"
+            }
+            val categoryIndex = categoryAdapter.getPosition(category)
             categorySpinner.setSelection(categoryIndex)
         }
 
