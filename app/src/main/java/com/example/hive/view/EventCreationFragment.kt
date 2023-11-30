@@ -82,7 +82,22 @@ class EventCreationFragment : Fragment() {
                     Log.d("date", formattedDate)
                     val description = view?.findViewById<EditText>(R.id.textBoxDescription)?.text.toString()
                     val num_participants = view?.findViewById<EditText>(R.id.inputBoxParticipant)?.text.toString()
-                    val category = view?.findViewById<Spinner>(R.id.spinner1)?.selectedItem.toString()
+                    var category = view?.findViewById<Spinner>(R.id.spinner1)?.selectedItem.toString()
+                    if (category == "Académico") {
+                        category = "ACADEMIC"
+                    }
+                    else if (category == "Deportivo") {
+                        category = "SPORTS"
+                    }
+                    else if (category == "Cultural") {
+                        category = "CULTURAL"
+                    }
+                    else if (category == "Entretenimiento") {
+                        category = "ENTERTAINMENT"
+                    }
+                    else if (category == "Otros") {
+                        category = "OTHER"
+                    }
                     val state = true
                     val duration = view?.findViewById<EditText>(R.id.inputBoxDuration)?.text.toString()
                     val creador = session.getUserSession().userId.toString()
