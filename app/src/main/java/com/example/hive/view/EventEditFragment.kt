@@ -2,6 +2,7 @@ package com.example.hive.view
 
 import android.graphics.Color
 import android.os.Bundle
+import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -11,17 +12,26 @@ import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProvider
 import com.example.hive.R
 import com.example.hive.model.adapters.SessionManager
-import com.example.hive.model.network.requests.CreateEventRequest
+import com.example.hive.model.network.requests.EditEventRequest
 import com.example.hive.util.ConnectionLiveData
 import com.example.hive.util.FormProgressCache
 import com.example.hive.util.Resource
-import com.example.hive.viewmodel.EventCreationViewModel
-import com.example.hive.viewmodel.EventCreationViewModelProviderFactory
+import com.example.hive.viewmodel.EventEditViewModel
+import com.example.hive.viewmodel.EventEditViewModelProviderFactory
 
-class EventCreationFragment : Fragment() {
+class EventEditFragment(
+    eventIDTextView: TextView,
+    eventNameTextView: TextView,
+    eventCategoryTextView: TextView,
+    eventDateTextView: TextView,
+    eventDuracionTextView: TextView,
+    eventDescriptionTextView: TextView,
+    eventLugarTextView: TextView,
+    eventParticipantTextView: TextView,
+) : Fragment() {
 
-    private lateinit var viewModel: EventCreationViewModel
-    private lateinit var viewModelFactory: EventCreationViewModelProviderFactory
+    private lateinit var viewModel: EventEditViewModel
+    private lateinit var viewModelFactory: EventEditViewModelProviderFactory
     private lateinit var connectionLiveData: ConnectionLiveData
     companion object {
         val formProgressCache = FormProgressCache<String, FormData>(4)
@@ -37,14 +47,34 @@ class EventCreationFragment : Fragment() {
                             val tags: String,
                             val links: String)
 
+    // crate variables with the data of the event
+    private var eventIDTextView = eventIDTextView
+    private var eventNameTextView = eventNameTextView
+    private var eventCategoryTextView = eventCategoryTextView
+    private var eventDateTextView = eventDateTextView
+    private var eventDuracionTextView = eventDuracionTextView
+    private var eventDescriptionTextView = eventDescriptionTextView
+    private var eventLugarTextView = eventLugarTextView
+    private var eventNumParticipantsTextView = eventParticipantTextView
+
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View? {
-        viewModelFactory = context?.let { EventCreationViewModelProviderFactory(it) }!!
-        viewModel = ViewModelProvider(this, viewModelFactory).get(EventCreationViewModel::class.java)
+        viewModelFactory = context?.let { EventEditViewModelProviderFactory(it) }!!
+        viewModel = ViewModelProvider(this, viewModelFactory).get(EventEditViewModel::class.java)
         connectionLiveData = ConnectionLiveData(requireContext())
-        return inflater.inflate(R.layout.fragment_event_creation, container, false)
+
+        Log.d("ID", eventIDTextView.text.toString())
+        Log.d("NAME", eventNameTextView.text.toString())
+        Log.d("CATEGORY", eventCategoryTextView.text.toString())
+        Log.d("DATE", eventDateTextView.text.toString())
+        Log.d("DURATION", eventDuracionTextView.text.toString())
+        Log.d("DESCRIPTION", eventDescriptionTextView.text.toString())
+        Log.d("PLACE", eventLugarTextView.text.toString())
+        Log.d("PARTICIPANTS", eventNumParticipantsTextView.text.toString())
+
+        return inflater.inflate(R.layout.fragment_event_edit, container, false)
     }
 
     override fun onActivityCreated(savedInstanceState: Bundle?) {
@@ -77,6 +107,8 @@ class EventCreationFragment : Fragment() {
                             formattedDate = "$year-$monthStr-$dayOfMonth"
                         }
                     }
+                    Log.d("date", "FECHA")
+                    Log.d("date", formattedDate)
                     val description = view?.findViewById<EditText>(R.id.textBoxDescription)?.text.toString()
                     val num_participants = view?.findViewById<EditText>(R.id.inputBoxParticipant)?.text.toString()
                     var category = view?.findViewById<Spinner>(R.id.spinner1)?.selectedItem.toString()
@@ -136,8 +168,8 @@ class EventCreationFragment : Fragment() {
                         }
                     }
 
-                    var createEventRequest = try {
-                        CreateEventRequest(name, place, formattedDate, description, num_participants.toInt(), category, state, duration.toInt(), creador, tags, links)
+                    var editEventRequest = try {
+                        EditEventRequest(name, place, formattedDate, description, num_participants.toInt(), category, state, duration.toInt(), creador, tags, links)
                     } catch (e: Exception) {
                         Toast.makeText(requireContext(), requireContext().getString(R.string.error_registro_evento), Toast.LENGTH_SHORT).show()
                         null
@@ -145,12 +177,12 @@ class EventCreationFragment : Fragment() {
 
                     if (name.isEmpty() || place.isEmpty() || formattedDate.isEmpty() || description.isEmpty() || num_participants.isEmpty() || category.isEmpty() || duration.isEmpty() || creador.isEmpty()) {
                         // Show toast message
-                        createEventRequest = null
+                        editEventRequest = null
                     }
 
-                    if (createEventRequest != null) {
+                    if (editEventRequest != null) {
                         try {
-                            viewModel.createEventVM(createEventRequest)
+                            viewModel.editEventVM(eventIDTextView.text.toString(), editEventRequest)
                         } catch (e: Exception) {
                             // Show toast message
                             println(e.stackTrace)
@@ -164,12 +196,12 @@ class EventCreationFragment : Fragment() {
             } else {
                 buttonCreateEvent?.isEnabled = false
             }
+            setupForm()
         })
 
-        viewModel.eventCreationPage.observe(viewLifecycleOwner, Observer { resource ->
+        viewModel.eventEditPage.observe(viewLifecycleOwner, Observer { resource ->
             when (resource) {
                 is Resource.Success -> {
-                    println("EVENTOOOOO")
                     println(resource.data)
                     Toast.makeText(requireContext(), requireContext().getString(R.string.evento_registrado), Toast.LENGTH_SHORT).show()
                     val transaction = requireActivity().supportFragmentManager.beginTransaction()
@@ -198,9 +230,9 @@ class EventCreationFragment : Fragment() {
         super.onPause()
 
         if (resourceHasSucceeded()) {
-            formProgressCache.remove("formData")
+            formProgressCache.remove(eventIDTextView.text.toString())
             println("Borrado")
-            println(formProgressCache.get("formData"))
+            println(formProgressCache.get(eventIDTextView.text.toString()))
         }
         else {
 
@@ -230,67 +262,122 @@ class EventCreationFragment : Fragment() {
             val links = view?.findViewById<EditText>(R.id.textBox)?.text.toString()
 
             val formData = FormData(name, place, formattedDate, description, num_participants, category, duration, tags, links)
-            formProgressCache.put("formData", formData)
-            println("Pause")
-            println(formProgressCache.get("formData"))
+            formProgressCache.put(eventIDTextView.text.toString(), formData)
         }
     }
 
     override fun onResume() {
         super.onResume()
+        setupForm()
+    }
 
-        val formData = formProgressCache.get("formData")
-        println("Resume")
-        println(formData)
+    private fun setupForm() {
 
-        view?.findViewById<EditText>(R.id.inputBox)?.setText(formData?.name ?: "")
-        view?.findViewById<EditText>(R.id.inputBoxLugar)?.setText(formData?.place ?: "")
-
+        val formData = formProgressCache.get(eventIDTextView.text.toString())
         if (formData != null) {
-            val dateParts = formData.formattedDate.split("-")
-            if (dateParts.size == 3) {
-                val year = dateParts[0].toInt()
-                val month = dateParts[1].toInt() - 1
-                val day = dateParts[2].toInt()
-                val datePicker = view?.findViewById<DatePicker>(R.id.datePicker)
-                datePicker?.init(year, month, day, null)
+
+            view?.findViewById<EditText>(R.id.inputBox)?.setText(formData?.name ?: "")
+            view?.findViewById<EditText>(R.id.inputBoxLugar)?.setText(formData?.place ?: "")
+
+            if (formData != null) {
+                val dateParts = formData.formattedDate.split("-")
+                if (dateParts.size == 3) {
+                    val year = dateParts[0].toInt()
+                    val month = dateParts[1].toInt() - 1
+                    val day = dateParts[2].toInt()
+                    val datePicker = view?.findViewById<DatePicker>(R.id.datePicker)
+                    datePicker?.init(year, month, day, null)
+                }
             }
+
+
+            view?.findViewById<EditText>(R.id.textBoxDescription)?.setText(formData?.description ?: "")
+            view?.findViewById<EditText>(R.id.inputBoxParticipant)?.setText(formData?.num_participants ?: "")
+
+            val categorySpinner = view?.findViewById<Spinner>(R.id.spinner1)
+            if (formData != null) {
+                val categoryAdapter = categorySpinner?.adapter as ArrayAdapter<String>
+                var category = formData.category
+                if (category == "ACADEMIC") {
+                    category = "Académico"
+                }
+                else if (category == "SPORTS") {
+                    category = "Deportivo"
+                }
+                else if (category == "CULTURAL") {
+                    category = "Cultural"
+                }
+                else if (category == "ENTERTAINMENT") {
+                    category = "Entretenimiento"
+                }
+                else if (category == "OTHER") {
+                    category = "Otros"
+                }
+                val categoryIndex = categoryAdapter.getPosition(category)
+                categorySpinner.setSelection(categoryIndex)
+            }
+
+            view?.findViewById<EditText>(R.id.inputBoxDuration)?.setText(formData?.duration ?: "")
+            view?.findViewById<EditText>(R.id.textBox2)?.setText(formData?.tags ?: "")
+            view?.findViewById<EditText>(R.id.textBox)?.setText(formData?.links ?: "")
+
+        } else {
+
+            if (eventNameTextView != null) {
+                view?.findViewById<EditText>(R.id.inputBox)?.setText(eventNameTextView.text.toString())
+            }
+            val categorySpinner = view?.findViewById<Spinner>(R.id.spinner1)
+            if (eventCategoryTextView != null) {
+                val categoryAdapter = categorySpinner?.adapter as ArrayAdapter<String>
+                var category = eventCategoryTextView.text.toString()
+                if (category == "ACADEMIC") {
+                    category = "Académico"
+                }
+                else if (category == "SPORTS") {
+                    category = "Deportivo"
+                }
+                else if (category == "CULTURAL") {
+                    category = "Cultural"
+                }
+                else if (category == "ENTERTAINMENT") {
+                    category = "Entretenimiento"
+                }
+                else if (category == "OTHER") {
+                    category = "Otros"
+                }
+                val categoryIndex = categoryAdapter.getPosition(category)
+                categorySpinner.setSelection(categoryIndex)
+            }
+            if (eventDateTextView != null) {
+                val dateParts = eventDateTextView.text.toString().split("/")
+                if (dateParts.size == 3) {
+                    val day = dateParts[0].toInt()
+                    val month = dateParts[1].toInt() - 1
+                    val year = dateParts[2].toInt()
+                    val datePicker = view?.findViewById<DatePicker>(R.id.datePicker)
+                    datePicker?.init(year, month, day, null)
+                }
+            }
+            if (eventDuracionTextView != null) {
+                val durationText = eventDuracionTextView.text.toString().split(" ")[0]  // Obtén solo el número de minutos
+                view?.findViewById<EditText>(R.id.inputBoxDuration)?.setText(durationText)
+            }
+            if (eventDescriptionTextView != null) {
+                view?.findViewById<EditText>(R.id.textBoxDescription)?.setText(eventDescriptionTextView.text.toString())
+            }
+            if (eventLugarTextView != null) {
+                view?.findViewById<EditText>(R.id.inputBoxLugar)?.setText(eventLugarTextView.text.toString())
+            }
+            if (eventNumParticipantsTextView != null) {
+                val participantsText = eventNumParticipantsTextView.text.toString().split(" ")[2]
+                view?.findViewById<EditText>(R.id.inputBoxParticipant)?.setText(participantsText)
+            }
+
         }
-
-
-        view?.findViewById<EditText>(R.id.textBoxDescription)?.setText(formData?.description ?: "")
-        view?.findViewById<EditText>(R.id.inputBoxParticipant)?.setText(formData?.num_participants ?: "")
-
-        val categorySpinner = view?.findViewById<Spinner>(R.id.spinner1)
-        if (formData != null) {
-            val categoryAdapter = categorySpinner?.adapter as ArrayAdapter<String>
-            var category = formData.category
-            if (category == "ACADEMIC") {
-                category = "Académico"
-            }
-            else if (category == "SPORTS") {
-                category = "Deportivo"
-            }
-            else if (category == "CULTURAL") {
-                category = "Cultural"
-            }
-            else if (category == "ENTERTAINMENT") {
-                category = "Entretenimiento"
-            }
-            else if (category == "OTHER") {
-                category = "Otros"
-            }
-            val categoryIndex = categoryAdapter.getPosition(category)
-            categorySpinner.setSelection(categoryIndex)
-        }
-
-        view?.findViewById<EditText>(R.id.inputBoxDuration)?.setText(formData?.duration ?: "")
-        view?.findViewById<EditText>(R.id.textBox2)?.setText(formData?.tags ?: "")
-        view?.findViewById<EditText>(R.id.textBox)?.setText(formData?.links ?: "")
     }
 
     private fun resourceHasSucceeded(): Boolean {
-        val resource = viewModel.eventCreationPage.value
+        val resource = viewModel.eventEditPage.value
         return resource is Resource.Success
     }
 }
