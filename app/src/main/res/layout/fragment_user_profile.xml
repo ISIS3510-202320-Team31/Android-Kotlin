@@ -21,16 +21,15 @@
                 android:orientation="vertical">
 
                 <RelativeLayout
-                    android:layout_width="match_parent"
+                    android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:gravity="center"
                     android:layout_gravity="center">
 
                     <TextView
                         android:id="@+id/textViewMonthYear"
-                        android:layout_width="wrap_content"
+                        android:layout_width="match_parent"
                         android:layout_height="wrap_content"
-                        android:layout_centerHorizontal="true"
                         android:gravity="center"
                         android:text="Perfil"
                         android:textSize="30sp"
@@ -40,8 +39,8 @@
 
                     <ImageView
                         android:id="@+id/iconImageView"
-                        android:layout_width="50dp"
-                        android:layout_height="50dp"
+                        android:layout_width="80dp"
+                        android:layout_height="60dp"
                         android:layout_alignParentEnd="true"
                         android:layout_centerVertical="true"
                         android:clickable="true"
