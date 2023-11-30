@@ -89,95 +89,93 @@ class EventEditFragment(
                 buttonCreateEvent?.isEnabled = true
                 buttonCreateEvent?.setBackgroundColor(Color.parseColor("#2196F3"))
                 buttonCreateEvent?.setOnClickListener {
-                    buttonCreateEvent?.setOnClickListener{
-                        val name = view?.findViewById<EditText>(R.id.inputBox)?.text.toString()
-                        val place = view?.findViewById<EditText>(R.id.inputBoxLugar)?.text.toString()
-                        val calendarDate = view?.findViewById<DatePicker>(R.id.datePicker)
-                        val year = calendarDate?.year
-                        val month = calendarDate?.month?.plus(1)
-                        val dayOfMonth = calendarDate?.dayOfMonth
-                        var formattedDate = ""
+                    val name = view?.findViewById<EditText>(R.id.inputBox)?.text.toString()
+                    val place = view?.findViewById<EditText>(R.id.inputBoxLugar)?.text.toString()
+                    val calendarDate = view?.findViewById<DatePicker>(R.id.datePicker)
+                    val year = calendarDate?.year
+                    val month = calendarDate?.month?.plus(1)
+                    val dayOfMonth = calendarDate?.dayOfMonth
+                    var formattedDate = ""
 
-                        if (month != null) {
-                            if (month>9) {
-                                var monthStr = month.toString()
-                                formattedDate = "$year-$monthStr-$dayOfMonth"
-                            }
-                            else {
-                                var monthStr = "0$month"
-                                formattedDate = "$year-$monthStr-$dayOfMonth"
-                            }
-                        }
-                        Log.d("date", "FECHA")
-                        Log.d("date", formattedDate)
-                        val description = view?.findViewById<EditText>(R.id.textBoxDescription)?.text.toString()
-                        val num_participants = view?.findViewById<EditText>(R.id.inputBoxParticipant)?.text.toString()
-                        val category = view?.findViewById<Spinner>(R.id.spinner1)?.selectedItem.toString()
-                        val state = true
-                        val duration = view?.findViewById<EditText>(R.id.inputBoxDuration)?.text.toString()
-                        val creador = session.getUserSession().userId.toString()
-                        val tags = view?.findViewById<EditText>(R.id.textBox2)?.text.toString().split(" ")
-                        val links = view?.findViewById<EditText>(R.id.textBox)?.text.toString().split(" ")
-
-                        if (name.isEmpty()) {
-                            view?.findViewById<EditText>(R.id.inputBox)?.error = requireContext().getString(R.string.error_nombre_evento)
-                            view?.findViewById<EditText>(R.id.inputBox)?.requestFocus()
-                            return@setOnClickListener
-                        }
-                        if (place.isEmpty()) {
-                            view?.findViewById<EditText>(R.id.inputBoxLugar)?.error = requireContext().getString(R.string.error_lugar_evento)
-                            view?.findViewById<EditText>(R.id.inputBoxLugar)?.requestFocus()
-                            return@setOnClickListener
-                        }
-                        if (description.isEmpty()) {
-                            view?.findViewById<EditText>(R.id.textBoxDescription)?.error = requireContext().getString(R.string.error_descripcion_evento)
-                            view?.findViewById<EditText>(R.id.textBoxDescription)?.requestFocus()
-                            return@setOnClickListener
-                        }
-                        if (num_participants.isEmpty()) {
-                            view?.findViewById<EditText>(R.id.inputBoxParticipant)?.error = requireContext().getString(R.string.error_participantes_evento)
-                            view?.findViewById<EditText>(R.id.inputBoxParticipant)?.requestFocus()
-                            return@setOnClickListener
-                        }
-                        if (duration.isEmpty()) {
-                            view?.findViewById<EditText>(R.id.inputBoxDuration)?.error = requireContext().getString(R.string.error_duracion_evento)
-                            view?.findViewById<EditText>(R.id.inputBoxDuration)?.requestFocus()
-                            return@setOnClickListener
-                        }
-                        if (links.all { it.isNotBlank() }){
-                            for (link in links) {
-                                if (!android.util.Patterns.WEB_URL.matcher(link).matches()) {
-                                    view?.findViewById<EditText>(R.id.textBox)?.error = requireContext().getString(R.string.error_enlaces_evento)
-                                    view?.findViewById<EditText>(R.id.textBox)?.requestFocus()
-                                    return@setOnClickListener
-                                }
-                            }
-                        }
-
-                        var editEventRequest = try {
-                            EditEventRequest(name, place, formattedDate, description, num_participants.toInt(), category, state, duration.toInt(), creador, tags, links)
-                        } catch (e: Exception) {
-                            Toast.makeText(requireContext(), requireContext().getString(R.string.error_registro_evento), Toast.LENGTH_SHORT).show()
-                            null
-                        }
-
-                        if (name.isEmpty() || place.isEmpty() || formattedDate.isEmpty() || description.isEmpty() || num_participants.isEmpty() || category.isEmpty() || duration.isEmpty() || creador.isEmpty()) {
-                            // Show toast message
-                            editEventRequest = null
-                        }
-
-                        if (editEventRequest != null) {
-                            try {
-                                viewModel.editEventVM(eventIDTextView.text.toString(), editEventRequest)
-                            } catch (e: Exception) {
-                                // Show toast message
-                                println(e.stackTrace)
-                                Toast.makeText(requireContext(), requireContext().getString(R.string.error_registro_evento), Toast.LENGTH_SHORT).show()
-                            }
+                    if (month != null) {
+                        if (month>9) {
+                            var monthStr = month.toString()
+                            formattedDate = "$year-$monthStr-$dayOfMonth"
                         }
                         else {
+                            var monthStr = "0$month"
+                            formattedDate = "$year-$monthStr-$dayOfMonth"
+                        }
+                    }
+                    Log.d("date", "FECHA")
+                    Log.d("date", formattedDate)
+                    val description = view?.findViewById<EditText>(R.id.textBoxDescription)?.text.toString()
+                    val num_participants = view?.findViewById<EditText>(R.id.inputBoxParticipant)?.text.toString()
+                    val category = view?.findViewById<Spinner>(R.id.spinner1)?.selectedItem.toString()
+                    val state = true
+                    val duration = view?.findViewById<EditText>(R.id.inputBoxDuration)?.text.toString()
+                    val creador = session.getUserSession().userId.toString()
+                    val tags = view?.findViewById<EditText>(R.id.textBox2)?.text.toString().split(" ")
+                    val links = view?.findViewById<EditText>(R.id.textBox)?.text.toString().split(" ")
+
+                    if (name.isEmpty()) {
+                        view?.findViewById<EditText>(R.id.inputBox)?.error = requireContext().getString(R.string.error_nombre_evento)
+                        view?.findViewById<EditText>(R.id.inputBox)?.requestFocus()
+                        return@setOnClickListener
+                    }
+                    if (place.isEmpty()) {
+                        view?.findViewById<EditText>(R.id.inputBoxLugar)?.error = requireContext().getString(R.string.error_lugar_evento)
+                        view?.findViewById<EditText>(R.id.inputBoxLugar)?.requestFocus()
+                        return@setOnClickListener
+                    }
+                    if (description.isEmpty()) {
+                        view?.findViewById<EditText>(R.id.textBoxDescription)?.error = requireContext().getString(R.string.error_descripcion_evento)
+                        view?.findViewById<EditText>(R.id.textBoxDescription)?.requestFocus()
+                        return@setOnClickListener
+                    }
+                    if (num_participants.isEmpty()) {
+                        view?.findViewById<EditText>(R.id.inputBoxParticipant)?.error = requireContext().getString(R.string.error_participantes_evento)
+                        view?.findViewById<EditText>(R.id.inputBoxParticipant)?.requestFocus()
+                        return@setOnClickListener
+                    }
+                    if (duration.isEmpty()) {
+                        view?.findViewById<EditText>(R.id.inputBoxDuration)?.error = requireContext().getString(R.string.error_duracion_evento)
+                        view?.findViewById<EditText>(R.id.inputBoxDuration)?.requestFocus()
+                        return@setOnClickListener
+                    }
+                    if (links.all { it.isNotBlank() }){
+                        for (link in links) {
+                            if (!android.util.Patterns.WEB_URL.matcher(link).matches()) {
+                                view?.findViewById<EditText>(R.id.textBox)?.error = requireContext().getString(R.string.error_enlaces_evento)
+                                view?.findViewById<EditText>(R.id.textBox)?.requestFocus()
+                                return@setOnClickListener
+                            }
+                        }
+                    }
+
+                    var editEventRequest = try {
+                        EditEventRequest(name, place, formattedDate, description, num_participants.toInt(), category, state, duration.toInt(), creador, tags, links)
+                    } catch (e: Exception) {
+                        Toast.makeText(requireContext(), requireContext().getString(R.string.error_registro_evento), Toast.LENGTH_SHORT).show()
+                        null
+                    }
+
+                    if (name.isEmpty() || place.isEmpty() || formattedDate.isEmpty() || description.isEmpty() || num_participants.isEmpty() || category.isEmpty() || duration.isEmpty() || creador.isEmpty()) {
+                        // Show toast message
+                        editEventRequest = null
+                    }
+
+                    if (editEventRequest != null) {
+                        try {
+                            viewModel.editEventVM(eventIDTextView.text.toString(), editEventRequest)
+                        } catch (e: Exception) {
+                            // Show toast message
+                            println(e.stackTrace)
                             Toast.makeText(requireContext(), requireContext().getString(R.string.error_registro_evento), Toast.LENGTH_SHORT).show()
                         }
+                    }
+                    else {
+                        Toast.makeText(requireContext(), requireContext().getString(R.string.error_registro_evento), Toast.LENGTH_SHORT).show()
                     }
                 }
             } else {
