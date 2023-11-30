@@ -21,11 +21,6 @@ import com.example.hive.model.room.entities.User
 import com.example.hive.util.ConnectionLiveData
 import com.example.hive.util.Resource
 import com.example.hive.viewmodel.*
-import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.Job
-import kotlinx.coroutines.launch
-import okhttp3.internal.wait
 
 class UserProfileFragment : Fragment() {
 
@@ -263,6 +258,13 @@ class UserProfileFragment : Fragment() {
                         }
                     }
                 })
+
+                val buttonEstadisticas = view?.findViewById<Button>(R.id.EstadisticasButton)
+                buttonEstadisticas?.setOnClickListener {
+                    val activity = getActivity() as MainActivity
+                    val fragment = EstadisticsFragment()
+                    activity.replaceFragment(fragment)
+                }
 
                 val buttonSignOut = view?.findViewById<Button>(R.id.signOutButton)
 

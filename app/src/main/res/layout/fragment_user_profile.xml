@@ -154,13 +154,23 @@
                     android:textSize="18sp" />
             </LinearLayout>
         </androidx.cardview.widget.CardView>
-
+        <Button
+            android:id="@+id/EstadisticasButton"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Estadisticas"
+            app:layout_constraintTop_toBottomOf="@+id/profileCard"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            android:layout_marginTop="20dp"
+            android:backgroundTint="@color/blueButtonColor"
+            />
         <Button
             android:id="@+id/signOutButton"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:text="Cerrar Sesión"
-            app:layout_constraintTop_toBottomOf="@+id/profileCard"
+            app:layout_constraintTop_toBottomOf="@+id/EstadisticasButton"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintEnd_toEndOf="parent"
             android:layout_marginTop="20dp"

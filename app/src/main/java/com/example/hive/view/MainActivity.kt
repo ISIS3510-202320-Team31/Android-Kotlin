@@ -207,7 +207,7 @@ class MainActivity : AppCompatActivity() {
         sessionManager.saveDatabase(false)
     }
 
-    private fun replaceFragment(fragment: Fragment) {
+    fun replaceFragment(fragment: Fragment) {
         if (fragment != null) {
             val transaction = supportFragmentManager.beginTransaction()
             transaction.replace(R.id.fragment_container, fragment)
