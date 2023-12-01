@@ -72,6 +72,7 @@
     <string name="sign_up_empty">Error al registrar usuario, ningún campo puede estar vacío</string>
     <string name="sign_up_success">Usuario registrado correctamente</string>
     <string name="sign_up_user_exists">El usuario ya existe</string>
+    <string name="top_creators_error">No hay datos guardados, revisa la conexión a internet...</string>
 
     <!-- STRINGS PROFILE -->
     <string name="profile_time_horas">horas</string>

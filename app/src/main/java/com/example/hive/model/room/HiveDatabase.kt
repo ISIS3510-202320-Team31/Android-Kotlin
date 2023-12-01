@@ -17,7 +17,7 @@ import com.example.hive.model.room.daos.*
 import com.example.hive.model.room.entities.*
 
 
-@Database(entities = arrayOf(User::class, Event::class, EventActivities::class, EventHistorical::class, EventUser::class), version = 7, exportSchema = false)
+@Database(entities = arrayOf(User::class, Event::class, EventActivities::class, EventHistorical::class, EventUser::class, TopCreators::class), version = 8, exportSchema = false)
 @TypeConverters(Converters::class)
 abstract class HiveDatabase : RoomDatabase() {
     abstract fun userDao(): UserDao
@@ -25,6 +25,7 @@ abstract class HiveDatabase : RoomDatabase() {
     abstract fun eventActivitiesDao(): EventActivitiesDao
     abstract fun eventHistoricalDao(): EventHistoricalDao
     abstract fun eventUserDao(): EventUserDao
+    abstract fun topCreatorsDao(): TopCreatorsDao
 
     companion object {
         private const val Database_NAME = "hive.db"
