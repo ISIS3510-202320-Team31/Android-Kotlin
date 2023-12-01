@@ -83,7 +83,7 @@
                         android:id="@+id/titleTextViewListPartners"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
-                        android:text="Personas que más asisten a mis eventos"
+                        android:text= "@string/top_partners_tittle"
                         android:textSize="15sp"
                         android:textStyle="bold"
                         android:textColor="@android:color/black"

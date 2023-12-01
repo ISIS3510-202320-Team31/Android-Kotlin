@@ -44,6 +44,8 @@ class UserProfileFragment : Fragment() {
         savedInstanceState: Bundle?
     ): View? {
         val view =  inflater.inflate(R.layout.fragment_user_profile, container, false)
+        val loadingProgressBar = view?.findViewById<ProgressBar>(R.id.loadingProgressBarProfile)
+        loadingProgressBar?.visibility = View.INVISIBLE
 
         val userSession = SessionManager(requireContext())
         user = userSession.getUserSession()
@@ -78,6 +80,7 @@ class UserProfileFragment : Fragment() {
         viewModelUserProfileOffline.allUsers?.observe(viewLifecycleOwner, Observer { resource ->
             val list = mutableListOf<UserCacheResponse>()
             resource.let {
+
                 println("resource: $it")
                 for (user in it){
                     val userToAdd = UserCacheResponse(
@@ -115,12 +118,19 @@ class UserProfileFragment : Fragment() {
                 }
             }
         })
+
+        val buttonEstadisticas = view?.findViewById<Button>(R.id.EstadisticasButton)
+        buttonEstadisticas?.setOnClickListener {
+            val activity = getActivity() as MainActivity
+            val fragment = EstadisticsFragment()
+            activity.replaceFragment(fragment)
+        }
+
         return view
     }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
-
         val loadingProgressBar = view?.findViewById<ProgressBar>(R.id.loadingProgressBarProfile)
         connectionLiveData = ConnectionLiveData(requireContext())
         val swipeRefreshLayout: SwipeRefreshLayout = view?.findViewById(R.id.swipeRefreshLayoutProfile)!!
@@ -272,6 +282,8 @@ class UserProfileFragment : Fragment() {
                     sessionManager = SessionManager(requireContext())
                     sessionManager.clearSession()
                     viewModelUserProfileOffline.removeUserDatabase()
+                    viewModelUserProfileOffline.removeCategoryDatabase()
+                    viewModelUserProfileOffline.removeTopPartnersDatabase()
                     viewModelEventListOffline.removeEventDatabase()
                     val intent = Intent(requireContext(), LoginActivity::class.java)
                     intent.flags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TASK // Clear the back stack

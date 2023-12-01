@@ -54,5 +54,5 @@ interface ApiInterface {
 
     //Top Partners
     @GET("users/{userId}/partners")
-    suspend fun getTopPartners(@Path("userId") userId: String): Response<List<TopPartnersResponse>>
+    suspend fun getTopPartners(@Path("userId") userId: String): List<String>
 }

@@ -27,7 +27,7 @@ class UserProfileViewModel(private val sessionManager: SessionManager, private v
     val categoryChart: MutableLiveData<Resource<List<CategoryResponse>>> = MutableLiveData()
 
     //Top Partners
-    val topPartners: MutableLiveData<Resource<List<TopPartnersResponse>>> = MutableLiveData()
+    val topPartners: MutableLiveData<Resource<List<String>>> = MutableLiveData()
 
     //LiveData for time usage
     private val _elapsedTimeLiveData = MutableLiveData<Long>()
@@ -83,13 +83,8 @@ class UserProfileViewModel(private val sessionManager: SessionManager, private v
         _elapsedTimeLiveData.value = sessionManager.getElapsedTime()
     }
 
-    private fun handleResponseTopPartners(response: Response<List<TopPartnersResponse>>): Resource<List<TopPartnersResponse>> {
-        if (response.isSuccessful) {
-            response.body()?.let { resultResponse ->
-                return Resource.Success(resultResponse)
-            }
-        }
-        return Resource.Error(response.message())
+    private fun handleResponseTopPartners(response: List<String>): Resource<List<String>> {
+        return Resource.Success(response)
     }
 
     private fun handleResponseCategoryChart(response: Response<List<CategoryResponse>>): Resource<List<CategoryResponse>> {

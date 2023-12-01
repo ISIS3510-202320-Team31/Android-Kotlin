@@ -6,6 +6,7 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.asLiveData
 import androidx.lifecycle.viewModelScope
 import com.example.hive.model.repository.UserRepository
+import com.example.hive.model.room.daos.TopPartnersDao
 import com.example.hive.model.room.entities.CategoryChart
 import com.example.hive.model.room.entities.TopPartners
 import com.example.hive.model.room.entities.User
@@ -18,7 +19,6 @@ class UserProfileOfflineViewModel(private val context: Context): ViewModel() {
     val allUsers: LiveData<List<User>>? = repository.allUsers?.asLiveData()
     val allCategories: LiveData<List<CategoryChart>>? = repository.allCategories?.asLiveData()
     val allTopPartners: LiveData<List<TopPartners>>? = repository.allTopPartners?.asLiveData()
-    suspend fun getUserById(id: String): LiveData<User>? = repository.findUserById(id)?.asLiveData()
 
     //CATEGORY
     fun insertCategory(category: CategoryChart) = viewModelScope.launch(Dispatchers.IO) {

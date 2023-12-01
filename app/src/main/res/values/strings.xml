@@ -89,4 +89,8 @@
     <!-- STRINGS NUMBER OF EVENTS -->
     <string name="number_of_events">Número de eventos:</string>
 
+    <!-- STRINGS ESTADISTICS -->
+    <string name="top_partners_error_data">No hay datos guardados, revisa la conexión a internet...</string>
+    <string name="top_partners_tittle">Estas son las personas con las que más coincides en los eventos </string>
+
 </resources>

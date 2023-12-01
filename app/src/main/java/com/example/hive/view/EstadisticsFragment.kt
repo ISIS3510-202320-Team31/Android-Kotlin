@@ -1,7 +1,10 @@
 package com.example.hive.view
 
+import PartnerNamesAdapter
 import android.graphics.Color
 import android.os.Bundle
+import android.telephony.mbms.StreamingServiceInfo
+import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -12,7 +15,6 @@ import androidx.lifecycle.ViewModelProvider
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.example.hive.R
-import com.example.hive.model.adapters.PartnerNamesAdapter
 import com.example.hive.model.adapters.SessionManager
 import com.example.hive.model.models.UserSession
 import com.example.hive.model.network.responses.CategoryResponse
@@ -21,10 +23,7 @@ import com.example.hive.model.room.entities.CategoryChart
 import com.example.hive.model.room.entities.TopPartners
 import com.example.hive.util.ConnectionLiveData
 import com.example.hive.util.Resource
-import com.example.hive.viewmodel.UserProfileOfflineViewModel
-import com.example.hive.viewmodel.UserProfileOfflineViewModelProviderFactory
-import com.example.hive.viewmodel.UserProfileViewModel
-import com.example.hive.viewmodel.UserProfileViewModelProviderFactory
+import com.example.hive.viewmodel.*
 import com.github.mikephil.charting.animation.Easing
 import com.github.mikephil.charting.charts.PieChart
 import com.github.mikephil.charting.data.PieData
@@ -97,31 +96,47 @@ class EstadisticsFragment : Fragment() {
         viewModelUserProfileOffline.allTopPartners?.observe(viewLifecycleOwner, Observer { resource ->
             val list = mutableListOf<TopPartnersResponse>()
             resource.let {
+                println("resource: $it")
                 for (topPartner in it){
                     val topPartnerToAdd = TopPartnersResponse(
                         topPartner.top?: emptyList(),
                     )
                     list.add(topPartnerToAdd)
                 }
-                val names = list.map { it.top }.flatten()
-
-                namesAdapter.submitList(names)
+                if (list.isNotEmpty()){
+                    val names = list[0].top
+                    namesAdapter.submitList(names)
+                }
+                else {
+                    val name = listOf(getString(R.string.top_partners_error_data))
+                    namesAdapter.submitList(name)
+                }
             }
         })
-
         return view
     }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
-        connectionLiveData = ConnectionLiveData(requireContext())
 
+        sessionManager = SessionManager(requireContext())
+        connectionLiveData = ConnectionLiveData(requireContext())
         connectionLiveData.observe(viewLifecycleOwner, Observer { isConnected ->
             if (isConnected){
 
-                sessionManager = SessionManager(requireContext())
-                val viewModelFactory = sessionManager?.let{ UserProfileViewModelProviderFactory(it,requireContext()) }
-                viewModel = ViewModelProvider(this, viewModelFactory!!).get(UserProfileViewModel::class.java)
+                val viewModelFactory = context?.let{
+                    UserProfileViewModelProviderFactory(
+                        SessionManager(requireContext()),
+                        it
+                    )
+                }
+
+                viewModel = viewModelFactory?.let {
+                    ViewModelProvider(
+                        this,
+                        it
+                    ).get(UserProfileViewModel::class.java)
+                }!!
 
                 //update user detail
                 viewModel.categoryChart.observe(viewLifecycleOwner, Observer { resourceCategoryChart ->
@@ -158,20 +173,20 @@ class EstadisticsFragment : Fragment() {
                         }
 
                         is Resource.Success<*> -> {
+                            //Update the recyclerView with the list of names of top partners
+                            resourceTopPartner.data?.let {
+                                namesAdapter.submitList(it)
+                            }
+
                             viewModelUserProfileOffline.removeTopPartnersDatabase()
 
-                            resourceTopPartner.data?.forEach { topPartner ->
-                                val topPartnerToAdd = TopPartners(
-                                    sessionManager.getUserSession().userId?:"",
-                                    topPartner.top?: emptyList(),
+                            val topPartnersToAdd = user.userId?.let { user_id ->
+                                TopPartners (
+                                    user_id,
+                                    resourceTopPartner.data
                                 )
-                                viewModelUserProfileOffline.insertTopPartner(topPartnerToAdd)
                             }
-                            val topPartnersTotal = resourceTopPartner.data as List<TopPartnersResponse>
-                            val names = topPartnersTotal.map { it.top }.flatten()
-
-
-                            namesAdapter.submitList(names)
+                            viewModelUserProfileOffline.insertTopPartner(topPartnersToAdd!!)
 
                         }
                         is Resource.Error<*> -> {
