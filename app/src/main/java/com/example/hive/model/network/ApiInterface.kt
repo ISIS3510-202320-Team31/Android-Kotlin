@@ -51,4 +51,7 @@ interface ApiInterface {
 
     @GET("/events/users/{userId}/createdby/")
     suspend fun getEventsCreatedBy(@Path("userId") userId: String): Response<List<EventResponse>>
+
+    @GET("/top_creators/")
+    suspend fun getTopCreators(): Response<List<TopCreatorsResponse>>
 }
