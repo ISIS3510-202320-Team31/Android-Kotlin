@@ -21,7 +21,7 @@ class LoginActivity : AppCompatActivity() {
     private lateinit var viewModel: LoginViewModel
 
     companion object {
-        val formProgressCache = FormProgressCache<String, formDataLogIn>(3)
+        val formProgressCache = FormProgressCache<String, formDataLogIn>(4)
     }
 
     data class formDataLogIn(val username: String,

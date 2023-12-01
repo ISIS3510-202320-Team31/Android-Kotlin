@@ -19,7 +19,7 @@ class SignUpActivity : AppCompatActivity() {
     private lateinit var viewModelFactory: SignUpViewModelProviderFactory
 
     companion object {
-        val formProgressCache = FormProgressCache<String, formDataSingUp>(3)
+        val formProgressCache = FormProgressCache<String, formDataSingUp>(4)
     }
 
     data class formDataSingUp(val name: String,

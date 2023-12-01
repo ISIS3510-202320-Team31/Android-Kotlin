@@ -1,6 +1,7 @@
 package com.example.hive.model.network
 
 import com.example.hive.model.network.requests.CreateEventRequest
+import com.example.hive.model.network.requests.EditEventRequest
 import com.example.hive.model.network.requests.LoginRequest
 import com.example.hive.model.network.requests.RegisterRequest
 import com.example.hive.model.network.responses.*
@@ -32,6 +33,9 @@ interface ApiInterface {
 
     @POST("/events/")
     suspend fun createEvent(@Body createEventRequest: CreateEventRequest): Response<CreateEventResponse>
+
+    @PUT("/events/edit/{id}/")
+    suspend fun editEvent(@Path("id") id: String, @Body editEventRequest: EditEventRequest): Response<EditEventResponse>
 
     @POST("/events/date/{date}/")
     suspend fun getEventsByDate(@Path("date") date: String): Response<List<EventResponse>>
