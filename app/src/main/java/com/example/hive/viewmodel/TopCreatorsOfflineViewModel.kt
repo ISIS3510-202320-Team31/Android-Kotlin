@@ -18,11 +18,11 @@ class TopCreatorsOfflineViewModel(private val context: Context) : ViewModel() {
     val repository = UserRepository(context)
     val allTopCreators: LiveData<List<TopCreators>>? = repository.allTopCreators?.asLiveData()
 
-    fun insertToDatabase(topCreators: List<TopCreators>) = viewModelScope.launch(Dispatchers.IO) {
+    fun insertToDatabase(topCreators: List<TopCreators>) = viewModelScope.launch {
         repository.insertTopCreators(*topCreators.toTypedArray())
     }
 
-    fun removeTopCreatorsDatabase() = viewModelScope.launch(Dispatchers.IO) {
+    fun removeTopCreatorsDatabase() = viewModelScope.launch {
         repository.deleteAllTopCreators()
     }
 
