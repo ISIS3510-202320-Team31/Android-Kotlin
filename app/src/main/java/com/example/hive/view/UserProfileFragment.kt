@@ -130,23 +130,6 @@ class UserProfileFragment : Fragment() {
 
         beeView = view.findViewById(R.id.beeView)
 
-        // Inside onViewCreated, update the touch event handling
-        beeView.setOnTouchListener { _, event ->
-            when (event.action) {
-                MotionEvent.ACTION_DOWN -> {
-                    // Get the touch coordinates
-                    val x = event.x
-                    val y = event.y
-
-
-                    // Update the UI on the main thread using Coroutines
-                    beeView.setBeePosition(x, y)
-                    return@setOnTouchListener true
-                }
-            }
-            return@setOnTouchListener false
-        }
-
         val loadingProgressBar = view?.findViewById<ProgressBar>(R.id.loadingProgressBarProfile)
         connectionLiveData = ConnectionLiveData(requireContext())
         val swipeRefreshLayout: SwipeRefreshLayout = view?.findViewById(R.id.swipeRefreshLayoutProfile)!!
