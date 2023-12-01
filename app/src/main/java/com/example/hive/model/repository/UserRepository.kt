@@ -8,6 +8,8 @@ import com.example.hive.model.network.requests.RegisterRequest
 import com.example.hive.model.room.HiveDatabase
 import com.example.hive.model.room.entities.CategoryChart
 import com.example.hive.model.room.entities.TopPartners
+import com.example.hive.model.room.entities.Event
+import com.example.hive.model.room.entities.TopCreators
 import com.example.hive.model.room.entities.User
 import kotlinx.coroutines.flow.Flow
 
@@ -17,11 +19,24 @@ class UserRepository(context: Context) {
     private val userDao = hiveDatabase?.userDao()
     private val categoryDao = hiveDatabase?.categoryChartDao()
     private val topPartnersDao = hiveDatabase?.topPartnersDao()
+    private val topCreatorsDao = hiveDatabase?.topCreatorsDao()
 
     //Room
     val allUsers: Flow<List<User>>? = userDao?.getAll()
     val allCategories: Flow<List<CategoryChart>>? = categoryDao?.getAll()
     val allTopPartners: Flow<List<TopPartners>>? = topPartnersDao?.getAll()
+
+    // Top Creators
+    val allTopCreators: Flow<List<TopCreators>>? = topCreatorsDao?.getAll()
+
+    //TOP CREATORS
+    @Suppress("RedundantSuspendModifier")
+    @WorkerThread
+    suspend fun insertTopCreators(vararg topCreators: TopCreators) = topCreatorsDao?.insertAll(*topCreators)
+
+    @Suppress("RedundantSuspendModifier")
+    @WorkerThread
+    suspend fun deleteAllTopCreators() = topCreatorsDao?.deleteAll()
 
     //USER
     @Suppress("RedundantSuspendModifier")
@@ -59,6 +74,7 @@ class UserRepository(context: Context) {
     suspend fun loginR(loginRequest: LoginRequest) = RetroFitInstance.api.loginUser(loginRequest)
     suspend fun getParticipationR(user_id: String) = RetroFitInstance.api.getParticipation(user_id)
     suspend fun getUserByIdR(user_id: String) = RetroFitInstance.api.getUserById(user_id)
+    suspend fun getTopCreatorsR() = RetroFitInstance.api.getTopCreators()
 
     //Category
     suspend fun getCategoriesR(user_id: String) = RetroFitInstance.api.getCategories(user_id)

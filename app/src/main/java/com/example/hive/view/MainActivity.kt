@@ -147,6 +147,10 @@ class MainActivity : AppCompatActivity() {
                     replaceFragment(CalendarFragment())
                     true
                 }
+                R.id.ic_topCreadores -> {
+                    replaceFragment(TopCreatorsFragment())
+                    true
+                }
                 R.id.ic_profile -> {
                     replaceFragment(UserProfileFragment())
                     true
