@@ -17,6 +17,7 @@ class UserProfileOfflineViewModel(private val context: Context): ViewModel() {
     val repository = UserRepository(context)
     val allUsers: LiveData<List<User>>? = repository.allUsers?.asLiveData()
     val allCategories: LiveData<List<CategoryChart>>? = repository.allCategories?.asLiveData()
+    val allTopPartners: LiveData<List<TopPartners>>? = repository.allTopPartners?.asLiveData()
     suspend fun getUserById(id: String): LiveData<User>? = repository.findUserById(id)?.asLiveData()
 
     //CATEGORY

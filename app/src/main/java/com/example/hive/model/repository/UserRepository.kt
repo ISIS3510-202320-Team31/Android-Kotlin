@@ -21,6 +21,7 @@ class UserRepository(context: Context) {
     //Room
     val allUsers: Flow<List<User>>? = userDao?.getAll()
     val allCategories: Flow<List<CategoryChart>>? = categoryDao?.getAll()
+    val allTopPartners: Flow<List<TopPartners>>? = topPartnersDao?.getAll()
 
     //USER
     @Suppress("RedundantSuspendModifier")

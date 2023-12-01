@@ -16,7 +16,9 @@ import com.example.hive.model.adapters.PartnerNamesAdapter
 import com.example.hive.model.adapters.SessionManager
 import com.example.hive.model.models.UserSession
 import com.example.hive.model.network.responses.CategoryResponse
+import com.example.hive.model.network.responses.TopPartnersResponse
 import com.example.hive.model.room.entities.CategoryChart
+import com.example.hive.model.room.entities.TopPartners
 import com.example.hive.util.ConnectionLiveData
 import com.example.hive.util.Resource
 import com.example.hive.viewmodel.UserProfileOfflineViewModel
@@ -58,6 +60,14 @@ class EstadisticsFragment : Fragment() {
             )
         }
 
+        //inicializa el recycler view
+        namesRecyclerView = view.findViewById(R.id.namesRecyclerView)
+        namesAdapter = PartnerNamesAdapter()
+
+        // Configurar el RecyclerView con un LinearLayoutManager y el Adapter
+        namesRecyclerView.layoutManager = LinearLayoutManager(context)
+        namesRecyclerView.adapter = namesAdapter
+
         viewModelUserProfileOffline =
             viewModelFactoryOffline?.let{
                 ViewModelProvider(this,
@@ -81,19 +91,21 @@ class EstadisticsFragment : Fragment() {
                 val values = list.map { it.value }
                 val colors = list.map { it.color }
                 setupPieChart(categories, values, colors)
+            }
+        })
 
-                //inicializa el recycler view
-                namesRecyclerView = view.findViewById(R.id.namesRecyclerView)
-                namesAdapter = PartnerNamesAdapter()
+        viewModelUserProfileOffline.allTopPartners?.observe(viewLifecycleOwner, Observer { resource ->
+            val list = mutableListOf<TopPartnersResponse>()
+            resource.let {
+                for (topPartner in it){
+                    val topPartnerToAdd = TopPartnersResponse(
+                        topPartner.top?: emptyList(),
+                    )
+                    list.add(topPartnerToAdd)
+                }
+                val names = list.map { it.top }.flatten()
 
-                // Configurar el RecyclerView con un LinearLayoutManager y el Adapter
-                namesRecyclerView.layoutManager = LinearLayoutManager(context)
-                namesRecyclerView.adapter = namesAdapter
-
-                // Simulación de datos
-                val samplesNames = listOf("Laura Valentina Martinez Presa", "Darwin Esteban Aguilar Figueroa", "Cristopher Arturo Sandino Ordoñez")
-                namesAdapter.submitList(samplesNames)
-
+                namesAdapter.submitList(names)
             }
         })
 
@@ -139,6 +151,34 @@ class EstadisticsFragment : Fragment() {
                         }
                     }
                 })
+
+                viewModel.topPartners.observe(viewLifecycleOwner, Observer { resourceTopPartner ->
+                    when (resourceTopPartner){
+                        is Resource.Loading<*> -> {
+                        }
+
+                        is Resource.Success<*> -> {
+                            viewModelUserProfileOffline.removeTopPartnersDatabase()
+
+                            resourceTopPartner.data?.forEach { topPartner ->
+                                val topPartnerToAdd = TopPartners(
+                                    sessionManager.getUserSession().userId?:"",
+                                    topPartner.top?: emptyList(),
+                                )
+                                viewModelUserProfileOffline.insertTopPartner(topPartnerToAdd)
+                            }
+                            val topPartnersTotal = resourceTopPartner.data as List<TopPartnersResponse>
+                            val names = topPartnersTotal.map { it.top }.flatten()
+
+
+                            namesAdapter.submitList(names)
+
+                        }
+                        is Resource.Error<*> -> {
+                        }
+                    }
+                })
+
             } else {
                 Toast.makeText(requireContext(), getString(R.string.no_internet), Toast.LENGTH_SHORT).show()
             }
