@@ -94,4 +94,7 @@
     <string name="top_partners_error_data">No hay datos guardados, revisa la conexión a internet...</string>
     <string name="top_partners_tittle">Estas son las personas con las que más coincides en los eventos </string>
 
+    <!-- STRINGS SPINNER FILTE BY CATEGORY -->
+    <string name="filter_by_category">Filtrar eventos por categoría</string>
+
 </resources>

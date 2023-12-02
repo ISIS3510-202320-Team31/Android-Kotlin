@@ -176,11 +176,18 @@ class HomePageFragment : Fragment() {
                             if (loadingProgressBar != null) {
                                 loadingProgressBar.visibility = View.VISIBLE
                             }
+
+                            // Disable swipeRefreshLayout because it is refreshing
+                            swipeRefreshLayout.isEnabled = false
                         }
                         is Resource.Success<*> -> {
                             if (loadingProgressBar != null) {
                                 loadingProgressBar.visibility = View.GONE
                             }
+
+                            // Enable swipeRefreshLayout because it is not refreshing
+                            swipeRefreshLayout.isEnabled = true
+
                             // Update the RecyclerView with the list of events
                             resource.data?.let {
                                 // Filter the list for only the ones with date of today and after
