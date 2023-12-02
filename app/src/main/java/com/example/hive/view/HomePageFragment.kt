@@ -529,13 +529,30 @@ class HomePageFragment : Fragment() {
     }
 
     private fun filterEventsByCategory(category: String, listEvents: List<EventResponse>) {
+        var category_checked = category
+
+        if (category == "Académico") {
+            category_checked = "ACADEMIC"
+        }
+        else if (category == "Deportivo") {
+            category_checked = "SPORTS"
+        }
+        else if (category == "Cultural") {
+            category_checked = "CULTURAL"
+        }
+        else if (category == "Entretenimiento") {
+            category_checked = "ENTERTAINMENT"
+        }
+        else if (category == "Otros") {
+            category_checked = "OTHER"
+        }
 
         // Filtra la lista según la categoría seleccionada
-        val filteredList = if (category == "Todos") {
+        val filteredList = if (category_checked == "Todos") {
             listEvents
         } else {
             listEvents?.filter { event ->
-                event.category == category
+                event.category == category_checked
             }
         }
 
