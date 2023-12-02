@@ -1,7 +1,6 @@
 package com.example.hive.view
 
 import android.app.Dialog
-import android.content.Context
 import android.content.Intent
 import android.graphics.Bitmap
 import android.os.Bundle
@@ -9,11 +8,9 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.*
-import androidx.appcompat.app.AppCompatActivity
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProvider
-import androidx.lifecycle.lifecycleScope
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import androidx.swiperefreshlayout.widget.SwipeRefreshLayout
@@ -22,7 +19,6 @@ import com.example.hive.model.adapters.EventsAdapter
 import com.example.hive.model.adapters.SessionManager
 import com.example.hive.model.models.UserSession
 import com.example.hive.model.network.responses.EventResponse
-import com.example.hive.model.repository.EventRepository
 import com.example.hive.model.room.entities.Event
 import com.example.hive.util.ConnectionLiveData
 import com.example.hive.util.Resource
@@ -33,7 +29,6 @@ import com.google.zxing.integration.android.IntentIntegrator
 import com.google.zxing.qrcode.QRCodeWriter
 import com.google.zxing.qrcode.decoder.ErrorCorrectionLevel
 import com.squareup.picasso.Picasso
-import kotlinx.coroutines.launch
 import java.text.SimpleDateFormat
 import java.util.*
 
@@ -62,6 +57,13 @@ class HomePageFragment : Fragment() {
         val swipeRefreshLayout: SwipeRefreshLayout = view?.findViewById(R.id.swipeRefreshLayout)!!
         swipeRefreshLayout.isRefreshing = false;
         swipeRefreshLayout.isEnabled = false;
+
+        //Configuration of the spinner
+        val spinnerFilterCategory = view?.findViewById<Spinner>(R.id.spinnerFilterCategory)
+        val categories = resources.getStringArray(R.array.filterEventsByCategory)
+        val adapter = ArrayAdapter(requireContext(), android.R.layout.simple_spinner_item, categories)
+        adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item)
+        spinnerFilterCategory?.adapter = adapter
 
         val userSession = SessionManager(requireContext())
         user = userSession.getUserSession()
@@ -142,8 +144,19 @@ class HomePageFragment : Fragment() {
                         list.add(eventToAdd)
                     }
 
-                    eventsAdapter.submitList(list) }
-                })
+
+                    spinnerFilterCategory?.onItemSelectedListener = object : AdapterView.OnItemSelectedListener {
+                        override fun onItemSelected(parent: AdapterView<*>?, view: View?, position: Int, id: Long) {
+                            // Cuando se selecciona un elemento del Spinner, filtra la lista de eventos
+                            filterEventsByCategory(categories[position], list)
+                        }
+
+                        override fun onNothingSelected(parent: AdapterView<*>?) {
+                           filterEventsByCategory("Todos", list)
+                        }
+                    }
+                }
+        })
         return view
     }
 
@@ -153,6 +166,14 @@ class HomePageFragment : Fragment() {
         val loadingProgressBar = view?.findViewById<ProgressBar>(R.id.loadingProgressBar)
         connectionLiveData = ConnectionLiveData(requireContext())
         val swipeRefreshLayout: SwipeRefreshLayout = view?.findViewById(R.id.swipeRefreshLayout)!!
+
+        //Configuration of the spinner
+        val spinnerFilterCategory = view?.findViewById<Spinner>(R.id.spinnerFilterCategory)
+        val categories = resources.getStringArray(R.array.filterEventsByCategory)
+        val adapter = ArrayAdapter(requireContext(), android.R.layout.simple_spinner_item, categories)
+        adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item)
+        spinnerFilterCategory?.adapter = adapter
+
         connectionLiveData.observe(viewLifecycleOwner, Observer { isConnected ->
             if (isConnected) {
                 // Refresh fragment
@@ -176,11 +197,18 @@ class HomePageFragment : Fragment() {
                             if (loadingProgressBar != null) {
                                 loadingProgressBar.visibility = View.VISIBLE
                             }
+
+                            // Disable swipeRefreshLayout because it is refreshing
+                            swipeRefreshLayout.isEnabled = false
                         }
                         is Resource.Success<*> -> {
                             if (loadingProgressBar != null) {
                                 loadingProgressBar.visibility = View.GONE
                             }
+
+                            // Enable swipeRefreshLayout because it is not refreshing
+                            swipeRefreshLayout.isEnabled = true
+
                             // Update the RecyclerView with the list of events
                             resource.data?.let {
                                 // Filter the list for only the ones with date of today and after
@@ -194,7 +222,18 @@ class HomePageFragment : Fragment() {
                                     eventDate.get(Calendar.DAY_OF_YEAR) >= today.get(Calendar.DAY_OF_YEAR)
                                 }
 
-                                eventsAdapter.submitList(filteredList) }
+                                spinnerFilterCategory?.onItemSelectedListener = object : AdapterView.OnItemSelectedListener {
+                                    override fun onItemSelected(parent: AdapterView<*>?, view: View?, position: Int, id: Long) {
+                                        // Cuando se selecciona un elemento del Spinner, filtra la lista de eventos
+                                        filterEventsByCategory(categories[position], filteredList)
+                                    }
+
+                                    override fun onNothingSelected(parent: AdapterView<*>?) {
+                                        filterEventsByCategory("Todos", filteredList)
+                                    }
+                                }
+
+                            }
 
                             viewModelEventListOffline.removeEventDatabase()
 
@@ -228,6 +267,7 @@ class HomePageFragment : Fragment() {
 
             } else {
                 swipeRefreshLayout.isEnabled = false
+                loadingProgressBar?.visibility = View.GONE
                 Toast.makeText(requireContext(), getString(R.string.no_internet), Toast.LENGTH_SHORT).show()
             }
         })
@@ -486,6 +526,31 @@ class HomePageFragment : Fragment() {
                 Toast.makeText(requireContext(), getString(R.string.no_internet), Toast.LENGTH_SHORT).show()
             }
         })
+    }
+
+    private fun filterEventsByCategory(category: String, listEvents: List<EventResponse>) {
+
+        // Filtra la lista según la categoría seleccionada
+        val filteredList = if (category == "Todos") {
+            listEvents
+        } else {
+            listEvents?.filter { event ->
+                event.category == category
+            }
+        }
+
+        val noEventsTextView = view?.findViewById<TextView>(R.id.noEventsTextView)
+
+        if (filteredList.isEmpty()) {
+            eventsAdapter.submitList(filteredList)
+            // Si no hay eventos de esa categoría, muestra un mensaje
+            noEventsTextView?.visibility = View.VISIBLE
+            noEventsTextView?.text = getString(R.string.no_events_category)
+
+        } else {
+            noEventsTextView?.visibility = View.GONE
+            eventsAdapter.submitList(filteredList)
+        }
     }
 
 }
