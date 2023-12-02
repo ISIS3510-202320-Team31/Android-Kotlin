@@ -10,6 +10,9 @@ import android.view.GestureDetector
 import android.view.MotionEvent
 import android.view.View
 import com.example.hive.R
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.GlobalScope
+import kotlinx.coroutines.launch
 
 
 class BeeView(context: Context, attrs: AttributeSet? = null) : View(context, attrs) {
@@ -23,7 +26,7 @@ class BeeView(context: Context, attrs: AttributeSet? = null) : View(context, att
         beeBitmap = Bitmap.createScaledBitmap(originalBitmap, 80, 80, false)
     }
 
-    fun setBeePosition(x: Float, y: Float) {
+    private fun setBeePosition(x: Float, y: Float) {
         beeX = x
         beeY = y
         invalidate() // Redraw the view
@@ -34,19 +37,18 @@ class BeeView(context: Context, attrs: AttributeSet? = null) : View(context, att
         val y = event.y
 
         when (event.action) {
-            MotionEvent.ACTION_DOWN -> {
-                setBeePosition(x, y)
-                return true // Consume the touch event
-            }
-            MotionEvent.ACTION_MOVE -> {
-                setBeePosition(x, y)
+            MotionEvent.ACTION_DOWN, MotionEvent.ACTION_MOVE -> {
+                // Use GlobalScope.launch to launch coroutine on the main thread
+                GlobalScope.launch(Dispatchers.Main) {
+                    setBeePosition(x, y)
+                }
                 return true // Consume the touch event
             }
             MotionEvent.ACTION_UP -> {
                 return false
             }
         }
-        return false
+        return true
     }
 
     override fun onDraw(canvas: Canvas) {
