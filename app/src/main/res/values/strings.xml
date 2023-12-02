@@ -96,5 +96,6 @@
 
     <!-- STRINGS SPINNER FILTE BY CATEGORY -->
     <string name="filter_by_category">Filtrar eventos por categoría</string>
+    <string name="no_events_category">No hay eventos en esta categoría</string>
 
 </resources>
