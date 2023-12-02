@@ -155,11 +155,13 @@ class UserProfileFragment : Fragment() {
                 isBeeOnScreen = false
                 swipeRefreshLayout.isEnabled = true
                 customScrollView.setScrollingEnabled(true)
+                Toast.makeText(context, "Adios abejita!", Toast.LENGTH_SHORT).show()
             }else{
                 beeView.visibility = View.VISIBLE
                 isBeeOnScreen = true
                 swipeRefreshLayout.isEnabled = false
                 customScrollView.setScrollingEnabled(false)
+                Toast.makeText(context, "Hola abejita!", Toast.LENGTH_SHORT).show()
             }
         }
 
@@ -312,7 +314,10 @@ class UserProfileFragment : Fragment() {
                     viewModelUserProfileOffline.removeUserDatabase()
                     viewModelUserProfileOffline.removeCategoryDatabase()
                     viewModelUserProfileOffline.removeTopPartnersDatabase()
+                    viewModelEventListOffline.removeEventCreadosDatabase()
                     viewModelEventListOffline.removeEventDatabase()
+                    viewModelEventListOffline.removeEventActivitiesDatabase()
+                    viewModelEventListOffline.removeEventHistoricalDatabase()
                     val intent = Intent(requireContext(), LoginActivity::class.java)
                     intent.flags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TASK // Clear the back stack
                     startActivity(intent)
