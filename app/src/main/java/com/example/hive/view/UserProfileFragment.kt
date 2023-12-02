@@ -23,11 +23,6 @@ import com.example.hive.model.room.entities.User
 import com.example.hive.util.ConnectionLiveData
 import com.example.hive.util.Resource
 import com.example.hive.viewmodel.*
-import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.Job
-import kotlinx.coroutines.launch
-import okhttp3.internal.wait
 
 class UserProfileFragment : Fragment() {
 
@@ -53,6 +48,8 @@ class UserProfileFragment : Fragment() {
         savedInstanceState: Bundle?
     ): View? {
         val view =  inflater.inflate(R.layout.fragment_user_profile, container, false)
+        val loadingProgressBar = view?.findViewById<ProgressBar>(R.id.loadingProgressBarProfile)
+        loadingProgressBar?.visibility = View.INVISIBLE
 
         sessionManager = SessionManager(requireContext())
         user = sessionManager.getUserSession()
@@ -87,6 +84,7 @@ class UserProfileFragment : Fragment() {
         viewModelUserProfileOffline.allUsers?.observe(viewLifecycleOwner, Observer { resource ->
             val list = mutableListOf<UserCacheResponse>()
             resource.let {
+
                 println("resource: $it")
                 for (user in it){
                     val userToAdd = UserCacheResponse(
@@ -124,6 +122,14 @@ class UserProfileFragment : Fragment() {
                 }
             }
         })
+
+        val buttonEstadisticas = view?.findViewById<Button>(R.id.EstadisticasButton)
+        buttonEstadisticas?.setOnClickListener {
+            val activity = getActivity() as MainActivity
+            val fragment = EstadisticsFragment()
+            activity.replaceFragment(fragment)
+        }
+
         return view
     }
 
@@ -289,6 +295,13 @@ class UserProfileFragment : Fragment() {
                     }
                 })
 
+                val buttonEstadisticas = view?.findViewById<Button>(R.id.EstadisticasButton)
+                buttonEstadisticas?.setOnClickListener {
+                    val activity = getActivity() as MainActivity
+                    val fragment = EstadisticsFragment()
+                    activity.replaceFragment(fragment)
+                }
+
                 val buttonSignOut = view?.findViewById<Button>(R.id.signOutButton)
 
                 buttonSignOut?.setOnClickListener {
@@ -297,6 +310,8 @@ class UserProfileFragment : Fragment() {
                     sessionManager.saveNotification(false)
                     sessionManager.saveElapsedTime(0)
                     viewModelUserProfileOffline.removeUserDatabase()
+                    viewModelUserProfileOffline.removeCategoryDatabase()
+                    viewModelUserProfileOffline.removeTopPartnersDatabase()
                     viewModelEventListOffline.removeEventDatabase()
                     val intent = Intent(requireContext(), LoginActivity::class.java)
                     intent.flags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TASK // Clear the back stack

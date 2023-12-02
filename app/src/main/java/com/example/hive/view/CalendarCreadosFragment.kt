@@ -7,7 +7,10 @@ import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import android.widget.*
+import android.widget.ImageView
+import android.widget.ProgressBar
+import android.widget.TextView
+import android.widget.Toast
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProvider
@@ -15,12 +18,9 @@ import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.example.hive.R
 import com.example.hive.model.adapters.CalendarCreadosAdapter
-import com.example.hive.model.adapters.CalendarHistoricalAdapter
 import com.example.hive.model.adapters.SessionManager
 import com.example.hive.model.models.UserSession
 import com.example.hive.model.network.responses.EventResponse
-import com.example.hive.model.room.entities.EventActivities
-import com.example.hive.model.room.entities.EventHistorical
 import com.example.hive.model.room.entities.EventUser
 import com.example.hive.util.ConnectionLiveData
 import com.example.hive.util.Resource
@@ -109,7 +109,7 @@ class CalendarCreadosFragment : Fragment() {
                     val formatter = SimpleDateFormat("yyyy-MM-dd")
                     val date = formatter.parse(event.date)
                     eventDate.time = date
-                    (eventDate.get(Calendar.DAY_OF_YEAR) <= today.get(Calendar.DAY_OF_YEAR) || eventDate.get(Calendar.YEAR) > today.get(Calendar.YEAR))
+                    (eventDate.get(Calendar.DAY_OF_YEAR) <= today.get(Calendar.DAY_OF_YEAR) || eventDate.get(Calendar.YEAR) >= today.get(Calendar.YEAR))
                 }
 
                 // Cast manually the list of events to the list of EventResponse
@@ -134,7 +134,6 @@ class CalendarCreadosFragment : Fragment() {
                 }
 
                 calendarCreadosAdapter.submitList(list)
-
                 // Update the number of events
                 numberOfEvents = list.size
 

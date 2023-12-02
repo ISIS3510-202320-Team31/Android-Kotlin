@@ -9,15 +9,18 @@ import android.content.pm.PackageManager
 import android.os.Build
 import android.os.Bundle
 import android.view.Menu
+import android.view.View
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.app.ActivityCompat
 import androidx.core.app.NotificationCompat
 import androidx.core.app.NotificationManagerCompat
 import androidx.core.content.ContextCompat
 import androidx.fragment.app.Fragment
+import androidx.lifecycle.Observer
 import com.example.hive.R
 import com.example.hive.databinding.ActivityMainBinding
 import com.example.hive.model.adapters.SessionManager
+import com.example.hive.util.ConnectionLiveData
 import com.example.hive.viewmodel.EventListViewModel
 import com.google.android.gms.location.FusedLocationProviderClient
 import com.google.android.gms.location.LocationServices
@@ -54,6 +57,8 @@ class MainActivity : AppCompatActivity() {
     companion object {
         private const val LOCATION_PERMISSION_REQUEST_CODE = 1
     }
+
+    private lateinit var connectionLiveData: ConnectionLiveData
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -142,6 +147,10 @@ class MainActivity : AppCompatActivity() {
                     replaceFragment(CalendarFragment())
                     true
                 }
+                R.id.ic_topCreadores -> {
+                    replaceFragment(TopCreatorsFragment())
+                    true
+                }
                 R.id.ic_profile -> {
                     replaceFragment(UserProfileFragment())
                     true
@@ -149,6 +158,17 @@ class MainActivity : AppCompatActivity() {
                 else -> false
             }
         }
+
+        connectionLiveData = ConnectionLiveData(this)
+        connectionLiveData.observe(this, Observer { isConnected ->
+            if (isConnected) {
+                binding.noInternetMessage.visibility = View.GONE
+            } else {
+                binding.noInternetMessage.visibility = View.VISIBLE
+                // Realiza acciones para manejar la falta de conexión
+            }
+        })
+
     }
 
     override fun onCreateOptionsMenu(menu: Menu): Boolean {
@@ -207,7 +227,7 @@ class MainActivity : AppCompatActivity() {
         sessionManager.saveDatabase(false)
     }
 
-    private fun replaceFragment(fragment: Fragment) {
+     fun replaceFragment(fragment: Fragment) {
         if (fragment != null) {
             val transaction = supportFragmentManager.beginTransaction()
             transaction.replace(R.id.fragment_container, fragment)

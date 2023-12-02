@@ -2,14 +2,12 @@
 <androidx.swiperefreshlayout.widget.SwipeRefreshLayout
     xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
     android:id="@+id/swipeRefreshLayout"
     android:layout_width="match_parent"
     android:layout_height="match_parent">
 
     <ScrollView
-        xmlns:android="http://schemas.android.com/apk/res/android"
-        xmlns:app="http://schemas.android.com/apk/res-auto"
-        xmlns:tools="http://schemas.android.com/tools"
         android:id="@+id/container"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
@@ -31,8 +29,9 @@
 
                 <ImageButton
                     android:id="@+id/scanQRButton"
-                    android:layout_width="wrap_content"
+                    android:layout_width="match_parent"
                     android:layout_height="match_parent"
+                    android:layout_weight="1"
                     android:src="@drawable/ic_baseline_qr_code_scanner_24"
                     android:contentDescription="Icon Button"
                     android:background="?android:attr/selectableItemBackground"
@@ -42,18 +41,31 @@
                 <TextView
                     android:id="@+id/textViewSignUp"
                     android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
+                    android:layout_height="match_parent"
                     android:textAlignment="center"
                     android:text="HIVE!"
                     android:textSize="30sp"
                     android:textStyle="bold"
-                    android:layout_marginRight="20sp"
+                    android:layout_weight="1"
                     android:textColor="@android:color/black"
                     app:layout_constraintTop_toBottomOf="@+id/imageView"
-                    app:layout_constraintStart_toStartOf="parent"
-                    app:layout_constraintEnd_toEndOf="parent" />
+                    app:layout_constraintStart_toEndOf="@+id/scanQRButton"
+                    app:layout_constraintEnd_toStartOf="@+id/spinnerFilterCategory" />
+
+                <Spinner
+                    android:id="@+id/spinnerFilterCategory"
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:layout_weight="1"
+                    android:entries="@array/filterEventsByCategory"
+                    android:prompt="@string/filter_by_category"
+                    android:spinnerMode="dialog"
+                    app:layout_constraintEnd_toEndOf="parent"
+                    app:layout_constraintStart_toEndOf="@+id/textViewSignUp"
+                    app:layout_constraintTop_toBottomOf="@+id/textViewSignUp" />
 
             </LinearLayout>
+
 
             <ProgressBar
                 android:id="@+id/loadingProgressBar"
@@ -76,6 +88,23 @@
                 app:layout_constraintTop_toBottomOf="@id/loadingProgressBar"
                 android:paddingTop="0dp"
                 android:paddingBottom="16dp" />
+
+            <TextView
+                android:id="@+id/noEventsTextView"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="@string/no_events_category"
+                android:textColor="@android:color/black"
+                android:textSize="18sp"
+                android:textStyle="bold"
+                android:layout_gravity="center"
+                android:gravity="center"
+                android:visibility="gone"
+                android:layout_marginTop="8dp"
+                app:layout_constraintTop_toBottomOf="@+id/loadingProgressBar"
+                app:layout_constraintBottom_toBottomOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintEnd_toEndOf="parent" />
         </androidx.constraintlayout.widget.ConstraintLayout>
     </ScrollView>
 </androidx.swiperefreshlayout.widget.SwipeRefreshLayout>

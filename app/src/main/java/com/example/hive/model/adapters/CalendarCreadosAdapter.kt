@@ -17,7 +17,8 @@ import com.example.hive.model.network.responses.EventDetailResponse
 import com.example.hive.model.network.responses.EventResponse
 import com.example.hive.util.ConnectionLiveData
 import com.example.hive.util.Resource
-import com.example.hive.viewmodel.AddParticipatEventViewModel
+import com.example.hive.view.EventEditFragment
+import com.example.hive.view.MainActivity
 import com.example.hive.viewmodel.EventDetailViewModel
 import com.google.zxing.BarcodeFormat
 import com.google.zxing.EncodeHintType
@@ -87,7 +88,7 @@ class CalendarCreadosAdapter(private val lifecycleOwner: LifecycleOwner,
 
                     eventDetailViewModel.getEventByIdVM(event.id)
 
-                    detailDialog.setContentView(R.layout.fragment_event_detail_historical)
+                    detailDialog.setContentView(R.layout.fragment_event_detail_edit)
 
                     val dialogLinearLayout =
                         detailDialog.findViewById<LinearLayout>(R.id.layoutCardHistorical)
@@ -124,6 +125,7 @@ class CalendarCreadosAdapter(private val lifecycleOwner: LifecycleOwner,
                     val eventLinksInteresesTextView =
                         detailDialog.findViewById<TextView>(R.id.linksInteres_historical)
                     val eventImageView = detailDialog.findViewById<ImageView>(R.id.imagen_historical)
+                    val buttonEditEvent = detailDialog.findViewById<Button>(R.id.submitButton)
 
                     eventDetailViewModel.eventById.observe(lifecycleOwner, Observer { resource ->
                         when (resource) {
@@ -147,6 +149,7 @@ class CalendarCreadosAdapter(private val lifecycleOwner: LifecycleOwner,
                                     detailDialog.findViewById<LinearLayout>(R.id.layoutCardHistorical)
                                 val dialogProgressBar =
                                     detailDialog.findViewById<ProgressBar>(R.id.loadingProgressCalendarHist)
+                                val contextToUse = holder.itemView.context
 
                                 dialogProgressBar.visibility = View.GONE
                                 dialogLinearLayout.visibility = View.VISIBLE
@@ -161,6 +164,13 @@ class CalendarCreadosAdapter(private val lifecycleOwner: LifecycleOwner,
                                 } else {
                                     eventEstadoTextView.text =
                                         holder.itemView.context.getString(R.string.event_state_inactivo)
+                                }
+
+                                buttonEditEvent?.setOnClickListener {
+                                    val activity = contextToUse as MainActivity
+                                    val fragment = EventEditFragment(eventIDTextView, eventNameTextView, eventCategoryTextView, eventDateTextView, eventDuracionTextView, eventDescriptionTextView, eventLugarTextView, eventParticipantTextView)
+                                    activity.replaceFragment(fragment)
+                                    detailDialog.dismiss()
                                 }
 
                                 eventIDTextView.text = eventDetailResponse.id
@@ -213,7 +223,6 @@ class CalendarCreadosAdapter(private val lifecycleOwner: LifecycleOwner,
                                         eventImageView.setImageResource(R.drawable.ic_baseline_calendar_day)
                                     }
                                 }
-
                             }
                             is Resource.Error<*> -> {
                                 // Handle error state (e.g., show an error message)
