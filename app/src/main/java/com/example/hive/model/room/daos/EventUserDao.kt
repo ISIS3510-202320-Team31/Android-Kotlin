@@ -20,6 +20,6 @@ interface EventUserDao {
     @Insert(onConflict = OnConflictStrategy.REPLACE)
     suspend fun insert(event: EventUser)
 
-    @Query("DELETE FROM event_historical")
+    @Query("DELETE FROM event_user")
     suspend fun deleteAll()
 }

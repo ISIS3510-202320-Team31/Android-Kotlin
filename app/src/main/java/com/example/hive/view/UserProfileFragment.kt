@@ -3,9 +3,11 @@ package com.example.hive.view
 import android.content.Intent
 import android.os.Bundle
 import android.view.LayoutInflater
+import android.view.MotionEvent
 import android.view.View
 import android.view.ViewGroup
 import android.widget.Button
+import android.widget.ImageView
 import android.widget.ProgressBar
 import android.widget.TextView
 import android.widget.Toast
@@ -35,6 +37,8 @@ class UserProfileFragment : Fragment() {
     private lateinit var user: UserSession
     private lateinit var connectionLiveData: ConnectionLiveData
     private lateinit var viewModelEventListOffline: EventListOfflineViewModel
+    private lateinit var beeView: BeeView
+    private var isBeeOnScreen: Boolean = false
 
     private var userParticipation: String = "0"
     private lateinit var userCache: UserCacheResponse
@@ -47,8 +51,8 @@ class UserProfileFragment : Fragment() {
         val loadingProgressBar = view?.findViewById<ProgressBar>(R.id.loadingProgressBarProfile)
         loadingProgressBar?.visibility = View.INVISIBLE
 
-        val userSession = SessionManager(requireContext())
-        user = userSession.getUserSession()
+        sessionManager = SessionManager(requireContext())
+        user = sessionManager.getUserSession()
 
         val viewModelFactoryOffline = context?.let{
             UserProfileOfflineViewModelProviderFactory(
@@ -131,22 +135,46 @@ class UserProfileFragment : Fragment() {
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
+
+        beeView = view.findViewById(R.id.beeViewProfile)
+
         val loadingProgressBar = view?.findViewById<ProgressBar>(R.id.loadingProgressBarProfile)
         connectionLiveData = ConnectionLiveData(requireContext())
         val swipeRefreshLayout: SwipeRefreshLayout = view?.findViewById(R.id.swipeRefreshLayoutProfile)!!
+
+        val customScrollView: CustomScrollView = view.findViewById(R.id.nestedView)
+
         swipeRefreshLayout.isEnabled = false
         swipeRefreshLayout.isRefreshing = false
+
+        val imageViewClickable = view?.findViewById<ImageView>(R.id.iconImageView)
+
+        imageViewClickable?.setOnClickListener {
+            if (isBeeOnScreen){
+                beeView.visibility = View.GONE
+                isBeeOnScreen = false
+                swipeRefreshLayout.isEnabled = true
+                customScrollView.setScrollingEnabled(true)
+                Toast.makeText(context, "Adios abejita!", Toast.LENGTH_SHORT).show()
+            }else{
+                beeView.visibility = View.VISIBLE
+                isBeeOnScreen = true
+                swipeRefreshLayout.isEnabled = false
+                customScrollView.setScrollingEnabled(false)
+                Toast.makeText(context, "Hola abejita!", Toast.LENGTH_SHORT).show()
+            }
+        }
 
         elapsedTimeTextView = view?.findViewById<TextView>(R.id.timeSpent)!!
 
         connectionLiveData.observe(viewLifecycleOwner, Observer { isConnected ->
             if (isConnected){
-                swipeRefreshLayout.isEnabled = true
+
+                swipeRefreshLayout.isEnabled = !isBeeOnScreen
 
                 swipeRefreshLayout.setOnRefreshListener {
                     refreshFragment(swipeRefreshLayout)
                 }
-                sessionManager = SessionManager(requireContext())
                 val viewModelFactory = sessionManager?.let{ UserProfileViewModelProviderFactory(it,requireContext()) }
                 viewModel = ViewModelProvider(this, viewModelFactory!!).get(UserProfileViewModel::class.java)
 
@@ -279,12 +307,17 @@ class UserProfileFragment : Fragment() {
                 val buttonSignOut = view?.findViewById<Button>(R.id.signOutButton)
 
                 buttonSignOut?.setOnClickListener {
-                    sessionManager = SessionManager(requireContext())
-                    sessionManager.clearSession()
+                    val userSession = UserSession("", "")
+                    sessionManager.saveUserSession(userSession)
+                    sessionManager.saveNotification(false)
+                    sessionManager.saveElapsedTime(0)
                     viewModelUserProfileOffline.removeUserDatabase()
                     viewModelUserProfileOffline.removeCategoryDatabase()
                     viewModelUserProfileOffline.removeTopPartnersDatabase()
+                    viewModelEventListOffline.removeEventCreadosDatabase()
                     viewModelEventListOffline.removeEventDatabase()
+                    viewModelEventListOffline.removeEventActivitiesDatabase()
+                    viewModelEventListOffline.removeEventHistoricalDatabase()
                     val intent = Intent(requireContext(), LoginActivity::class.java)
                     intent.flags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TASK // Clear the back stack
                     startActivity(intent)
