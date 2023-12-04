@@ -1,11 +1,9 @@
 package com.example.hive.viewmodel
 
 import android.content.Context
-import android.widget.Toast
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.example.hive.R
 import com.example.hive.model.network.responses.EventDetailResponse
 import com.example.hive.model.repository.EventRepository
 import com.example.hive.util.Resource

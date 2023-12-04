@@ -1,6 +1,6 @@
 package com.example.hive.view
 
-import PartnerNamesAdapter
+import com.example.hive.model.adapters.PartnerNamesAdapter
 import android.graphics.Color
 import android.os.Bundle
 import android.view.LayoutInflater

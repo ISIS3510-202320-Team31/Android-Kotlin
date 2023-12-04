@@ -8,7 +8,6 @@ import com.example.hive.model.network.requests.RegisterRequest
 import com.example.hive.model.room.HiveDatabase
 import com.example.hive.model.room.entities.CategoryChart
 import com.example.hive.model.room.entities.TopPartners
-import com.example.hive.model.room.entities.Event
 import com.example.hive.model.room.entities.TopCreators
 import com.example.hive.model.room.entities.User
 import kotlinx.coroutines.flow.Flow

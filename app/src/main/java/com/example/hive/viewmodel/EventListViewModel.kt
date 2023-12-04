@@ -1,13 +1,10 @@
 package com.example.hive.viewmodel
 
 import android.content.Context
-import android.widget.Toast
 import androidx.lifecycle.*
-import com.example.hive.R
 import com.example.hive.model.models.UserSession
 import com.example.hive.model.network.responses.EventResponse
 import com.example.hive.model.repository.EventRepository
-import com.example.hive.model.room.entities.Event
 import com.example.hive.util.Resource
 import kotlinx.coroutines.launch
 import retrofit2.Response
