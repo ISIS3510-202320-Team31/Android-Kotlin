@@ -1,44 +1,23 @@
 package com.example.hive.view
 
-import android.app.Dialog
-import android.content.Context
-import android.content.Intent
-import android.graphics.Bitmap
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.*
-import androidx.appcompat.app.AppCompatActivity
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProvider
-import androidx.lifecycle.lifecycleScope
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import androidx.swiperefreshlayout.widget.SwipeRefreshLayout
 import com.example.hive.R
-import com.example.hive.model.adapters.EventsAdapter
-import com.example.hive.model.adapters.SessionManager
 import com.example.hive.model.adapters.TopCreatorsAdapter
-import com.example.hive.model.models.UserSession
-import com.example.hive.model.network.responses.EventResponse
 import com.example.hive.model.network.responses.TopCreatorsResponse
-import com.example.hive.model.repository.EventRepository
-import com.example.hive.model.room.entities.Event
 import com.example.hive.model.room.entities.TopCreators
 import com.example.hive.util.ConnectionLiveData
 import com.example.hive.util.Resource
 import com.example.hive.viewmodel.*
-import com.google.zxing.BarcodeFormat
-import com.google.zxing.EncodeHintType
-import com.google.zxing.integration.android.IntentIntegrator
-import com.google.zxing.qrcode.QRCodeWriter
-import com.google.zxing.qrcode.decoder.ErrorCorrectionLevel
-import com.squareup.picasso.Picasso
-import kotlinx.coroutines.launch
-import java.text.SimpleDateFormat
-import java.util.*
 
 class TopCreatorsFragment : Fragment() {
 

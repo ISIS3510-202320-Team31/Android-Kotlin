@@ -5,8 +5,6 @@ import android.graphics.Bitmap
 import android.graphics.BitmapFactory
 import android.graphics.Canvas
 import android.util.AttributeSet
-import android.util.Log
-import android.view.GestureDetector
 import android.view.MotionEvent
 import android.view.View
 import com.example.hive.R
