@@ -32,9 +32,6 @@ import java.text.SimpleDateFormat
 import java.util.*
 
 class CalendarHistoricalFragment : Fragment() {
-    companion object {
-        fun newInstance() = CalendarActivitiesFragment()
-    }
 
     private lateinit var sessionManager: SessionManager
     private lateinit var viewModel: CalendarViewModel

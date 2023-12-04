@@ -25,10 +25,6 @@ import com.example.hive.viewmodel.*
 
 class UserProfileFragment : Fragment() {
 
-    companion object {
-        fun newInstance() = UserProfileFragment()
-    }
-
     private lateinit var viewModel: UserProfileViewModel
     private lateinit var sessionManager: SessionManager
     private lateinit var elapsedTimeTextView: TextView

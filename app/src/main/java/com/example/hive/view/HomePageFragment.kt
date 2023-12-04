@@ -35,10 +35,6 @@ import java.util.*
 
 class HomePageFragment : Fragment() {
 
-    companion object {
-        fun newInstance() = HomePageFragment()
-    }
-
     private lateinit var viewModel: HomePageViewModel
     private lateinit var viewModelEvent: EventListViewModel
     private var eventsAdapter: WeakReference<EventsAdapter>? = null
