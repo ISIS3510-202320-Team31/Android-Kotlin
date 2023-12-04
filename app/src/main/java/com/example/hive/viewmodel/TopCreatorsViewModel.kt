@@ -4,7 +4,6 @@ import android.content.Context
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.example.hive.model.network.responses.EventResponse
 import com.example.hive.model.network.responses.TopCreatorsResponse
 import com.example.hive.model.repository.UserRepository
 import com.example.hive.util.Resource

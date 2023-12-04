@@ -8,7 +8,6 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.*
-import androidx.core.content.ContentProviderCompat.requireContext
 import androidx.lifecycle.LifecycleOwner
 import androidx.lifecycle.Observer
 import androidx.recyclerview.widget.AsyncListDiffer
@@ -17,7 +16,6 @@ import androidx.recyclerview.widget.RecyclerView
 import com.example.hive.R
 import com.example.hive.model.network.responses.EventDetailResponse
 import com.example.hive.model.network.responses.EventResponse
-import com.example.hive.model.repository.EventRepository
 import com.example.hive.util.ConnectionLiveData
 import com.example.hive.util.Resource
 import com.example.hive.viewmodel.AddParticipatEventViewModel

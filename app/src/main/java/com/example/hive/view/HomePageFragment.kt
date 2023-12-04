@@ -29,18 +29,15 @@ import com.google.zxing.integration.android.IntentIntegrator
 import com.google.zxing.qrcode.QRCodeWriter
 import com.google.zxing.qrcode.decoder.ErrorCorrectionLevel
 import com.squareup.picasso.Picasso
+import java.lang.ref.WeakReference
 import java.text.SimpleDateFormat
 import java.util.*
 
 class HomePageFragment : Fragment() {
 
-    companion object {
-        fun newInstance() = HomePageFragment()
-    }
-
     private lateinit var viewModel: HomePageViewModel
     private lateinit var viewModelEvent: EventListViewModel
-    private lateinit var eventsAdapter: EventsAdapter
+    private var eventsAdapter: WeakReference<EventsAdapter>? = null
     private lateinit var viewModelEventDetail: EventDetailViewModel
     private lateinit var viewModelAddParticipant: AddParticipatEventViewModel
     private lateinit var viewModelEventListOffline: EventListOfflineViewModel
@@ -82,13 +79,11 @@ class HomePageFragment : Fragment() {
 
         // Set up RecyclerView
         val recyclerView = view.findViewById<RecyclerView>(R.id.recyclerView)
-        eventsAdapter = context?.let {
-            EventsAdapter(viewModelAddParticipant, this, userSession,
-                it
-            )
-        }!!
+        eventsAdapter = WeakReference(context?.let {
+            EventsAdapter(viewModelAddParticipant, this, userSession, it)
+        })
         recyclerView.layoutManager = LinearLayoutManager(requireContext())
-        recyclerView.adapter = eventsAdapter
+        recyclerView.adapter = eventsAdapter?.get()
 
         // Set up ViewModel
         val viewModelFactoryOffline = context?.let {
@@ -144,6 +139,7 @@ class HomePageFragment : Fragment() {
                         list.add(eventToAdd)
                     }
 
+                    eventsAdapter?.get()?.submitList(list)
 
                     spinnerFilterCategory?.onItemSelectedListener = object : AdapterView.OnItemSelectedListener {
                         override fun onItemSelected(parent: AdapterView<*>?, view: View?, position: Int, id: Long) {
@@ -221,6 +217,8 @@ class HomePageFragment : Fragment() {
                                     eventDate.time = date
                                     eventDate.get(Calendar.DAY_OF_YEAR) >= today.get(Calendar.DAY_OF_YEAR)
                                 }
+
+                                eventsAdapter?.get()?.submitList(filteredList)
 
                                 spinnerFilterCategory?.onItemSelectedListener = object : AdapterView.OnItemSelectedListener {
                                     override fun onItemSelected(parent: AdapterView<*>?, view: View?, position: Int, id: Long) {
@@ -559,14 +557,14 @@ class HomePageFragment : Fragment() {
         val noEventsTextView = view?.findViewById<TextView>(R.id.noEventsTextView)
 
         if (filteredList.isEmpty()) {
-            eventsAdapter.submitList(filteredList)
+            eventsAdapter?.get()?.submitList(filteredList)
             // Si no hay eventos de esa categoría, muestra un mensaje
             noEventsTextView?.visibility = View.VISIBLE
             noEventsTextView?.text = getString(R.string.no_events_category)
 
         } else {
             noEventsTextView?.visibility = View.GONE
-            eventsAdapter.submitList(filteredList)
+            eventsAdapter?.get()?.submitList(filteredList)
         }
     }
 

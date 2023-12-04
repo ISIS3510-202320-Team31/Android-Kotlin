@@ -18,7 +18,6 @@ import com.example.hive.model.adapters.CalendarHistoricalAdapter
 import com.example.hive.model.adapters.SessionManager
 import com.example.hive.model.models.UserSession
 import com.example.hive.model.network.responses.EventResponse
-import com.example.hive.model.room.entities.EventActivities
 import com.example.hive.model.room.entities.EventHistorical
 import com.example.hive.util.ConnectionLiveData
 import com.example.hive.util.Resource
@@ -33,9 +32,6 @@ import java.text.SimpleDateFormat
 import java.util.*
 
 class CalendarHistoricalFragment : Fragment() {
-    companion object {
-        fun newInstance() = CalendarActivitiesFragment()
-    }
 
     private lateinit var sessionManager: SessionManager
     private lateinit var viewModel: CalendarViewModel

@@ -34,10 +34,6 @@ import java.util.*
 
 class CalendarActivitiesFragment : Fragment() {
 
-    companion object {
-        fun newInstance() = CalendarActivitiesFragment()
-    }
-
     private lateinit var sessionManager: SessionManager
     private lateinit var viewModel: CalendarViewModel
     private lateinit var viewModelCalendar: CalendarListViewModel

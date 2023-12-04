@@ -3,7 +3,6 @@ package com.example.hive.view
 import android.content.Intent
 import android.os.Bundle
 import android.view.LayoutInflater
-import android.view.MotionEvent
 import android.view.View
 import android.view.ViewGroup
 import android.widget.Button
@@ -25,10 +24,6 @@ import com.example.hive.util.Resource
 import com.example.hive.viewmodel.*
 
 class UserProfileFragment : Fragment() {
-
-    companion object {
-        fun newInstance() = UserProfileFragment()
-    }
 
     private lateinit var viewModel: UserProfileViewModel
     private lateinit var sessionManager: SessionManager

@@ -7,7 +7,6 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.hive.model.adapters.SessionManager
 import com.example.hive.model.network.responses.CategoryResponse
-import com.example.hive.model.network.responses.TopPartnersResponse
 import com.example.hive.model.network.responses.UserParticipationResponse
 import com.example.hive.model.network.responses.UserResponse
 import com.example.hive.model.repository.UserRepository

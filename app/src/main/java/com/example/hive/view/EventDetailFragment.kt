@@ -15,10 +15,6 @@ import com.example.hive.viewmodel.EventDetailViewModel
 
 class EventDetailFragment : Fragment() {
 
-    companion object {
-        fun newInstance() = EventDetailFragment()
-    }
-
     private lateinit var viewModel: EventDetailViewModel
     private lateinit var viewModelAddParticipant: AddParticipatEventViewModel
     private lateinit var sessionManager: SessionManager

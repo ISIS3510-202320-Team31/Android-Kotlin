@@ -6,7 +6,6 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.asLiveData
 import androidx.lifecycle.viewModelScope
 import com.example.hive.model.repository.UserRepository
-import com.example.hive.model.room.daos.TopPartnersDao
 import com.example.hive.model.room.entities.CategoryChart
 import com.example.hive.model.room.entities.TopPartners
 import com.example.hive.model.room.entities.User
