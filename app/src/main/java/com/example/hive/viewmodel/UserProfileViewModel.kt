@@ -6,6 +6,7 @@ import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.hive.model.adapters.SessionManager
+import com.example.hive.model.network.responses.CategoryResponse
 import com.example.hive.model.network.responses.UserParticipationResponse
 import com.example.hive.model.network.responses.UserResponse
 import com.example.hive.model.repository.UserRepository
@@ -21,6 +22,12 @@ class UserProfileViewModel(private val sessionManager: SessionManager, private v
     //User Detail
     val userDetail: MutableLiveData<Resource<UserResponse>> = MutableLiveData()
 
+    //Category Chart
+    val categoryChart: MutableLiveData<Resource<List<CategoryResponse>>> = MutableLiveData()
+
+    //Top Partners
+    val topPartners: MutableLiveData<Resource<List<String>>> = MutableLiveData()
+
     //LiveData for time usage
     private val _elapsedTimeLiveData = MutableLiveData<Long>()
     val elapsedTimeLiveData: LiveData<Long> = _elapsedTimeLiveData
@@ -30,7 +37,33 @@ class UserProfileViewModel(private val sessionManager: SessionManager, private v
     init{
         getUserDetailVM()
         getUserParticipationVM()
+        getCategoryChartVM()
+        getTopPartnersVM()
         _elapsedTimeLiveData.value = sessionManager.getElapsedTime()
+    }
+
+    private fun getTopPartnersVM() = viewModelScope.launch {
+        try {
+            topPartners.postValue(Resource.Loading())
+            val response = sessionManager.getUserSession().userId?.let { repository.getTopPartnersR(it) }
+            topPartners.postValue(response?.let { handleResponseTopPartners(it) })
+        }
+        catch (e: Exception) {
+            //Toast.makeText(context, context.getString(R.string.error_internet), Toast.LENGTH_LONG).show()
+            e.printStackTrace()
+        }
+    }
+
+    private fun getCategoryChartVM() = viewModelScope.launch {
+        try {
+            categoryChart.postValue(Resource.Loading())
+            val response = sessionManager.getUserSession().userId?.let { repository.getCategoriesR(it) }
+            categoryChart.postValue(response?.let { handleResponseCategoryChart(it) })
+        }
+        catch (e: Exception) {
+            //Toast.makeText(context, context.getString(R.string.error_internet), Toast.LENGTH_LONG).show()
+            e.printStackTrace()
+        }
     }
 
     fun getUserParticipationVM() = viewModelScope.launch {
@@ -47,6 +80,19 @@ class UserProfileViewModel(private val sessionManager: SessionManager, private v
 
     fun updateElapsedTime(){
         _elapsedTimeLiveData.value = sessionManager.getElapsedTime()
+    }
+
+    private fun handleResponseTopPartners(response: List<String>): Resource<List<String>> {
+        return Resource.Success(response)
+    }
+
+    private fun handleResponseCategoryChart(response: Response<List<CategoryResponse>>): Resource<List<CategoryResponse>> {
+        if (response.isSuccessful) {
+            response.body()?.let { resultResponse ->
+                return Resource.Success(resultResponse)
+            }
+        }
+        return Resource.Error(response.message())
     }
 
     private fun handleResponseParticipation(response: Response<UserParticipationResponse>): Resource<UserParticipationResponse> {

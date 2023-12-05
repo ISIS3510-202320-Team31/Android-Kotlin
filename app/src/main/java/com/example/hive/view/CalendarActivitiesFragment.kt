@@ -1,5 +1,6 @@
 package com.example.hive.view
 
+import android.annotation.SuppressLint
 import android.app.Dialog
 import android.content.Intent
 import android.graphics.Bitmap
@@ -33,10 +34,6 @@ import java.util.*
 
 class CalendarActivitiesFragment : Fragment() {
 
-    companion object {
-        fun newInstance() = CalendarActivitiesFragment()
-    }
-
     private lateinit var sessionManager: SessionManager
     private lateinit var viewModel: CalendarViewModel
     private lateinit var viewModelCalendar: CalendarListViewModel
@@ -46,7 +43,9 @@ class CalendarActivitiesFragment : Fragment() {
     private lateinit var viewModelEventDetail: EventDetailViewModel
     private lateinit var connectionLiveData: ConnectionLiveData
     private lateinit var user: UserSession
+    private var numberOfEvents: Int = 0
 
+    @SuppressLint("SetTextI18n")
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?
@@ -131,6 +130,14 @@ class CalendarActivitiesFragment : Fragment() {
                 }
 
                 calendarActivitiesAdapter.submitList(list)
+
+                // Update the number of events
+                numberOfEvents = list.size
+
+                // Show the number of events
+                val numberOfEventsTextView =
+                    view.findViewById<TextView>(R.id.numberOfEventsTextView)
+                numberOfEventsTextView.text = getString(R.string.number_of_events) +" "+ numberOfEvents.toString()
             }
         })
         return view

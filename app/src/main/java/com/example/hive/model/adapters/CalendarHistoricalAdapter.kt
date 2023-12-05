@@ -17,7 +17,6 @@ import com.example.hive.model.network.responses.EventDetailResponse
 import com.example.hive.model.network.responses.EventResponse
 import com.example.hive.util.ConnectionLiveData
 import com.example.hive.util.Resource
-import com.example.hive.viewmodel.AddParticipatEventViewModel
 import com.example.hive.viewmodel.EventDetailViewModel
 import com.google.zxing.BarcodeFormat
 import com.google.zxing.EncodeHintType

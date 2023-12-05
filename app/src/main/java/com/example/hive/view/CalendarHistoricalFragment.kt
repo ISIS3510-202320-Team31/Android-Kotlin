@@ -18,7 +18,6 @@ import com.example.hive.model.adapters.CalendarHistoricalAdapter
 import com.example.hive.model.adapters.SessionManager
 import com.example.hive.model.models.UserSession
 import com.example.hive.model.network.responses.EventResponse
-import com.example.hive.model.room.entities.EventActivities
 import com.example.hive.model.room.entities.EventHistorical
 import com.example.hive.util.ConnectionLiveData
 import com.example.hive.util.Resource
@@ -33,9 +32,6 @@ import java.text.SimpleDateFormat
 import java.util.*
 
 class CalendarHistoricalFragment : Fragment() {
-    companion object {
-        fun newInstance() = CalendarActivitiesFragment()
-    }
 
     private lateinit var sessionManager: SessionManager
     private lateinit var viewModel: CalendarViewModel
@@ -46,6 +42,7 @@ class CalendarHistoricalFragment : Fragment() {
     private lateinit var viewModelEventDetail: EventDetailViewModel
     private lateinit var connectionLiveData: ConnectionLiveData
     private lateinit var user: UserSession
+    private var numberOfEvents: Int = 0
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
@@ -131,6 +128,14 @@ class CalendarHistoricalFragment : Fragment() {
                 }
 
                 calendarHistoricalAdapter.submitList(list)
+
+                // Update the number of events
+                numberOfEvents = list.size
+
+                // Show the number of events
+                val numberOfEventsTextView =
+                    view.findViewById<TextView>(R.id.numberOfEventsTextView)
+                numberOfEventsTextView.text = getString(R.string.number_of_events) +" "+ numberOfEvents.toString()
             }
         })
         return view

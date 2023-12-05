@@ -2,7 +2,6 @@ package com.example.hive.viewmodel
 
 import android.content.Context
 import androidx.lifecycle.*
-import com.example.hive.model.network.responses.EventResponse
 import com.example.hive.model.repository.EventRepository
 import com.example.hive.model.room.entities.Event
 import com.example.hive.model.room.entities.EventActivities

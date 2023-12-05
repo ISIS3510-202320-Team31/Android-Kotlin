@@ -2,12 +2,50 @@ package com.example.hive.model.adapters
 
 import android.content.Context
 import android.content.SharedPreferences
+import android.security.keystore.KeyGenParameterSpec
+import android.security.keystore.KeyProperties
+import androidx.security.crypto.EncryptedSharedPreferences
+import androidx.security.crypto.MasterKey
 import com.example.hive.model.models.UserSession
 
 class SessionManager(context: Context) {
-    private val sharedPreferences: SharedPreferences = context.getSharedPreferences("user_session", Context.MODE_PRIVATE)
-    private val sharedPreferencesDatabase: SharedPreferences = context.getSharedPreferences("database", Context.MODE_PRIVATE)
-    private val sharedPreferencesNotification: SharedPreferences = context.getSharedPreferences("notification", Context.MODE_PRIVATE)
+    private val masterKey: MasterKey = MasterKey.Builder(context)
+        .setKeyGenParameterSpec(
+            KeyGenParameterSpec.Builder(
+                MasterKey.DEFAULT_MASTER_KEY_ALIAS,
+                KeyProperties.PURPOSE_ENCRYPT or KeyProperties.PURPOSE_DECRYPT
+            )
+                .setKeySize(MasterKey.DEFAULT_AES_GCM_MASTER_KEY_SIZE)
+                .setBlockModes(KeyProperties.BLOCK_MODE_GCM)
+                .setEncryptionPaddings(KeyProperties.ENCRYPTION_PADDING_NONE)
+                .build()
+        )
+        .build()
+
+    // Create an EncryptedSharedPreferences instance
+    private val sharedPreferences: SharedPreferences = EncryptedSharedPreferences.create(
+        context,
+        "user_session",
+        masterKey,
+        EncryptedSharedPreferences.PrefKeyEncryptionScheme.AES256_SIV,
+        EncryptedSharedPreferences.PrefValueEncryptionScheme.AES256_GCM
+    )
+
+    private val sharedPreferencesDatabase: SharedPreferences = EncryptedSharedPreferences.create(
+        context,
+        "database",
+        masterKey,
+        EncryptedSharedPreferences.PrefKeyEncryptionScheme.AES256_SIV,
+        EncryptedSharedPreferences.PrefValueEncryptionScheme.AES256_GCM
+    )
+
+    private val sharedPreferencesNotification: SharedPreferences = EncryptedSharedPreferences.create(
+        context,
+        "notification",
+        masterKey,
+        EncryptedSharedPreferences.PrefKeyEncryptionScheme.AES256_SIV,
+        EncryptedSharedPreferences.PrefValueEncryptionScheme.AES256_GCM
+    )
 
     private val editor: SharedPreferences.Editor = sharedPreferences.edit()
 
@@ -54,6 +92,7 @@ class SessionManager(context: Context) {
     }
 
     fun clearSession() {
+        // Create a new editor with the current master key alias
         editor.clear().apply()
     }
 }
